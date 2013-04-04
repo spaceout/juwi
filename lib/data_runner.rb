@@ -61,19 +61,11 @@ class DataRunner
   end
 
   def self.get_series_from_ttdb(series_id)
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"))
-    rescue
-      puts "Invalid show XML from ttdb"
-    end
+    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"))
   end
   
   def self.get_episode_from_ttdb(episode_id)
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episode/#{episode_id}/en.xml"))
-    rescue
-      puts "Invalid episode XML from ttdb"
-    end
+    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"))
   end
 
   def self.import_new_show_from_xdb(showid)
@@ -205,13 +197,13 @@ class DataRunner
     print " "
     puts episode.jdb_season_number
     #setup episode data
-    jdb_episode_title = episode['EpisodeName'].first
-    jdb_season_number = episode['SeasonNumber'].first
-    jdb_episode_number = episode['EpisodeNumber'].first
-    ttdb_episode_id = episode['id'].first
-    ttdb_episode_overview = episode['Overview'].first
-    ttdb_last_updated = episode['lastupdated'].first
-    ttdb_series_id = episode['seriesid'].first
+    jdb_episode_title = ttdbdata['Episode'].first['EpisodeName'].first
+    jdb_season_number = ttdbdata['Episode'].first['SeasonNumber'].first
+    jdb_episode_number = ttdbdata['Episode'].first['EpisodeNumber'].first
+    ttdb_episode_id = ttdbdata['Episode'].first['id'].first
+    ttdb_episode_overview = ttdbdata['Episode'].first['Overview'].first
+    ttdb_last_updated = ttdbdata['Episode'].first['lastupdated'].first
+    ttdb_series_id = ttdbdata['Episode'].first['seriesid'].first
     #update episode data
     episode.update_attributes(
       :jdb_episode_title => jdb_episode_title,

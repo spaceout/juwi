@@ -89,10 +89,41 @@ task :updateData => :environment do
     end
   end
 
-  #update tvrage data for all current shows
-  DataRunner.update_tvrage_data
-
   #Reset last update time
   Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => updatedata["Time"].first)
   xbmcdb.disconnect
 end
+
+desc "This updates tvrage data"
+task :updateRageData => :environment do
+  require 'data_runner'
+  DataRunner.update_tvrage_data
+end
+
+desc "This will check for any changes to XDB that have to remove stuff from JDB"
+task :xdbvsjdb => :environment do
+  require 'data_runner'
+  require 'mysql'
+  require 'sequel'
+
+   xbmcdb = Sequel.connect(XBMCDB)
+   xdbtvshows = xbmcdb[:tvshow]
+   xdbepisodes = xbmcdb[:episode]
+   Tvshow.all.each do |tvshow|
+     if xdbtvshows.filter(:c12 => tvshow.jdb_ttdb_id).empty?
+       puts "deleting #{tvshow.jdb_show_title} from JDB"
+       tvshow.destroy
+     end
+   end
+  Episode.all.each do |episode|
+    next if episode.xdb_episode_id.nil?
+    if xdbepisodes.filter(:idEpisode => episode.xdb_episode_id).empty?
+      puts "clearing XDB info on #{episode.tvshow.jdb_show_title} - #{episode.jdb_season_number} #{episode.jdb_episode_number}"
+      episode.update_attributes(
+        :xdb_episode_id => nil,
+        :xdb_episode_location => nil
+        )
+    end
+  end
+end
+

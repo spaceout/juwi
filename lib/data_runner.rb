@@ -41,31 +41,65 @@ class DataRunner
   end
 
   def self.ttdb_xml_show_data(zipfile, insidefile)
-    somezip = Zip::ZipFile.open(zipfile)
-    data = XmlSimple.xml_in(somezip.file.read(insidefile))
+    data = nil
+    begin
+      somezip = Zip::ZipFile.open(zipfile)
+      data = XmlSimple.xml_in(somezip.file.read(insidefile))
+    rescue
+      puts "Something happened getting XML data from TTDB ZIP file"
+    end
     return data
   end
 
   def self.get_zip_from_ttdb(tvdbid)
-    download_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{tvdbid}/all/en.zip", "/home/jemily/juwi/ttdbdata/#{tvdbid}.zip")
+    begin
+      download_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{tvdbid}/all/en.zip", "/home/jemily/juwi/ttdbdata/#{tvdbid}.zip")
+    rescue
+      puts "Something happened downloading ZIP from TTDB"
+    end
   end
 
   def self.get_time_from_ttdb
-    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=none"))
-    return data["Time"].first
+    data = nil
+    begin
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=none"))
+    rescue
+      puts "Something happened getting time from TTDB"
+    end
+    unless data.nil?
+      return data["Time"].first
+    end
+    return nil
   end
 
   def self.get_updates_from_ttdb(lastupdate)
-    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"))
+    data = nil
+    begin
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"))
+    rescue
+      puts "Something happened getting update XML from TTDB"
+    end
     return data
   end
 
   def self.get_series_from_ttdb(series_id)
-    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"))
+    data = nil
+    begin
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"))
+    rescue
+      puts "Something happened getting series XML from TTDB"
+    end
+    return data
   end
   
   def self.get_episode_from_ttdb(episode_id)
-    data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"))
+    data = nil
+    begin
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"))
+    rescue
+      puts "Something happened getting episode XML from TTDB"
+    end
+    return data
   end
 
   def self.import_new_show_from_xdb(showid)
@@ -101,7 +135,6 @@ class DataRunner
     ttdb_poster = ttdbdata['Series'].first['poster'].first
     #Create show db entry
     puts "Creating Show " + jdb_show_title
-    puts "Show Status " + tvr_status
     currentShow = Tvshow.create(
       :xdb_show_location => xdb_show_location,
       :xdb_show_id => xdb_show_id,
@@ -195,7 +228,7 @@ class DataRunner
     print " - "
     print episode.jdb_season_number
     print " "
-    puts episode.jdb_season_number
+    puts episode.jdb_episode_number
     #setup episode data
     jdb_episode_title = ttdbdata['Episode'].first['EpisodeName'].first
     jdb_season_number = ttdbdata['Episode'].first['SeasonNumber'].first

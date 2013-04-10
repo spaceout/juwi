@@ -28,6 +28,7 @@ class DataRunner
   end
 
   def self.download_http_data(url, savelocation)
+    puts "Downloading: #{url}"
     curl = Curl::Easy.new
     curl.follow_location = true
     curl.url = url
@@ -101,7 +102,19 @@ class DataRunner
     end
     return data
   end
-
+#fix null values for:
+  #Show:
+    #ttdb_show_imdb_id
+    #banner
+    #fanart
+    #poster
+    #show rating
+    #show overview
+  #episode
+    #episode overview
+    #episode rating
+    #episode airdate
+    #episode title
   def self.import_new_show_from_xdb(showid)
     xbmcdb = Sequel.connect(XBMCDB)
     xdbtvshows = xbmcdb[:tvshow]
@@ -115,64 +128,101 @@ class DataRunner
     #Get TVRage data
     tvragedata = get_tvrage_data(ttdbdata['Series'].first['SeriesName'].first.to_s)
     #Setup all show data
-    jdb_ttdb_id = show[:c12]
+    ttdb_show_id = show[:c12]
     xdb_show_location = show[:c16]
     xdb_show_id = show[:idShow]
-    jdb_show_title = ttdbdata['Series'].first['SeriesName'].first
+    ttdb_show_title = ttdbdata['Series'].first['SeriesName'].first
     tvr_show_id = tvragedata['Show ID']
+    #Processing of tvrage next/latest episode
     tvr_latest_episode = tvragedata['Latest Episode']
-    tvr_latest_episode.force_encoding("utf-8") if tvr_latest_episode != nil
-    tvr_next_episode = tvragedata['Next Episode']
-    tvr_url = tvragedata['Show URL']
-    tvr_started = tvragedata['Started']
-    tvr_ended = tvragedata['Ended']
-    tvr_status = tvragedata['Status']
-    ttdb_imdb_id = ttdbdata['Series'].first['IMDB_ID'].first
-    ttdb_overview = ttdbdata['Series'].first['Overview'].first
-    ttdb_last_updated = ttdbdata['Series'].first['lastupdated'].first
-    ttdb_banner = ttdbdata['Series'].first['banner'].first
-    ttdb_fanart = ttdbdata['Series'].first['fanart'].first
-    ttdb_poster = ttdbdata['Series'].first['poster'].first
+      if tvr_latest_episode != nil
+        tvr_latest_episode.force_encoding("utf-8")
+        tvr_latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+        tvr_latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+        tvr_latest_episode_title = tvr_latest_episode.split("^")[1]
+        tvr_latest_episode_date = tvr_latest_episode.split("^")[2]
+      end
+      tvr_next_episode = tvragedata['Next Episode']
+      if tvr_next_episode != nil
+        tvr_latest_episode.force_encoding("utf-8")
+        tvr_next_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+        tvr_next_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+        tvr_next_episode_title = tvr_latest_episode.split("^")[1]
+        tvr_next_episode_date = tvr_latest_episode.split("^")[2]
+      end
+    tvr_show_url = tvragedata['Show URL']
+    tvr_show_started = tvragedata['Started']
+    tvr_show_ended = tvragedata['Ended']
+    tvr_show_status = tvragedata['Status']
+    ttdb_show_imdb_id = ttdbdata['Series'].first['IMDB_ID'].first
+    ttdb_show_overview = ttdbdata['Series'].first['Overview'].first
+    ttdb_show_last_updated = ttdbdata['Series'].first['lastupdated'].first
+    ttdb_show_banner = ttdbdata['Series'].first['banner'].first
+    ttdb_show_fanart = ttdbdata['Series'].first['fanart'].first
+    ttdb_show_poster = ttdbdata['Series'].first['poster'].first
+    ttdb_show_rating = nil
+    ttdb_show_rating = ttdbdata['Series'].first['Rating'].first unless ttdbdata['Series'].first['Rating'].first.empty?
+    ttdb_show_rating_count = ttdbdata['Series'].first['RatingCount'].first
+    ttdb_show_network = ttdbdata['Series'].first['Network'].first
+    ttdb_show_status = ttdbdata['Series'].first['Status'].first
+    ttdb_show_runtime = ttdbdata['Series'].first['Runtime'].first
     #Create show db entry
-    puts "Creating Show " + jdb_show_title
+    puts "Creating Show " + ttdb_show_title
     currentShow = Tvshow.create(
       :xdb_show_location => xdb_show_location,
       :xdb_show_id => xdb_show_id,
       :tvr_show_id => tvr_show_id,
-      :tvr_latest_episode => tvr_latest_episode,
-      :tvr_next_episode => tvr_next_episode,
-      :tvr_url => tvr_url,
-      :tvr_started => tvr_started,
-      :tvr_ended => tvr_ended,
-      :tvr_status => tvr_status,
-      :ttdb_imdb_id => ttdb_imdb_id,
-      :ttdb_last_updated => ttdb_last_updated,
-      :ttdb_banner => ttdb_banner,
-      :ttdb_fanart => ttdb_fanart,
-      :ttdb_poster => ttdb_poster,
-      :jdb_ttdb_id => jdb_ttdb_id,
-      :ttdb_overview => ttdb_overview,
-      :jdb_show_title => jdb_show_title
+      :tvr_latest_season_number => tvr_latest_season_number,
+      :tvr_latest_episode_number => tvr_latest_episode_number,
+      :tvr_latest_episode_title => tvr_latest_episode_title,
+      :tvr_latest_episode_date => tvr_latest_episode_date,
+      :tvr_next_season_number => tvr_next_season_number,
+      :tvr_next_episode_number => tvr_next_episode_number,
+      :tvr_next_episode_title => tvr_next_episode_title,
+      :tvr_next_episode_date => tvr_next_episode_date,
+      :tvr_show_url => tvr_show_url,
+      :tvr_show_started => tvr_show_started,
+      :tvr_show_ended => tvr_show_ended,
+      :tvr_show_status => tvr_show_status,
+      :ttdb_show_imdb_id => ttdb_show_imdb_id,
+      :ttdb_show_last_updated => ttdb_show_last_updated,
+      :ttdb_show_banner => ttdb_show_banner,
+      :ttdb_show_fanart => ttdb_show_fanart,
+      :ttdb_show_poster => ttdb_show_poster,
+      :ttdb_show_id => ttdb_show_id,
+      :ttdb_show_overview => ttdb_show_overview,
+      :ttdb_show_title => ttdb_show_title,
+      :ttdb_show_rating => ttdb_show_rating,
+      :ttdb_show_rating_count => ttdb_show_rating_count,
+      :ttdb_show_network => ttdb_show_network,
+      :ttdb_show_status => ttdb_show_status,
+      :ttdb_show_runtime => ttdb_show_runtime
       )
     ttdbdata['Episode'].each do |episode|
     #Setup episode data
-      jdb_episode_title = episode['EpisodeName'].first
-      jdb_season_number = episode['SeasonNumber'].first
-      jdb_episode_number = episode['EpisodeNumber'].first
+      ttdb_episode_title = episode['EpisodeName'].first
+      ttdb_season_number = episode['SeasonNumber'].first
+      ttdb_episode_number = episode['EpisodeNumber'].first
       ttdb_episode_id = episode['id'].first
       ttdb_episode_overview = episode['Overview'].first
-      ttdb_last_updated = episode['lastupdated'].first
-      ttdb_series_id = episode['seriesid'].first
+      ttdb_episode_last_updated = episode['lastupdated'].first
+      ttdb_show_id = episode['seriesid'].first
+      ttdb_episode_airdate = episode['FirstAired'].first
+      ttdb_episode_rating = episode['Rating'].first
+      ttdb_episode_rating_count = episode['RatingCount'].first
       #Create episode db entry
-      puts "  Creating Episode " + jdb_season_number + " " + jdb_episode_number
+      puts "  Creating Episode " + ttdb_season_number + " " + ttdb_episode_number
       currentShow.episodes.create(
-        :jdb_episode_title => jdb_episode_title,
-        :jdb_season_number => jdb_season_number,
-        :jdb_episode_number => jdb_episode_number,
+        :ttdb_episode_title => ttdb_episode_title,
+        :ttdb_season_number => ttdb_season_number,
+        :ttdb_episode_number => ttdb_episode_number,
         :ttdb_episode_id => ttdb_episode_id,
         :ttdb_episode_overview => ttdb_episode_overview,
-        :ttdb_last_updated => ttdb_last_updated,
-        :ttdb_series_id => ttdb_series_id,
+        :ttdb_episode_last_updated => ttdb_episode_last_updated,
+        :ttdb_show_id => ttdb_show_id,
+        :ttdb_episode_airdate => ttdb_episode_airdate,
+        :ttdb_episode_rating => ttdb_episode_rating,
+        :ttdb_episode_rating_count => ttdb_episode_rating_count,
         :xdb_show_id => xdb_show_id
         )
     end
@@ -186,8 +236,8 @@ class DataRunner
     puts "Syncing #{episode[:c00]}"
     jdbepisode = Episode.where(
       :xdb_show_id => episode[:idShow],
-      :jdb_season_number => episode[:c12],
-      :jdb_episode_number => episode[:c13]
+      :ttdb_season_number => episode[:c12],
+      :ttdb_episode_number => episode[:c13]
       ).first
     jdbepisode.update_attributes(
       :xdb_episode_id => episode[:idEpisode],
@@ -195,85 +245,121 @@ class DataRunner
       )
     xbmcdb.disconnect
   end
-  
+
   def self.update_ttdb_show_data(ttdbid)
-    puts "updating TTDB data for " + Tvshow.where(:jdb_ttdb_id => ttdbid).first.jdb_show_title
+    puts "updating TTDB data for " + Tvshow.where(:ttdb_show_id => ttdbid).first.ttdb_show_title
     ttdbdata = get_series_from_ttdb(ttdbid)
-    show = Tvshow.where(:jdb_ttdb_id => ttdbid).first
+    show = Tvshow.where(:ttdb_show_id => ttdbid).first
     #setup show data
-    jdb_show_title = ttdbdata['Series'].first['SeriesName'].first
-    ttdb_imdb_id = ttdbdata['Series'].first['IMDB_ID'].first
-    ttdb_overview = ttdbdata['Series'].first['Overview'].first
-    ttdb_last_updated = ttdbdata['Series'].first['lastupdated'].first
-    ttdb_banner = ttdbdata['Series'].first['banner'].first
-    ttdb_fanart = ttdbdata['Series'].first['fanart'].first
-    ttdb_poster = ttdbdata['Series'].first['poster'].first
+    ttdb_show_title = ttdbdata['Series'].first['SeriesName'].first
+    ttdb_show_imdb_id = ttdbdata['Series'].first['IMDB_ID'].first
+    ttdb_show_overview = ttdbdata['Series'].first['Overview'].first
+    ttdb_show_last_updated = ttdbdata['Series'].first['lastupdated'].first
+    ttdb_show_banner = ttdbdata['Series'].first['banner'].first
+    ttdb_show_fanart = ttdbdata['Series'].first['fanart'].first
+    ttdb_show_poster = ttdbdata['Series'].first['poster'].first
+    ttdb_show_rating = ttdbdata['Series'].first['Rating'].first
+    ttdb_show_rating_count = ttdbdata['Series'].first['RatingCount'].first
+    ttdb_show_network = ttdbdata['Series'].first['Network'].first
+    ttdb_show_status = ttdbdata['Series'].first['Status'].first
+    ttdb_show_runtime = ttdbdata['Series'].first['Runtime'].first
     #update show data
     show.update_attributes(
-      :ttdb_imdb_id => ttdb_imdb_id,
-      :ttdb_last_updated => ttdb_last_updated,
-      :ttdb_banner => ttdb_banner,
-      :ttdb_fanart => ttdb_fanart,
-      :ttdb_poster => ttdb_poster,
-      :ttdb_overview => ttdb_overview,
-      :jdb_show_title => jdb_show_title
+      :ttdb_show_imdb_id => ttdb_show_imdb_id,
+      :ttdb_show_last_updated => ttdb_show_last_updated,
+      :ttdb_show_banner => ttdb_show_banner,
+      :ttdb_show_fanart => ttdb_show_fanart,
+      :ttdb_show_poster => ttdb_show_poster,
+      :ttdb_show_overview => ttdb_show_overview,
+      :ttdb_show_title => ttdb_show_title,
+      :ttdb_show_rating => ttdb_show_rating,
+      :ttdb_show_rating_count => ttdb_show_rating_count,
+      :ttdb_show_network => ttdb_show_network,
+      :ttdb_show_status => ttdb_show_status,
+      :ttdb_show_runtime => ttdb_show_runtime
       )
   end
 
   def self.update_ttdb_episode_data(ttdbid)
     ttdbdata = get_episode_from_ttdb(ttdbid)
     episode = Episode.where(:ttdb_episode_id => ttdbid).first
-    print "Updating ttdb data for Episode: "
-    print episode.tvshow.jdb_show_title
+    print "Updating TTDB data for Episode: "
+    print episode.tvshow.ttdb_show_title
     print " - "
-    print episode.jdb_season_number
+    print episode.ttdb_season_number
     print " "
-    puts episode.jdb_episode_number
+    puts episode.ttdb_episode_number
     #setup episode data
-    jdb_episode_title = ttdbdata['Episode'].first['EpisodeName'].first
-    jdb_season_number = ttdbdata['Episode'].first['SeasonNumber'].first
-    jdb_episode_number = ttdbdata['Episode'].first['EpisodeNumber'].first
+    ttdb_episode_title = ttdbdata['Episode'].first['EpisodeName'].first
+    ttdb_season_number = ttdbdata['Episode'].first['SeasonNumber'].first
+    ttdb_episode_number = ttdbdata['Episode'].first['EpisodeNumber'].first
     ttdb_episode_id = ttdbdata['Episode'].first['id'].first
     ttdb_episode_overview = ttdbdata['Episode'].first['Overview'].first
-    ttdb_last_updated = ttdbdata['Episode'].first['lastupdated'].first
-    ttdb_series_id = ttdbdata['Episode'].first['seriesid'].first
+    ttdb_episode_last_updated = ttdbdata['Episode'].first['lastupdated'].first
+    ttdb_show_id = ttdbdata['Episode'].first['seriesid'].first
+    ttdb_episode_airdate = ttdbdata['Episode'].first['FirstAired'].first
+    ttdb_episode_rating = ttdbdata['Episode'].first['Rating'].first
+    ttdb_episode_rating_count = ttdbdata['Episode'].first['RatingCount'].first
     #update episode data
     episode.update_attributes(
-      :jdb_episode_title => jdb_episode_title,
-      :jdb_season_number => jdb_season_number,
-      :jdb_episode_number => jdb_episode_number,
+      :ttdb_episode_title =>ttdb_episode_title,
+      :ttdb_season_number => ttdb_season_number,
+      :ttdb_episode_number => ttdb_episode_number,
       :ttdb_episode_id => ttdb_episode_id,
       :ttdb_episode_overview => ttdb_episode_overview,
-      :ttdb_last_updated => ttdb_last_updated,
-      :ttdb_series_id => ttdb_series_id
+      :ttdb_episode_last_updated => ttdb_episode_last_updated,
+      :ttdb_show_id => ttdb_show_id,
+      :ttdb_episode_airdate => ttdb_episode_airdate,
+      :ttdb_episode_rating => ttdb_episode_rating,
+      :ttdb_episode_rating_count => ttdb_episode_rating_count
       )
   end
 
   def self.update_tvrage_data
     Tvshow.all.each do |tvshow|
-      next if tvshow.tvr_status == "Canceled/Ended"
-      next if tvshow.tvr_status == "Ended"
-      next if tvshow.tvr_status == "Canceled"
-      puts "Updating TVR for: " + tvshow.jdb_show_title
-      tvragedata = get_tvrage_data(tvshow.jdb_show_title)
+      next if tvshow.tvr_show_status == "Canceled/Ended"
+      next if tvshow.tvr_show_status == "Ended"
+      next if tvshow.tvr_show_status == "Canceled"
+      puts "Updating TVR for: " + tvshow.ttdb_show_title
+      tvragedata = get_tvrage_data(tvshow.ttdb_show_title)
       #prepare tvr data
       tvr_show_id = tvragedata['Show ID']
+      #Process latest/next tvrage episode info
       tvr_latest_episode = tvragedata['Latest Episode']
-      tvr_latest_episode.force_encoding("utf-8") if tvr_latest_episode != nil
+      if tvr_latest_episode != nil
+        tvr_latest_episode.force_encoding("utf-8")
+        tvr_latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+        tvr_latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+        tvr_latest_episode_title = tvr_latest_episode.split("^")[1]
+        tvr_latest_episode_date = tvr_latest_episode.split("^")[2]
+      end
       tvr_next_episode = tvragedata['Next Episode']
-      tvr_url = tvragedata['Show URL']
-      tvr_started = tvragedata['Started']
-      tvr_ended = tvragedata['Ended']
-      tvr_status = tvragedata['Status']
+      if tvr_next_episode != nul
+        tvr_next_episode.force_encoding("utf-8")
+        tvr_next_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+        tvr_next_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+        tvr_next_episode_title = tvr_latest_episode.split("^")[1]
+        tvr_next_episode_date = tvr_latest_episode.split("^")[2]
+      end
+      tvr_show_url = tvragedata['Show URL']
+      tvr_show_started = tvragedata['Started']
+      tvr_show_ended = tvragedata['Ended']
+      tvr_show_status = tvragedata['Status']
       #update tvr data
       tvshow.update_attributes(
         :tvr_show_id => tvr_show_id,
-        :tvr_latest_episode => tvr_latest_episode,
-        :tvr_next_episode => tvr_next_episode,
-        :tvr_url => tvr_url,
-        :tvr_started => tvr_started,
-        :tvr_ended => tvr_ended,
-        :tvr_status => tvr_status
+        :tvr_latest_season_number => tvr_latest_season_number,
+        :tvr_latest_episode_number => tvr_latest_episode_number,
+        :tvr_latest_episode_title => tvr_latest_episode_title,
+        :tvr_latest_episode_date => tvr_latest_episode_date,
+        :tvr_next_season_number => tvr_next_season_number,
+        :tvr_next_episode_number => tvr_next_episode_number,
+        :tvr_next_episode_title => tvr_next_episode_title,
+        :tvr_next_episode_date => tvr_next_episode_date,
+        :tvr_show_url => tvr_show_url,
+        :tvr_show_started => tvr_show_started,
+        :tvr_show_ended => tvr_show_ended,
+        :tvr_show_status => tvr_show_status
         )
     end
   end

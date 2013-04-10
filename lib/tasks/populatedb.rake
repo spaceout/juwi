@@ -1,5 +1,8 @@
 # encoding: utf-8
-
+# Create File when downloading cache and put last update time in there
+# Split data from tvr_latest_episode into all three columns
+# Split Data form tvr_next_episode into all three columns
+#
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 XBMCDB = 'mysql://xbmc:xbmc@192.168.1.8/MyVideos75'
 
@@ -14,7 +17,15 @@ task :importData => :environment do
   xdbtvshows = xbmcdb[:tvshow]
   xdbepisodes = xbmcdb[:episode]
   #set initial scrape time for ttdb
-  Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => DataRunner.get_time_from_ttdb)
+  ttdbtime = DataRunner.get_time_from_ttdb
+  #create file for cache ttdb time
+  if File.exist?("#{TTDBCACHE}updatetime")
+    oldcachetime = File.open("#{TTDBCACHE}updatetime", 'r') { |f| f.read }
+    Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => oldcachetime)
+  else
+    Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => ttdbtime)
+    File.open("#{TTDBCACHE}updatetime", 'w') {|f| f.write(ttdbtime) }
+  end
   #import every show
   xdbtvshows.each do |show|
     DataRunner.import_new_show_from_xdb(show[:idShow])
@@ -40,7 +51,7 @@ task :syncData => :environment do
   xbmcdb.disconnect
 end
 
-desc "This performs and update from xdb, thetvdb and tvrage"
+desc "This updates from xdb and ttdb"
 task :updateData => :environment do
   require 'sequel'
   require 'mysql'
@@ -61,32 +72,32 @@ task :updateData => :environment do
     Settings.where(:name => "last_xdb_show_id").first.update_attributes(:value => xdbtvshows.order(:idShow).last[:idShow])
   end
 
-  #Search for new XDB episodes
+  #Get updates from ttdb
+  updatedata = DataRunner.get_updates_from_ttdb(Settings.where(:name => "ttdb_last_scrape").first.value)
+
+  #Check if we have any of the shows in the ttdb update xml that are to be updated
+  unless updatedata["Series"].nil?
+    updatedata["Series"].each do |series|
+      next if Tvshow.where(:ttdb_show_id => series).empty?
+      DataRunner.update_ttdb_show_data(series)
+    end
+  end
+
+  #check if we have any episodes in the ttdb update xml that are to be updated
+  unless updatedata["Episode"].nil?
+    updatedata["Episode"].each do |episode|
+      next if Episode.where(:ttdb_episode_id => episode).empty?
+      DataRunner.update_ttdb_episode_data(episode)
+    end
+  end
+
+  #Search and sync newly added XDB episodes
   new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
   unless new_episodes.empty?
     new_episodes.each do |episode|
       DataRunner.sync_episode_data(episode[:idEpisode])
     end
     Settings.where(:name => "last_xdb_episode_id").first.update_attributes(:value => xdbepisodes.order(:idEpisode).last[:idEpisode])
-  end
-
-  #Get updates from ttdb
-  updatedata = DataRunner.get_updates_from_ttdb(Settings.where(:name => "ttdb_last_scrape").first.value)
-
-  #Check if we have any of the shows that are to be updated
-  unless updatedata["Series"].nil?
-    updatedata["Series"].each do |series|
-      next if Tvshow.where(:jdb_ttdb_id => series).empty?
-      DataRunner.update_ttdb_show_data(series)
-    end
-  end
-
-  #check if we have any episodes that are to be updated
-  unless updatedata["Episode"].nil?
-    updatedata["Episode"].each do |episode|
-      next if Episode.where(:ttdb_episode_id => episode).empty?
-      DataRunner.update_ttdb_episode_data(episode)
-    end
   end
 
   #Reset last update time
@@ -110,15 +121,15 @@ task :xdbvsjdb => :environment do
    xdbtvshows = xbmcdb[:tvshow]
    xdbepisodes = xbmcdb[:episode]
    Tvshow.all.each do |tvshow|
-     if xdbtvshows.filter(:c12 => tvshow.jdb_ttdb_id).empty?
-       puts "deleting #{tvshow.jdb_show_title} from JDB"
+     if xdbtvshows.filter(:c12 => tvshow.ttdb_show_id).empty?
+       puts "deleting #{tvshow.ttdb_show_title} from JDB"
        tvshow.destroy
      end
    end
   Episode.all.each do |episode|
     next if episode.xdb_episode_id.nil?
     if xdbepisodes.filter(:idEpisode => episode.xdb_episode_id).empty?
-      puts "clearing XDB info on #{episode.tvshow.jdb_show_title} - #{episode.jdb_season_number} #{episode.jdb_episode_number}"
+      puts "clearing XDB info on #{episode.tvshow.ttdb_show_title} - #{episode.ttdb_season_number} #{episode.ttdb_episode_number}"
       episode.update_attributes(
         :xdb_episode_id => nil,
         :xdb_episode_location => nil

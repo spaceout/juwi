@@ -14,19 +14,22 @@
 ActiveRecord::Schema.define(:version => 20130402162010) do
 
   create_table "episodes", :force => true do |t|
-    t.datetime "created_at",            :null => false
-    t.datetime "updated_at",            :null => false
     t.integer  "tvshow_id"
     t.integer  "xdb_episode_id"
     t.string   "xdb_episode_location"
     t.integer  "xdb_show_id"
-    t.string   "jdb_episode_title"
-    t.integer  "jdb_season_number"
-    t.integer  "jdb_episode_number"
+    t.string   "ttdb_episode_title"
+    t.integer  "ttdb_season_number"
+    t.integer  "ttdb_episode_number"
     t.integer  "ttdb_episode_id"
     t.text     "ttdb_episode_overview"
-    t.integer  "ttdb_last_updated"
-    t.integer  "ttdb_series_id"
+    t.integer  "ttdb_episode_last_updated"
+    t.integer  "ttdb_show_id"
+    t.date     "ttdb_episode_airdate"
+    t.string   "ttdb_episode_rating"
+    t.integer  "ttdb_episode_rating_count"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
   create_table "settings", :force => true do |t|
@@ -37,25 +40,36 @@ ActiveRecord::Schema.define(:version => 20130402162010) do
   end
 
   create_table "tvshows", :force => true do |t|
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
-    t.integer  "jdb_ttdb_id"
+    t.integer  "ttdb_show_id"
     t.string   "xdb_show_location"
     t.integer  "xdb_show_id"
-    t.string   "jdb_show_title"
+    t.string   "ttdb_show_title"
     t.integer  "tvr_show_id"
-    t.string   "tvr_latest_episode"
-    t.string   "tvr_next_episode"
-    t.string   "tvr_url"
-    t.string   "tvr_started"
-    t.string   "tvr_ended"
-    t.string   "tvr_status"
-    t.string   "ttdb_imdb_id"
-    t.text     "ttdb_overview"
-    t.integer  "ttdb_last_updated"
-    t.string   "ttdb_banner"
-    t.string   "ttdb_fanart"
-    t.string   "ttdb_poster"
+    t.integer  "tvr_latest_season_number"
+    t.integer  "tvr_latest_episode_number"
+    t.string   "tvr_latest_episode_title"
+    t.date     "tvr_latest_episode_date"
+    t.integer  "tvr_next_season_number"
+    t.integer  "tvr_next_episode_number"
+    t.string   "tvr_next_episode_title"
+    t.date     "tvr_next_episode_date"
+    t.string   "tvr_show_url"
+    t.date     "tvr_show_started"
+    t.date     "tvr_show_ended"
+    t.string   "tvr_show_status"
+    t.string   "ttdb_show_imdb_id"
+    t.text     "ttdb_show_overview"
+    t.integer  "ttdb_show_last_updated"
+    t.string   "ttdb_show_banner"
+    t.string   "ttdb_show_fanart"
+    t.string   "ttdb_show_poster"
+    t.integer  "ttdb_show_rating"
+    t.integer  "ttdb_show_rating_count"
+    t.string   "ttdb_show_network"
+    t.string   "ttdb_show_status"
+    t.integer  "ttdb_show_runtime"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
 end

@@ -45,7 +45,7 @@ class DataRunner
     data = nil
     begin
       somezip = Zip::ZipFile.open(zipfile)
-      data = XmlSimple.xml_in(somezip.file.read(insidefile))
+      data = XmlSimple.xml_in(somezip.file.read(insidefile), { 'SuppressEmpty' => '' } )
     rescue
       puts "Something happened getting XML data from TTDB ZIP file"
     end
@@ -63,7 +63,7 @@ class DataRunner
   def self.get_time_from_ttdb
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=none"))
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=none"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting time from TTDB"
     end
@@ -76,7 +76,7 @@ class DataRunner
   def self.get_updates_from_ttdb(lastupdate)
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"))
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting update XML from TTDB"
     end
@@ -86,7 +86,7 @@ class DataRunner
   def self.get_series_from_ttdb(series_id)
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"))
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting series XML from TTDB"
     end
@@ -96,7 +96,7 @@ class DataRunner
   def self.get_episode_from_ttdb(episode_id)
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"))
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting episode XML from TTDB"
     end

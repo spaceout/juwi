@@ -1,0 +1,21 @@
+<h1> <%= "Listing #{@tvshows.count} TVshows" %></h1>
+
+<table>
+  <tr>
+    <th>Show Name</th>
+    <th>Airing Status</th>
+    <th>Next Airing</th>
+  </tr>
+
+  <% @tvshows.each do |tvshow| %>
+  <tr>
+    <td><%= link_to(tvshow.ttdb_show_title, tvshow_episodes_path(tvshow)) %></td>
+    <td><%= tvshow.tvr_show_status %></td>
+    <td><%= tvshow.tvr_next_episode_date %></td>
+    <td><%= link_to 'Show', tvshow %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+

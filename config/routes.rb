@@ -1,4 +1,13 @@
 Juwi::Application.routes.draw do
+
+  resources :tvshows do
+    collection do
+      get :forcast
+    end
+    resources :episodes
+  end
+
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -48,7 +57,7 @@ Juwi::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+   root :to => 'tvshows#index'
 
   # See how all your routes lay out with "rake routes"
 

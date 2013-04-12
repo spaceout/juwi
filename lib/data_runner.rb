@@ -144,11 +144,11 @@ class DataRunner
       end
       tvr_next_episode = tvragedata['Next Episode']
       if tvr_next_episode != nil
-        tvr_latest_episode.force_encoding("utf-8")
-        tvr_next_season_number = tvr_latest_episode.split("^").first.split("x")[0]
-        tvr_next_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
-        tvr_next_episode_title = tvr_latest_episode.split("^")[1]
-        tvr_next_episode_date = tvr_latest_episode.split("^")[2]
+        tvr_next_episode.force_encoding("utf-8")
+        tvr_next_season_number = tvr_next_episode.split("^").first.split("x")[0]
+        tvr_next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
+        tvr_next_episode_title = tvr_next_episode.split("^")[1]
+        tvr_next_episode_date = tvr_next_episode.split("^")[2]
       end
     tvr_show_url = tvragedata['Show URL']
     tvr_show_started = tvragedata['Started']
@@ -299,7 +299,7 @@ class DataRunner
     ttdb_show_id = ttdbdata['Episode'].first['seriesid'].first
     ttdb_episode_airdate = ttdbdata['Episode'].first['FirstAired'].first
     ttdb_episode_rating = ttdbdata['Episode'].first['Rating'].first
-    ttdb_episode_rating_count = ttdbdata['Episode'].first['RatingCount'].first
+    ttdb_episode_rating_count = ttdbdata['Episode'].first['RatingCount']
     #update episode data
     episode.update_attributes(
       :ttdb_episode_title =>ttdb_episode_title,
@@ -334,12 +334,12 @@ class DataRunner
         tvr_latest_episode_date = tvr_latest_episode.split("^")[2]
       end
       tvr_next_episode = tvragedata['Next Episode']
-      if tvr_next_episode != nul
+      if tvr_next_episode != nil
         tvr_next_episode.force_encoding("utf-8")
-        tvr_next_season_number = tvr_latest_episode.split("^").first.split("x")[0]
-        tvr_next_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
-        tvr_next_episode_title = tvr_latest_episode.split("^")[1]
-        tvr_next_episode_date = tvr_latest_episode.split("^")[2]
+        tvr_next_season_number = tvr_next_episode.split("^").first.split("x")[0]
+        tvr_next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
+        tvr_next_episode_title = tvr_next_episode.split("^")[1]
+        tvr_next_episode_date = tvr_next_episode.split("^")[2]
       end
       tvr_show_url = tvragedata['Show URL']
       tvr_show_started = tvragedata['Started']

@@ -1,0 +1,8 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%= @tvshow.ttdb_show_title %></h1>
+<br />
+<%= @tvshow.ttdb_show_overview %>
+<br /><br />
+<%= link_to 'Episodes', tvshow_episodes_path(@tvshow) %>|
+<%= link_to 'Back', tvshows_path %>

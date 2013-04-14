@@ -15,7 +15,7 @@
     episode.ttdb_episode_title %></td>
     <td><%= episode.ttdb_episode_airdate %></td>
     <td><%= episode.xdb_episode_id %></td>
-    <td><%= link_to 'show', "/tvshows/#{@tvshow.id}/episodes/#{episode.id}" %></td>
+    <td><%= link_to 'show', "/episodes/#{episode.id}" %></td>
   </tr>
 <% end %>
 </table>

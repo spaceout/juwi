@@ -1,13 +1,17 @@
 Juwi::Application.routes.draw do
 
-  resources :tvshows do
+  match 'episodes' => 'all_episodes#index'
+  match 'episodes/missing' => 'all_episodes#missing'
+  match "episodes/:episode_id" => 'all_episodes#show'
+  resources :tvshows, :only => [:index, :show] do
     collection do
       get :forcast
     end
-    resources :episodes
+    resources :episodes, :only => [:index, :show]
+    get :missing
   end
 
-
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -57,7 +61,7 @@ Juwi::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-   root :to => 'tvshows#index'
+   root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
 

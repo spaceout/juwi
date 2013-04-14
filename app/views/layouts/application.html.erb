@@ -7,8 +7,14 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-<h2>MediaMonster</h2>
+<h3><%= link_to("MediaMonster", root_path)  %></h3>
+
+|<%= link_to("All TV Shows", tvshows_path)  %>|
+<%= link_to("TV Show Forcast", forcast_tvshows_path)  %>|
+<%= link_to("All Episodes", episodes_path) %>|
+<%= link_to("Missing Episodes", episodes_missing_path)  %>|
 <br />
+
 <%= yield %>
 
 </body>

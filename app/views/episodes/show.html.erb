@@ -1,9 +1,8 @@
-<p id="notice"><%= notice %></p>
-<h1><%=@episode.tvshow.ttdb_show_title + " - " + 
+<h3><%=@episode.tvshow.ttdb_show_title + " - " + 
     "s" '%02d' % @episode.ttdb_season_number + "e" + 
     '%02d' % @episode.ttdb_episode_number + " - " + 
     @episode.ttdb_episode_title %>
-</h1>
+</h3>
 <br />
 <%= @episode.ttdb_episode_overview %>
 <br /><br />

@@ -1,9 +1,11 @@
-<h1><%= "Here is the Index!"  %></h1>
-<%= link_to("All TV Shows", tvshows_path)  %>
+<h3>Library statistics</h3>
+Total Shows <%= @tvshows.count  %>
 <br />
-<%= link_to("TV Show Forcast", forcast_tvshows_path)  %>
+Total Episodes <%= @episodes.count  %>
 <br />
-<%= link_to("Missing Episodes", episodes_missing_path)  %>
+Missing Episodes <%= @episodes.missing.count %>
+<br />
+Collection Grade <%= @completeness  %>%
 <br />
 <%= link_to("Home", root_path)  %>
 <br />

@@ -54,7 +54,7 @@ class DataRunner
 
   def self.get_zip_from_ttdb(tvdbid)
     begin
-      download_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{tvdbid}/all/en.zip", "/home/jemily/juwi/ttdbdata/#{tvdbid}.zip")
+      download_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{tvdbid}/all/en.zip", "#{TTDBCACHE}#{tvdbid}.zip")
     rescue
       puts "Something happened downloading ZIP from TTDB"
     end

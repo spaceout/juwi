@@ -239,10 +239,12 @@ class DataRunner
       :ttdb_season_number => episode[:c12],
       :ttdb_episode_number => episode[:c13]
       ).first
-    jdbepisode.update_attributes(
+    if jdbepisode.!empty
+      jdbepisode.update_attributes(
       :xdb_episode_id => episode[:idEpisode],
       :xdb_episode_location => episode[:c18]
       )
+    end
     xbmcdb.disconnect
   end
 

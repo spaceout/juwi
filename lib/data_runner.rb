@@ -347,6 +347,7 @@ class DataRunner
       tvr_show_started = tvragedata['Started']
       tvr_show_ended = tvragedata['Ended']
       tvr_show_status = tvragedata['Status']
+      puts tvr_show_status
       #update tvr data
       tvshow.update_attributes(
         :tvr_show_id => tvr_show_id,

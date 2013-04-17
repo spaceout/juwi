@@ -1,10 +1,13 @@
 class AllEpisodesController < ApplicationController
-def index
+
+  # GET /episodes
+  def index
     @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
   end
 
+  # GET /episodes/missing
   def missing
-    @episodes = Episode.missing
+    @episodes = Episode.missing.sort_by {|u| u.tvshow.ttdb_show_title}
     render :index
   end
 

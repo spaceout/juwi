@@ -117,15 +117,17 @@ task :xdbvsjdb => :environment do
   require 'mysql'
   require 'sequel'
 
-   xbmcdb = Sequel.connect(XBMCDB)
-   xdbtvshows = xbmcdb[:tvshow]
-   xdbepisodes = xbmcdb[:episode]
-   Tvshow.all.each do |tvshow|
-     if xdbtvshows.filter(:c12 => tvshow.ttdb_show_id).empty?
-       puts "deleting #{tvshow.ttdb_show_title} from JDB"
-       tvshow.destroy
-     end
-   end
+  xbmcdb = Sequel.connect(XBMCDB)
+  xdbtvshows = xbmcdb[:tvshow]
+  xdbepisodes = xbmcdb[:episode]
+
+  Tvshow.all.each do |tvshow|
+    if xdbtvshows.filter(:idShow => tvshow.xdb_show_id).empty?
+      puts "deleting #{tvshow.ttdb_show_title} from JDB"
+      tvshow.destroy
+    end
+  end
+
   Episode.all.each do |episode|
     next if episode.xdb_episode_id.nil?
     if xdbepisodes.filter(:idEpisode => episode.xdb_episode_id).empty?
@@ -136,5 +138,6 @@ task :xdbvsjdb => :environment do
         )
     end
   end
+
 end
 

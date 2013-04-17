@@ -6,6 +6,7 @@ Juwi::Application.routes.draw do
   resources :tvshows, :only => [:index, :show] do
     collection do
       get :forcast
+      get :recently_canceled
     end
     resources :episodes, :only => [:index, :show]
     get :missing

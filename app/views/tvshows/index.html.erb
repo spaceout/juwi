@@ -11,7 +11,7 @@
   <tr>
     <td><%= link_to(tvshow.ttdb_show_title, tvshow) %></td>
     <td><%= tvshow.tvr_show_status %></td>
-    <td><%= tvshow.tvr_next_episode_date %></td>
+    <td><%= if tvshow.tvr_next_episode_date == nil then "TBD" else "#{tvshow.tvr_next_episode_date}" end %></td>
     <td><%= link_to 'Episodes', tvshow_episodes_path(tvshow) %></td>
   </tr>
 <% end %>

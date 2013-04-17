@@ -2,6 +2,7 @@ class TvshowsController < ApplicationController
   # GET /tvshows/forcast
   def forcast
     @tvshows = Tvshow.where("tvr_next_episode_date > 0").sort_by(&:tvr_next_episode_date)
+    @tvshows_tba = Tvshows.where("tvr_next_episode = nil AND tvr_show_status != canceled AND tvr_show_status != ended AND tvr_show_status != canceled/ended")
     render :index
   end
 

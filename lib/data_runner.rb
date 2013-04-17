@@ -323,9 +323,14 @@ class DataRunner
       next if tvshow.tvr_show_status == "Ended"
       next if tvshow.tvr_show_status == "Canceled"
       puts "Updating TVR for: " + tvshow.ttdb_show_title
-      tvragedata = get_tvrage_data(tvshow.ttdb_show_title)
+      sanitized_title = tvshow.ttdb_show_title.split("(").first
+      tvragedata = get_tvrage_data(sanitized_title)
       #prepare tvr data
       tvr_show_id = tvragedata['Show ID']
+      tvr_show_url = tvragedata['Show URL']
+      tvr_show_started = tvragedata['Started']
+      tvr_show_ended = tvragedata['Ended']
+      tvr_show_status = tvragedata['Status']
       #Process latest/next tvrage episode info
       tvr_latest_episode = tvragedata['Latest Episode']
       if tvr_latest_episode != nil
@@ -343,13 +348,9 @@ class DataRunner
         tvr_next_episode_title = tvr_next_episode.split("^")[1]
         tvr_next_episode_date = tvr_next_episode.split("^")[2]
       end
-      tvr_show_url = tvragedata['Show URL']
-      tvr_show_started = tvragedata['Started']
-      tvr_show_ended = tvragedata['Ended']
-      tvr_show_status = tvragedata['Status']
       puts tvr_show_status
       #update tvr data
-      tvshow.update_attributes(
+      if tvshow.update_attributes(
         :tvr_show_id => tvr_show_id,
         :tvr_latest_season_number => tvr_latest_season_number,
         :tvr_latest_episode_number => tvr_latest_episode_number,
@@ -364,6 +365,11 @@ class DataRunner
         :tvr_show_ended => tvr_show_ended,
         :tvr_show_status => tvr_show_status
         )
+        puts "Updated Successfully"
+      else
+        puts "Error Updating record"
+        puts tvshow.errors
+      end
     end
   end
 end

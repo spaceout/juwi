@@ -9,8 +9,8 @@ class TvshowsController < ApplicationController
   end
 
   def recently_canceled
-    @tvshows = Tvshow.where("tvr_show_ended > ? AND tvr_show_ended < ?", 6.months.ago, Date.today).sort_by(&:tvr_show_ended)
-    render :index
+    @tvshows_recently_canceled = Tvshow.where("tvr_show_ended > ? AND tvr_show_ended < ?", 6.months.ago, Date.today).sort_by(&:tvr_show_ended).reverse
+    
   end
 
   def index

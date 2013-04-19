@@ -3,7 +3,7 @@ require 'curb'
 require 'zip/zipfilesystem'
 
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
-XBMCDB = 'mysql://xbmc:xbmc@192.168.1.8/MyVideos75'
+SETTINGYAML = File.join(Rails.root,'/settings/settings.yml')
 
 class DataRunner
   
@@ -54,7 +54,7 @@ class DataRunner
 
   def self.get_zip_from_ttdb(tvdbid)
     begin
-      download_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{tvdbid}/all/en.zip", "#{TTDBCACHE}#{tvdbid}.zip")
+      download_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/series/#{tvdbid}/all/en.zip", "#{TTDBCACHE}#{tvdbid}.zip")
     rescue
       puts "Something happened downloading ZIP from TTDB"
     end
@@ -86,7 +86,7 @@ class DataRunner
   def self.get_series_from_ttdb(series_id)
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting series XML from TTDB"
     end
@@ -96,27 +96,14 @@ class DataRunner
   def self.get_episode_from_ttdb(episode_id)
     data = nil
     begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/8E35AC6C9C5836F0/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
+      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting episode XML from TTDB"
     end
     return data
   end
-#fix null values for:
-  #Show:
-    #ttdb_show_imdb_id
-    #banner
-    #fanart
-    #poster
-    #show rating
-    #show overview
-  #episode
-    #episode overview
-    #episode rating
-    #episode airdate
-    #episode title
   def self.import_new_show_from_xdb(showid)
-    xbmcdb = Sequel.connect(XBMCDB)
+    xbmcdb = Sequel.connect(CONFIG['xbmcdb')
     xdbtvshows = xbmcdb[:tvshow]
     show = xdbtvshows.where("idShow = #{showid}").first
     #Get ttdb xml data if not in cache
@@ -230,7 +217,7 @@ class DataRunner
   end
 
   def self.sync_episode_data(episodeid)
-    xbmcdb = Sequel.connect(XBMCDB)
+    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
     xdbepisodes = xbmcdb[:episode]
     episode = xdbepisodes.where("idEpisode = #{episodeid}").first
     puts "Syncing #{episode[:c00]}"

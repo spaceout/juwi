@@ -1,5 +1,4 @@
 <h3>Library statistics</h3>
-<%=image_tag("rails.png", alt: "Yeah")%>
 Total Shows <%= @tvshows.count  %>
 <br />
 Total Episodes <%= @episodes.count  %>
@@ -9,5 +8,7 @@ Missing Episodes <%= @episodes.missing.count %>
 Collection Grade <%= @completeness  %>%
 <br />
 <%= link_to("Home", root_path)  %>
-<br />
 
+<br />
+<br />
+<%=image_tag("rails.png", alt: "Yeah")%>

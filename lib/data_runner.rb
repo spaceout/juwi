@@ -4,6 +4,7 @@ require 'zip/zipfilesystem'
 
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 SETTINGYAML = File.join(Rails.root,'/settings/settings.yml')
+CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
 class DataRunner
   
@@ -103,7 +104,7 @@ class DataRunner
     return data
   end
   def self.import_new_show_from_xdb(showid)
-    xbmcdb = Sequel.connect(CONFIG['xbmcdb')
+    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
     xdbtvshows = xbmcdb[:tvshow]
     show = xdbtvshows.where("idShow = #{showid}").first
     #Get ttdb xml data if not in cache

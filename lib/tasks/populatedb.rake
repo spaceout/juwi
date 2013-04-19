@@ -138,6 +138,15 @@ task :xdbvsjdb => :environment do
         )
     end
   end
-
 end
+
+desc "This will download all images for current tvshows"
+task :getttdbimages => :environment do
+  require 'data_runner'
+  Tvshow.all.each do |tvshow|
+    next if File.exist?(File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+    DataRunner.get_all_images(tvshow)
+  end
+end
+
 

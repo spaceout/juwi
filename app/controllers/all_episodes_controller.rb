@@ -11,6 +11,11 @@ class AllEpisodesController < ApplicationController
     render :index
   end
 
+  def recently_aired
+    @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ? AND ttdb_episode_airdate > ?", 1.day.ago, 7.days.ago).sort_by(&:ttdb_episode_airdate).reverse
+    render :index
+  end
+
   # GET /episodes/1
   def show
     @episode = Episode.find(params[:episode_id])

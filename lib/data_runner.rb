@@ -3,7 +3,6 @@ require 'curb'
 require 'zip/zipfilesystem'
 
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
-SETTINGYAML = File.join(Rails.root,'/settings/settings.yml')
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
 class DataRunner
@@ -102,6 +101,22 @@ class DataRunner
       puts "Something happened getting episode XML from TTDB"
     end
     return data
+  end
+  def self.get_all_images(tvshow)
+    begin
+      if tvshow.ttdb_show_banner != nil
+        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_banner}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+      end
+      if tvshow.ttdb_show_fanart != nil
+        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_fanart}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_fanart.jpg"))
+      end
+      if tvshow.ttdb_show_poster != nil
+        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
+      end
+    rescue
+      puts "Something happened downloading image from TTDB"
+    end
+
   end
   def self.import_new_show_from_xdb(showid)
     xbmcdb = Sequel.connect(CONFIG['xbmcdb'])

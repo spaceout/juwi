@@ -2,6 +2,8 @@ Juwi::Application.routes.draw do
 
   match 'episodes' => 'all_episodes#index'
   match 'episodes/missing' => 'all_episodes#missing'
+  
+  match 'episodes/recently_aired' => 'all_episodes#recently_aired'
   match "episodes/:episode_id" => 'all_episodes#show'
   resources :tvshows, :only => [:index, :show] do
     collection do

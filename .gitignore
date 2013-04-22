@@ -14,5 +14,5 @@
 /log/*.log
 /tmp
 /settings/settings.yml
-/app/assets/images/*
-/ttdbdata/*
+/app/assets/images/*.jpg
+/ttdbdata/*.zip

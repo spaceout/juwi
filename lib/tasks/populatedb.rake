@@ -5,6 +5,7 @@
 #
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 XBMCDB = 'mysql://xbmc:xbmc@192.168.1.8/MyVideos75'
+CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
 desc "This will populate the data from cache zip files"
 task :importData => :environment do
@@ -13,7 +14,7 @@ task :importData => :environment do
   require 'mysql'
   require 'data_runner'
 
-  xbmcdb = Sequel.connect(XBMCDB)
+  xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
   xdbtvshows = xbmcdb[:tvshow]
   xdbepisodes = xbmcdb[:episode]
   #set initial scrape time for ttdb
@@ -43,7 +44,7 @@ task :syncData => :environment do
   require 'mysql'
   require 'data_runner'
 
-  xbmcdb = Sequel.connect(XBMCDB)
+  xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
   xdbepisodes = xbmcdb[:episode]
   xdbepisodes.each do |episode|
     DataRunner.sync_episode_data(episode[:idEpisode])
@@ -57,7 +58,7 @@ task :updateData => :environment do
   require 'mysql'
   require 'data_runner'
 
-  xbmcdb = Sequel.connect(XBMCDB)
+  xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
   xdbtvshows = xbmcdb[:tvshow]
   xdbepisodes = xbmcdb[:episode]
   last_xdb_show_id = Settings.where(:name => "last_xdb_show_id").first.value
@@ -117,7 +118,7 @@ task :xdbvsjdb => :environment do
   require 'mysql'
   require 'sequel'
 
-  xbmcdb = Sequel.connect(XBMCDB)
+  xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
   xdbtvshows = xbmcdb[:tvshow]
   xdbepisodes = xbmcdb[:episode]
 
@@ -138,6 +139,7 @@ task :xdbvsjdb => :environment do
         )
     end
   end
+  xbmcdb.disconnect
 end
 
 desc "This will download all images for current tvshows"
@@ -149,4 +151,6 @@ task :getttdbimages => :environment do
   end
 end
 
+desc "This will drop the database, recreate it and repopulate it"
+task :dropandimport => ["db:drop", "db:migrate", "db:seed", "importData", "syncData", "getttdbimages"]
 

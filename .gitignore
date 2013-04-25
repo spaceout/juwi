@@ -14,6 +14,6 @@
 /log/*.log
 /tmp
 /settings/settings.yml
-/app/assets/images/*.jpg
+/public/images/*.jpg
 /ttdbdata/*.zip
 /ttdbdata/updatetime

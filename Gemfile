@@ -41,5 +41,4 @@ gem 'xml-simple'
 gem 'curb'
 gem 'sequel'
 gem 'mysql'
-
-
+gem 'httparty'

@@ -1,123 +1,11 @@
-require 'xmlsimple'
-require 'curb'
-require 'zip/zipfilesystem'
+require 'ttdb_helper'
+require 'tvr_helper'
 
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
 class DataRunner
-  
-  def self.get_tvrage_data(showname)
-    rage_show = showname.gsub(" ", "%20")
-    tvrage_data = get_http_data("http://services.tvrage.com/tools/quickinfo.php?show=#{rage_show}")
-    tvrage = Hash[*tvrage_data.gsub!("<pre>","").gsub!("\n","@").split("@")]
-    return tvrage
-  end
 
-  def self.get_http_data(url)
-    body_data = ""
-    curl = Curl::Easy.new
-    curl.follow_location = true
-    curl.url = url
-    curl.on_body do |data|
-      body_data << data
-      data.size
-    end
-    curl.perform
-    return body_data
-  end
-
-  def self.download_http_data(url, savelocation)
-    puts "Downloading: #{url}"
-    curl = Curl::Easy.new
-    curl.follow_location = true
-    curl.url = url
-    File.open(savelocation, 'wb') do|f|
-      curl.on_body do |data| 
-        f << data
-        data.size
-      end
-      curl.perform
-    end
-  end
-
-  def self.ttdb_xml_show_data(zipfile, insidefile)
-    data = nil
-    begin
-      somezip = Zip::ZipFile.open(zipfile)
-      data = XmlSimple.xml_in(somezip.file.read(insidefile), { 'SuppressEmpty' => '' } )
-    rescue
-      puts "Something happened getting XML data from TTDB ZIP file"
-    end
-    return data
-  end
-
-  def self.get_zip_from_ttdb(tvdbid)
-    begin
-      download_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/series/#{tvdbid}/all/en.zip", "#{TTDBCACHE}#{tvdbid}.zip")
-    rescue
-      puts "Something happened downloading ZIP from TTDB"
-    end
-  end
-
-  def self.get_time_from_ttdb
-    data = nil
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=none"), { 'SuppressEmpty' => '' })
-    rescue
-      puts "Something happened getting time from TTDB"
-    end
-    unless data.nil?
-      return data["Time"].first
-    end
-    return nil
-  end
-
-  def self.get_updates_from_ttdb(lastupdate)
-    data = nil
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"), { 'SuppressEmpty' => '' })
-    rescue
-      puts "Something happened getting update XML from TTDB"
-    end
-    return data
-  end
-
-  def self.get_series_from_ttdb(series_id)
-    data = nil
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
-    rescue
-      puts "Something happened getting series XML from TTDB"
-    end
-    return data
-  end
-  
-  def self.get_episode_from_ttdb(episode_id)
-    data = nil
-    begin
-      data = XmlSimple.xml_in(get_http_data("http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
-    rescue
-      puts "Something happened getting episode XML from TTDB"
-    end
-    return data
-  end
-  def self.get_all_images(tvshow)
-    begin
-      if tvshow.ttdb_show_banner != nil
-        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_banner}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
-      end
-      if tvshow.ttdb_show_fanart != nil
-        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_fanart}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_fanart.jpg"))
-      end
-      if tvshow.ttdb_show_poster != nil
-        download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
-      end
-    rescue
-      puts "Something happened downloading image from TTDB"
-    end
-
-  end
   def self.import_new_show_from_xdb(showid)
     xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
     xdbtvshows = xbmcdb[:tvshow]
@@ -125,11 +13,11 @@ class DataRunner
     #Get ttdb xml data if not in cache
     if File.exist?(TTDBCACHE + show[:c12] +".zip") == false
       puts "downloading " + show[:c00]
-      get_zip_from_ttdb(show[:c12])
+      TtdbHelper.get_zip_from_ttdb(show[:c12])
     end
-    ttdbdata = ttdb_xml_show_data("#{TTDBCACHE}#{show[:c12]}.zip", "en.xml")
+    ttdbdata = TtdbHelper.ttdb_xml_show_data("#{TTDBCACHE}#{show[:c12]}.zip", "en.xml")
     #Get TVRage data
-    tvragedata = get_tvrage_data(ttdbdata['Series'].first['SeriesName'].first.to_s)
+    tvragedata = TvrHelper.get_tvrage_data(ttdbdata['Series'].first['SeriesName'].first.to_s)
     #Setup all show data
     ttdb_show_id = show[:c12]
     xdb_show_location = show[:c16]
@@ -253,7 +141,7 @@ class DataRunner
 
   def self.update_ttdb_show_data(ttdbid)
     puts "updating TTDB data for " + Tvshow.where(:ttdb_show_id => ttdbid).first.ttdb_show_title
-    ttdbdata = get_series_from_ttdb(ttdbid)
+    ttdbdata = TtdbHelper.get_series_from_ttdb(ttdbid)
     show = Tvshow.where(:ttdb_show_id => ttdbid).first
     #setup show data
     ttdb_show_title = ttdbdata['Series'].first['SeriesName'].first
@@ -286,7 +174,7 @@ class DataRunner
   end
 
   def self.update_ttdb_episode_data(ttdbid)
-    ttdbdata = get_episode_from_ttdb(ttdbid)
+    ttdbdata = TtdbHelper.get_episode_from_ttdb(ttdbid)
     episode = Episode.where(:ttdb_episode_id => ttdbid).first
     print "Updating TTDB data for Episode: "
     print episode.tvshow.ttdb_show_title
@@ -327,7 +215,7 @@ class DataRunner
       next if tvshow.tvr_show_status == "Canceled"
       puts "Updating TVR for: " + tvshow.ttdb_show_title
       sanitized_title = tvshow.ttdb_show_title.split("(").first
-      tvragedata = get_tvrage_data(sanitized_title)
+      tvragedata = TvrHelper.get_tvrage_data(sanitized_title)
       #prepare tvr data
       tvr_show_id = tvragedata['Show ID']
       tvr_show_url = tvragedata['Show URL']
@@ -376,4 +264,3 @@ class DataRunner
     end
   end
 end
-

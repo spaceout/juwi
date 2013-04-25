@@ -1,4 +1,3 @@
-TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
 desc "This will download all images for current tvshows"

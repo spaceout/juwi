@@ -5,22 +5,9 @@ require 'file_manipulator'
 require 'xmission_api'
 require 'xbmc_api'
 
-#SHOULD NOT NEED THE BELOW OPTIONS
-#USER = ENV['USER']
-#CURRENTSCRIPTDIR = File.dirname(__FILE__)
-
 desc "This is jemuby minus renamer (for now)"
 task :processDownloads => :environment do
-
-  #FIX TO BE PART OF RAILS ROOT PATH Process Configuration file an create it if it does not exist
-#  if File.exist?("/home/#{USER}/.jemuby/config.yml")
-#    CONFIG = YAML.load_file("/home/#{USER}/.jemuby/config.yml")["config"]
-#  else
-#    FileUtils.mkdir("/home/#{USER}/.jemuby/") unless File.exists?("/home/#{USER}/.jemuby/")
-#    FileUtils.cp("#{CURRENTSCRIPTDIR}/config.yml.sample", "/home/#{USER}/.jemuby/config.yml")
-#    CONFIG = YAML.load_file("/home/#{USER}/.jemuby/config.yml")["config"]
-#    abort "Please edit /home/#{USER}/.jemuby/config.yml and relaunch"
-#  end
+  CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 
   #Initialize Logger
   if CONFIG["logtofile"] == false
@@ -59,11 +46,6 @@ task :processDownloads => :environment do
         fm.delete_folder(dir_entry, CONFIG["min_videosize"])
       end
     end
-    # Add in new renamer code
-    #fb = FileBotAPI.new(log)
-    #fb.filebot_rename(CONFIG["base_path"], CONFIG["tvshow_basepath"], CONFIG["filebot_log"])
-    #xb = XbmcApi.new(log)
-    #xb.update_xbmc(CONFIG["xbmc_hostname"], CONFIG["xbmc_port"])
     log.info "Script Completed successfully"
   end
 end

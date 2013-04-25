@@ -1,4 +1,14 @@
 config:
   xbmcdb: 'mysql://xbmc:xbmc@IPADDRESS/MyVideos75'
   ttdbapikey: 'APIKEY'
- 
+  base_path: /path/to/download/folder
+  tvshow_basepath: /path/to/tvshow/storage
+  min_videosize: 60000000
+  xbmc_hostname: xbmchostname
+  xbmc_port: 9090
+  transmission_url: http://transmissionIP:9091/transmission/rpc
+  transmission_user: transmission
+  transmission_password: transmission
+  runfrom_cli: true
+  logtofile: false
+  logfile: /path/to/logfile

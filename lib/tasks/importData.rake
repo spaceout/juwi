@@ -12,7 +12,7 @@ task :importData => :environment do
   xdbtvshows = xbmcdb[:tvshow]
   xdbepisodes = xbmcdb[:episode]
   #set initial scrape time for ttdb
-  ttdbtime = DataRunner.get_time_from_ttdb
+  ttdbtime = TtdbHelper.get_time_from_ttdb
   #create file for cache ttdb time
   if File.exist?("#{TTDBCACHE}updatetime")
     oldcachetime = File.open("#{TTDBCACHE}updatetime", 'r') { |f| f.read }

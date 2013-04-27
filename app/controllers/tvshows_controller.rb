@@ -9,8 +9,8 @@ class TvshowsController < ApplicationController
   end
 
   def recently_canceled
-    @tvshows_recently_canceled = Tvshow.where("tvr_show_ended > ? AND tvr_show_ended < ?", 6.months.ago, Date.today).sort_by(&:tvr_show_ended).reverse
-    
+   # @tvshows_recently_canceled = Tvshow.where("tvr_show_ended > ? AND tvr_show_ended < ?", 6.months.ago, Date.today).sort_by(&:tvr_show_ended).reverse
+    @tvshows_recently_canceled = Tvshow.where("tvr_show_status = 'Canceled' OR tvr_show_status = 'Ended' OR tvr_show_status = 'Canceled/Ended'").where("tvr_show_ended > ? AND tvr_show_ended < ?", 6.months.ago, Date.today).reverse.select(&:tvr_latest_episode_date).sort_by(&:tvr_latest_episode_date).reverse + Tvshow.where("tvr_show_status = 'Canceled' OR tvr_show_status = 'Ended' OR tvr_show_status = 'Canceled/Ended'").reject(&:tvr_latest_episode_date) 
   end
 
   def index

@@ -69,13 +69,13 @@ class TtdbHelper
   def self.get_all_images(tvshow)
     begin
       if tvshow.ttdb_show_banner != nil
-        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_banner}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
       end
       if tvshow.ttdb_show_fanart != nil
-        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_fanart}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_fanart.jpg"))
+        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_fanart.jpg"))
       end
       if tvshow.ttdb_show_poster != nil
-        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/app/assets/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
+        CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
       end
     rescue
       puts "Something happened downloading image from TTDB"

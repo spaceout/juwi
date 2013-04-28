@@ -59,7 +59,8 @@ class DataRunner
     ttdb_show_runtime = ttdbdata['Series'].first['Runtime'].first
     #Create show db entry
     puts "Creating Show " + ttdb_show_title
-    currentShow = Tvshow.create(
+    currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
+    currentShow.update_attributes(
       :xdb_show_location => xdb_show_location,
       :xdb_show_id => xdb_show_id,
       :tvr_show_id => tvr_show_id,
@@ -103,7 +104,8 @@ class DataRunner
       ttdb_episode_rating_count = episode['RatingCount'].first
       #Create episode db entry
       puts "  Creating Episode " + ttdb_season_number + " " + ttdb_episode_number
-      currentShow.episodes.create(
+      currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(ttdb_episode_id)
+      currentEpisode.update_attributes(
         :ttdb_episode_title => ttdb_episode_title,
         :ttdb_season_number => ttdb_season_number,
         :ttdb_episode_number => ttdb_episode_number,

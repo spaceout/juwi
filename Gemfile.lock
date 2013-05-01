@@ -39,8 +39,11 @@ GEM
     coffee-script-source (1.6.1)
     curb (0.8.3)
     erubis (2.7.0)
+    eventmachine (1.0.3)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    faye-websocket (0.4.7)
+      eventmachine (>= 0.12.0)
     hike (1.2.1)
     httparty (0.10.2)
       multi_json (~> 1.0)
@@ -115,6 +118,7 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   curb
+  faye-websocket
   httparty
   jquery-rails
   mysql

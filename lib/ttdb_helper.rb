@@ -36,10 +36,17 @@ class TtdbHelper
     return nil
   end
 
-  def self.get_updates_from_ttdb(lastupdate)
+  def self.get_updates_from_ttdb(lastupdate,update_interval)
     data = nil
+    if update_interval == 1
+      url = "http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/updates/updates_day.xml"
+    elsif update_interval == 2
+      url = "http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/updates/updates_week.xml"
+    elsif update_interval == 3
+      url = "http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/updates/updates_month.xml"
+    end
     begin
-      data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/Updates.php?type=all&time=#{lastupdate}"), { 'SuppressEmpty' => '' })
+      data = XmlSimple.xml_in(CurlHelper.get_http_data(url), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting update XML from TTDB"
     end

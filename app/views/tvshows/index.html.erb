@@ -8,12 +8,13 @@
   </tr>
 
   <% @tvshows.each do |tvshow| %>
-  <tr>
-    <td><%= link_to(image_tag("/images/#{tvshow.ttdb_show_id}_banner.jpg", :alt => tvshow.ttdb_show_title, :size=> "190x35"), tvshow)%>
-    <td><%= tvshow.tvr_show_status %></td>
-    <td><%= if tvshow.tvr_next_episode_date == nil then "TBD" else "#{tvshow.tvr_next_episode_date}" end %></td>
-    <td><%= link_to 'Episodes', tvshow_episodes_path(tvshow) %></td>
-  </tr>
+    <tr><td><%= tvshow.ttdb_show_title %></td></tr>
+    <tr>
+      <td><%= link_to(image_tag("/images/#{tvshow.ttdb_show_id}_banner.jpg", :alt => tvshow.ttdb_show_title, :size=> "190x35"), tvshow)%>
+      <td><%= tvshow.tvr_show_status %></td>
+      <td><%= if tvshow.tvr_next_episode_date == nil then "TBD" else "#{tvshow.tvr_next_episode_date}" end %></td>
+      <td><%= link_to 'Episodes', tvshow_episodes_path(tvshow) %></td>
+    </tr>
 <% end %>
 </table>
 

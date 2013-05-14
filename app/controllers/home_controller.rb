@@ -4,4 +4,7 @@ class HomeController < ApplicationController
     @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(2)
   end
+  def updateData
+    Rake::Task['updateData'].invoke()
+  end
 end

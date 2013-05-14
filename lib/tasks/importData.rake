@@ -1,6 +1,7 @@
+
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
-
+namespace :jdb do
 desc "This will populate the data from cache zip files"
 task :importData => :environment do
   require 'xmlsimple'
@@ -31,5 +32,5 @@ task :importData => :environment do
   Settings.where(:name => "xdb_last_scrape").first.update_attributes(:value => DateTime.current)
   xbmcdb.disconnect
 end
-
-
+# FIXME: blah blah blah
+end

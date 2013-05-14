@@ -13,4 +13,6 @@ class XbmcApi
     telnethost.close
     @log.info "XBMC Update is probably complete?"
   end
+
+
 end

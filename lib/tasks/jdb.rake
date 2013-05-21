@@ -1,7 +1,7 @@
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 namespace :jdb do
 desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
-task :updateFromXDB => :environment do
+task :update => :environment do
   require 'sequel'
   require 'mysql'
   require 'data_runner'
@@ -54,6 +54,22 @@ task :updateFromXDB => :environment do
     end
   end
 xbmcdb.disconnect
+end
+
+desc "This checks sync with XDB"
+task :verify => :environment do
+  require 'sequel'
+  require 'mysql'
+  require 'data_runner'
+
+  xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+  xdbtvshows = xbmcdb[:tvshow]
+  xdbtvshows.each do |tvshow|
+    if Tvshow.where(:xdb_show_id => tvshow[:idShow]).empty?
+      puts "Importing #{tvshow[:c00]}"
+      DataRunner.import_new_show_from_xdb(tvshow[:idShow])
+    end
+  end
 end
 
 desc "This synch up the rest of the episode info"

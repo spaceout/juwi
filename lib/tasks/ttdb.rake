@@ -1,6 +1,6 @@
 namespace :ttdb do
 desc "This updates TTDB data for all shows"
-task :updateData => :environment do
+task :update => :environment do
   require 'data_runner'
 
   #Figure out how long since last update
@@ -40,8 +40,8 @@ task :updateData => :environment do
 
   #Reset last update time
   Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => updatedata["time"])
-  xbmcdb.disconnect
 end
+
 
 ####GET ALL TTDB IMAGES####
 desc "This will download all images for current tvshows"

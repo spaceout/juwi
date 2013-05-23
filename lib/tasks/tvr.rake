@@ -3,7 +3,9 @@ namespace :tvr do
   desc "This updates tvrage data"
   task :update => :environment do
     require 'data_runner'
-    DataRunner.update_tvrage_data
+    puts "ballsack1"
+    DataRunner.update_tvrage
+    
   end
 end
 

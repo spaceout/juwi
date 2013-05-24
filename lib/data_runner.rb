@@ -210,12 +210,4 @@ class DataRunner
       )
   end
 
-  def self.update_tvrage
-    Tvshow.all.each do |tvshow|
-      next if tvshow.tvr_show_status == "Canceled/Ended"
-      next if tvshow.tvr_show_status == "Ended"
-      next if tvshow.tvr_show_status == "Canceled"
-      TvrHelper.update_tvrage_data(tvshow.ttdb_show_title, tvshow.id)
-    end
-  end
-end
+

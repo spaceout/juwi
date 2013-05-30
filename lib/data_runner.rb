@@ -209,5 +209,5 @@ class DataRunner
       :ttdb_episode_rating_count => ttdb_episode_rating_count
       )
   end
-
+end
 

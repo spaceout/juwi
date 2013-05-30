@@ -1,6 +1,6 @@
 require 'tvr_helper'
 namespace :tvr do
-  desc "This updates tvrage data"
+  desc "This updates tvrage data for non cancelled/ended shows"
   task :update => :environment do
     Tvshow.all.each do |tvshow|
       next if tvshow.tvr_show_status == "Canceled/Ended"

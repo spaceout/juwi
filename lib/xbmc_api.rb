@@ -1,17 +1,10 @@
+CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 require 'net/telnet'
 require 'logger'
 
 class XbmcApi
   def initialize(logger = nil)
     @log = logger || Logger.new(STDOUT)
-  end
-
-  def update_xbmc(hostname, port)
-    @log.info "Begin Updating XBMC"
-    telnethost = Net::Telnet::new("Host" => "#{hostname}","Port" => "#{port}", "Timeout" => 10,"Prompt" => /.*/, "Waittime" => 3)
-    telnethost.cmd(%{{"jsonrpc":"2.0","method":"VideoLibrary.Scan","id":1}}) { |c| puts c}
-    telnethost.close
-    @log.info "XBMC Update is probably complete?"
   end
 
   def self.process_message(message)
@@ -26,22 +19,88 @@ class XbmcApi
     elsif message_method == "VideoLibrary.OnCleanFinished"
       puts "XBMC DB clean complete"
     elsif message_method == "VideoLibrary.OnUpdate"
-      puts "New episode added to XBMC DB"
-     # add_episode(parsed_message["params"]["data"]["item"]["id"])
+      if parsed_message["params"]["data"]["playcount"] == nil
+        puts "New episode added to XBMC DB"
+        add_episode(parsed_message["params"]["data"]["item"]["id"])
+      else
+        puts "Episode updated"
+      end
     elsif message_method == "VideoLibrary.OnRemove"
       puts "Episode removed from XBMC DB"
-      #remove_episode(parsed_message["params"]["data"]["id"])
+      remove_episode(parsed_message["params"]["data"]["id"])
     end
   end
 
-  def add_episode(xdb_ep_id)
+  def self.add_episode(xdb_ep_id)
     puts xdb_ep_id
+    #sync episode info
   end
 
-  def remove_episode(xdb_ep_id)
+  def self.remove_episode(xdb_ep_id)
     puts xdb_ep_id
+    #remove xdb info from ep
   end
+
+  def self.add_tvshow(xdb_show_id)
+    puts xdb_show_id
+    #import new show form XDB
+  end
+
+  def self.remove_tvshow(xdb_show_id)
+    puts xdb_show_id
+    #tvshow.destroy
+  end
+
+  def self.compose_command(method)
+    require 'faye/websocket'
+    require 'eventmachine'
+
+    command = {
+      "jsonrpc" => "2.0",
+      "method" => "#{method}",
+      "id" => 1
+      }
+    send_command(command.to_json)
+  end
+
+  def self.compose_query(method, data)
+    command = {
+      "jsonrpc"=>"2.0",
+      "method"=>"#{method}",
+      "params"=>
+        {
+        "data"=>"#{data}",
+        "sender"=>"xbmc"
+        }
+      }
+    send_command(command.to_json)
+  end
+
+
+  def self.send_command(command)
+    EM.run {
+      ws = Faye::WebSocket::Client.new("ws://#{CONFIG["xbmc_hostname"]}:#{CONFIG["xbmc_port"]}/")
+      ws.onopen = lambda do |event|
+        puts "successfully established connection"
+        ws.send(command)
+      end
+      ws.onmessage = lambda do |event|
+        puts event.data
+        EM.stop
+      end
+      ws.onclose = lambda do |event|
+        ws = nil
+        puts "Disconnected from server"
+        EM.stop
+      end
+    }
+  end
+
 end
+
+
+
+
 #Methods =
 # VideoLibrary.OnScanStarted
 #VideoLibrary.OnScanFinished

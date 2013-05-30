@@ -11,7 +11,9 @@ class TvrHelper
 #make sure to pass a Tvshow object to this function, not a name
   def self.update_tvrage_data(tvshow, jdbid)
     currentshow = Tvshow.find(jdbid)
-    puts "Updating TVR for: " + tvshow
+    print 'Updating TVR for: '
+    print tvshow
+    print ' Status: '
     sanitized_title = tvshow.split("(").first
     tvragedata = TvrHelper.get_tvrage_data(sanitized_title)
     #prepare tvr data
@@ -54,7 +56,6 @@ class TvrHelper
       :tvr_show_ended => tvr_show_ended,
       :tvr_show_status => tvr_show_status
       )
-      puts "Updated Successfully"
     else
       puts "Error Updating record"
       puts tvshow.errors

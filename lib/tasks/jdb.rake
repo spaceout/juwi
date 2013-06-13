@@ -70,6 +70,7 @@ task :verify => :environment do
       DataRunner.import_new_show_from_xdb(tvshow[:idShow])
     end
   end
+  xbmcdb.disconnect
 end
 
 desc "This synch up the rest of the episode info"

@@ -1,6 +1,7 @@
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 require 'net/telnet'
 require 'logger'
+require 'data_runner'
 
 class XbmcApi
   def initialize(logger = nil)
@@ -19,7 +20,7 @@ class XbmcApi
     elsif message_method == "VideoLibrary.OnCleanFinished"
       puts "XBMC DB clean complete"
     elsif message_method == "VideoLibrary.OnUpdate"
-      if parsed_message["params"]["data"]["playcount"] == nil
+      if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] != "movie"
         puts "New episode added to XBMC DB"
         add_episode(parsed_message["params"]["data"]["item"]["id"])
       else
@@ -32,23 +33,33 @@ class XbmcApi
   end
 
   def self.add_episode(xdb_ep_id)
-    puts xdb_ep_id
-    #sync episode info
+    puts "Adding episode with XDBID #{xdb_ep_id}"
+    DataRunner.sync_episode_data(xdb_ep_id)
+    puts "Episode Addition complete"
   end
 
   def self.remove_episode(xdb_ep_id)
-    puts xdb_ep_id
-    #remove xdb info from ep
+    episode = Episode.where(:xdb_episode_id => xdb_ep_id).first
+    puts "un-syncing #{episode.tvshow.ttdb_show_title} - s#{episode.ttdb_season_number}e#{episode.ttdb_episode_number}"
+    episode.update_attributes(
+        :xdb_episode_id => nil,
+        :xdb_episode_location => nil
+        )
+    "un-sync complete"
   end
 
   def self.add_tvshow(xdb_show_id)
-    puts xdb_show_id
-    #import new show form XDB
+    puts "Adding new show with XDBID #{xdb_show_id}"
+    DataRunner.import_new_show_from_xdb(xdb_show_id)
+    puts "Import of new TV show complete"
   end
 
   def self.remove_tvshow(xdb_show_id)
     puts xdb_show_id
-    #tvshow.destroy
+    tvshow = Tvshow.where(:xdb_show_id => xdb_show_id).first
+    puts "Destroying #{tvshow.ttdb_show_title} and all episodes"
+    tvshow.destroy
+    puts "TV Show removal complete"
   end
 
   def self.compose_command(method)

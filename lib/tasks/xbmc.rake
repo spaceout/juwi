@@ -41,6 +41,7 @@ namespace :xbmc do
     end
     while true
       puts "Attempting Connection"
+      sleep(5)
       xbmcconnect
     end
   end

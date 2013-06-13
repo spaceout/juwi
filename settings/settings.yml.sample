@@ -12,3 +12,5 @@ config:
   runfrom_cli: true
   logtofile: false
   logfile: /path/to/logfile
+  renamedir: /mnt/finished/tvshows
+  destinationdir: /home/jemily/renametest/test2

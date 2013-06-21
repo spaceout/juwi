@@ -33,7 +33,7 @@ task :update => :environment do
   #check if we have any episodes in the ttdb update xml that are to be updated
   unless updatedata["Episode"].nil?
     updatedata["Episode"].each do |episode|
-      next if Episode.where(:ttdb_episode_id => episode["id"]).empty?
+      #next if Episode.where(:ttdb_episode_id => episode["id"]).empty?
       DataRunner.update_ttdb_episode_data(episode["id"].first)
     end
   end

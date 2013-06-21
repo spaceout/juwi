@@ -1,5 +1,5 @@
 Juwi::Application.routes.draw do
-  match 'updateData' => 'home#updateData'
+  match 'update' => 'home#update'
   match 'episodes' => 'all_episodes#index'
   match 'episodes/missing' => 'all_episodes#missing'
   

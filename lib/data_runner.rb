@@ -177,13 +177,19 @@ class DataRunner
 
   def self.update_ttdb_episode_data(ttdbid)
     ttdbdata = TtdbHelper.get_episode_from_ttdb(ttdbid)
-    episode = Episode.where(:ttdb_episode_id => ttdbid).first
+    ttdb_show_id = ttdbdata['Episode'].first['seriesid'].first
+
+    return if Tvshow.where(:ttdb_show_id => ttdb_show_id).first.nil?
+    puts "New Episode!" if Episode.where(:ttdb_episode_id => ttdbid).first.nil?
+
+    episode = Episode.find_or_initialize_by_ttdb_episode_id(ttdbid)
+   # episode = Episode.where(:ttdb_episode_id => ttdbid).first
     print "Updating TTDB data for Episode: "
-    print episode.tvshow.ttdb_show_title
+    print Tvshow.where(:ttdb_show_id => ttdb_show_id).first.ttdb_show_title
     print " - "
-    print episode.ttdb_season_number
+    print ttdbdata['Episode'].first['SeasonNumber'].first
     print " "
-    puts episode.ttdb_episode_number
+    puts ttdbdata['Episode'].first['EpisodeNumber'].first
     #setup episode data
     ttdb_episode_title = ttdbdata['Episode'].first['EpisodeName'].first
     ttdb_season_number = ttdbdata['Episode'].first['SeasonNumber'].first

@@ -25,18 +25,22 @@ task :update => :environment do
   #Check if we have any of the shows in the ttdb update xml that are to be updated
   unless updatedata["Series"].nil?
     updatedata["Series"].each do |series|
-      next if Tvshow.where(:ttdb_show_id => series["id"]).empty?
-      DataRunner.update_ttdb_show_data(series["id"].first)
+      currentshow = Tvshow.where(:ttdb_show_id => series["id"])
+      next if currentshow.empty?
+      #puts currentshow.first.ttdb_show_title
+      Rake::Task["jdb:updateShow"].reenable
+      Rake::Task['jdb:updateShow'].invoke(currentshow.first.ttdb_show_title)
+      #DataRunner.update_ttdb_show_data(series["id"].first)
     end
   end
 
   #check if we have any episodes in the ttdb update xml that are to be updated
-  unless updatedata["Episode"].nil?
-    updatedata["Episode"].each do |episode|
-      #next if Episode.where(:ttdb_episode_id => episode["id"]).empty?
-      DataRunner.update_ttdb_episode_data(episode["id"].first)
-    end
-  end
+  #unless updatedata["Episode"].nil?
+  #  updatedata["Episode"].each do |episode|
+  #    #next if Episode.where(:ttdb_episode_id => episode["id"]).empty?
+  #    DataRunner.update_ttdb_episode_data(episode["id"].first)
+  #  end
+  #end
 
   #Reset last update time
   Settings.where(:name => "ttdb_last_scrape").first.update_attributes(:value => updatedata["time"])

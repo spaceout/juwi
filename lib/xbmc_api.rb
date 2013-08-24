@@ -19,16 +19,25 @@ class XbmcApi
       puts "XBMC DB clean initiated"
     elsif message_method == "VideoLibrary.OnCleanFinished"
       puts "XBMC DB clean complete"
+
     elsif message_method == "VideoLibrary.OnUpdate"
-      if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] != "movie"
+      if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] == "episode"
         puts "New episode added to XBMC DB"
         add_episode(parsed_message["params"]["data"]["item"]["id"])
-      else
-        puts "Episode updated"
+      elsif parsed_message["params"]["data"]["item"]["type"] == "tvshow"
+        puts "New TV show added to XBMC DB"
+      elsif parsed_message["params"]["data"]["item"]["type"] = "movie"
+        puts "New Movie added to XBMC DB"
       end
+
     elsif message_method == "VideoLibrary.OnRemove"
-      puts "Episode removed from XBMC DB"
-      remove_episode(parsed_message["params"]["data"]["id"])
+      if parsed_message["params"]["data"]["type"] == "movie"
+        puts "Movie Removed from XBMC DB"
+      elsif parsed_message["params"]["data"]["item"]["type"] == "episode"
+        puts "Episode removed from XBMC DB"
+        remove_episode(parsed_message["params"]["data"]["id"])
+      end
+
     end
   end
 

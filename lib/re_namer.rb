@@ -19,7 +19,7 @@ class Renamer
         if tvshow.ttdb_show_title.gsub(/[\.\-\_\:]/, ' ').gsub("!", '').gsub("'", '').gsub(/\(us\)/i, '').gsub("  ", " ").gsub(/\(20\d\d\)/, '').downcase.strip == clean_show_name
           show_match = true
           match_ttdb_id = tvshow.ttdb_show_id
-          matched_show_title = tvshow.ttdb_show_title
+          matched_show_title = tvshow.ttdb_show_title.gsub(":", '')
           matched_episode = Episode.where("ttdb_season_number = ? AND ttdb_episode_number = ? AND ttdb_show_id = ?", season_number, episode_number, match_ttdb_id)
           if matched_episode.empty?
             puts "No Matched Episode; checking ttdb"

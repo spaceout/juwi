@@ -1,5 +1,36 @@
 class Renamer
+  require 'fileutils'
+  def self.process_dir(rename_input_dir, rename_output_dir)
+    rename_input_dir = CONFIG["renamedir"]
+    rename_output_dir = CONFIG["destinationdir"]
+    Dir.glob(File.join(rename_input_dir, "*")).each do |dir_entry|
+      next if File.directory?(dir_entry)
+      #puts "OLD: #{dir_entry}"
+      clean_name = Renamer.rename(File.basename(dir_entry), 1)
+      if clean_name != "#"
+        new_path = File.join(rename_output_dir, clean_name.split(" - ").first, "/")
+        new_name = clean_name + File.extname(dir_entry)
+        destination = new_path + new_name
+        if File.directory?(new_path)
+          #puts "NEW: #{destination}"
+          if File.file?(destination)
+            puts "Destination already exists #{destination}"
+          else
+            puts "Moving #{dir_entry} to #{destination}"
+            FileUtils.mv(dir_entry, destination)
+          end
+        else
+          puts "Destination directory #{new_path} not found"
+        end
+      else
+        puts "No match for #{dir_entry}"
+      end
+    end
+
+  end
+
   def self.rename(dirty_name, attempt)
+    require 'exceptions'
     if attempt == 2
       puts "second try"
     end
@@ -15,6 +46,7 @@ class Renamer
       episode_match = false
       matched_show_title = nil
       matched_episode_title = nil
+      clean_show_name = Exceptions.process(clean_show_name)
       Tvshow.all.each do |tvshow|
         if tvshow.ttdb_show_title.gsub(/[\.\-\_\:]/, ' ').gsub("!", '').gsub("'", '').gsub(/\(us\)/i, '').gsub("  ", " ").gsub(/\(20\d\d\)/, '').downcase.strip == clean_show_name
           show_match = true
@@ -24,7 +56,7 @@ class Renamer
           if matched_episode.empty?
             puts "No Matched Episode; checking ttdb"
             if attempt == 1
-              Rake::Task['jdb:updateShow'].invoke(matched_show_title)
+              Rake::Task['jdb:update_show'].invoke(tvshow.ttdb_show_id)
               Renamer.rename(dirty_name, 2)
             end
           else

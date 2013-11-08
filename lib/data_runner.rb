@@ -57,6 +57,7 @@ class DataRunner
     ttdb_show_network = ttdbdata['Series'].first['Network'].first
     ttdb_show_status = ttdbdata['Series'].first['Status'].first
     ttdb_show_runtime = ttdbdata['Series'].first['Runtime'].first
+    jdb_clean_show_title = Scrubber.clean_show_name(ttdb_show_title)
     #Create show db entry
     puts "Creating Show " + ttdb_show_title
     currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
@@ -88,7 +89,8 @@ class DataRunner
       :ttdb_show_rating_count => ttdb_show_rating_count,
       :ttdb_show_network => ttdb_show_network,
       :ttdb_show_status => ttdb_show_status,
-      :ttdb_show_runtime => ttdb_show_runtime
+      :ttdb_show_runtime => ttdb_show_runtime,
+      :jdb_clean_show_title => jdb_clean_show_title
       )
     ttdbdata['Episode'].each do |episode|
     #Setup episode data

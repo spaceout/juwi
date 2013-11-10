@@ -16,7 +16,7 @@ class Exceptions
       puts "Exception Found! Show name: #{clean_show_name} New season number: #{season_number}"
     elsif clean_show_name == "eastbound and down"
       clean_show_name = "eastbound & down"
-      puts "Exceotion Found! New show name: #{clean_show_name}"
+      puts "Exception Found! New show name: #{clean_show_name}"
     end
     return clean_show_name,season_number,episode_number
   end

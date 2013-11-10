@@ -11,7 +11,7 @@ task :renametest => :environment do
   filebot_history = XmlSimple.xml_in(filebot_log)
   filebot_history['sequence'].each do |sequence|
     sequence['rename'].each do |rename|
-      puts Renamer.rename(rename['from'])
+      puts Renamer.rename(rename['from'], 1)[0]
     end
   end
 end

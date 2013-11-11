@@ -82,7 +82,7 @@ class Renamer
           #If on the first try the episode title is TBA, try to update_show that shit, otherwise name it TBA
           if matched_episode_title == "TBA"
             if attempt == 1
-              JdbHelper.update_show(clean_show_name)
+              JdbHelper.update_show(tvshow.first.ttdb_show_title)
               Renamer.rename(dirty_name, 2)
             end
           end

@@ -1,5 +1,6 @@
 require 'ttdb_helper'
 require 'tvr_helper'
+require 'scrubber'
 
 TTDBCACHE = File.join(Rails.root,'/ttdbdata/')
 CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]

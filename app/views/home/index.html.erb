@@ -5,9 +5,10 @@ Total Episodes <%= @episodes.count  %>
 <br />
 Missing Episodes <%= @episodes.missing.count %>
 <br />
-Collection Grade <%= @completeness  %>%
+Collection Grade <%= @completeness  %>
 <br />
 <%= link_to("Home", root_path)  %>
+<%= button_to("rename", :action => "rename", :controller => "home") %>
 
 <br />
 <br />

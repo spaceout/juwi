@@ -2,8 +2,7 @@ class Renamer
 
   def self.process_dir(rename_input_dir, rename_output_dir)
     require 'fileutils'
-    rename_input_dir = CONFIG["renamedir"]
-    rename_output_dir = CONFIG["destinationdir"]
+    output = []
     Dir.glob(File.join(rename_input_dir, "*")).each do |dir_entry|
       next if File.directory?(dir_entry)
       clean_name,overwrite_enable = Renamer.rename(File.basename(dir_entry), 1)
@@ -14,24 +13,32 @@ class Renamer
         if File.directory?(new_path)
           if File.file?(destination)
             puts "Destination already exists #{destination}"
+            output.push("Destination already exists #{destination}")
             if overwrite_enable == true
               puts "OVERWRITE IS ENABLED REMOVING #{destination}"
+              output.push("OVERWRITE IS ENABLED REMOVING #{destination}")
               File.unlink(destination)
               puts "REMOVED #{destination}"
+              ouput.push("REMOVED #{destination}")
               puts "Moving #{dir_entry} to #{destination}"
+              output.push("Moving #{dir_entry} to #{destination}")
               FileUtils.mv(dir_entry, destination)
             end
           else
             puts "Moving #{dir_entry} to #{destination}"
+            output.push("Moving #{dir_entry} to #{destination}")
             FileUtils.mv(dir_entry, destination)
           end
         else
           puts "Destination directory #{new_path} not found"
+          output.push("Destination directory #{new_path} not found")
         end
       else
         puts "No match for #{dir_entry}"
+        ouput.push("No match for #{dir_entry}")
       end
     end
+    return output
   end
 
   def self.rename(dirty_name, attempt)
@@ -60,12 +67,11 @@ class Renamer
       if tvshow.empty? == false
         match_ttdb_id = tvshow.first.ttdb_show_id
         matched_show_title = tvshow.first.ttdb_show_title.gsub(":", '')
-        matched_episode = Episode.where("ttdb_season_number = ? AND ttdb_episode_number = ? AND ttdb_show_id = ?", season_number, episode_number, match_ttdb_id)
+        matched_episode = Episode.where("ttdb_season_number = ? AND ttdb_episode_number = ? AND ttdb_show_id = ?", season_number, episode_number, match_ttdb_id).reload
         if matched_episode.empty?
           puts "No Matched Episode for: #{matched_show_title} - s#{season_number}e#{episode_number} checking ttdb"
           if attempt == 1
             JdbHelper.update_show(tvshow.first.ttdb_show_title)
-            Episode.reload
             Renamer.rename(dirty_name, 2)
           elsif attempt == 2
             puts "No Episode Found for: #{matched_show_title} - s#{season_number}e#{episode_number}"
@@ -77,7 +83,6 @@ class Renamer
           if matched_episode_title == "TBA"
             if attempt == 1
               JdbHelper.update_show(clean_show_name)
-              Episode.reload
               Renamer.rename(dirty_name, 2)
             end
           end
@@ -91,42 +96,3 @@ class Renamer
     end
   end
 end
-      #
-      #
-      #FIX CODE BELOW HERE TO USE THE NEW JDB_CLEAN_SHOW_TITLE
-      #
-      #
-=begin
-      Tvshow.all.each do |tvshow|
-        if tvshow.ttdb_show_title.gsub(/[\.\-\_\:]/, ' ').gsub("!", '').gsub("'", '').gsub(/\(us\)/i, '').gsub("  ", " ").gsub(/\(20\d\d\)/, '').downcase.strip == clean_show_name
-          show_match = true
-          match_ttdb_id = tvshow.ttdb_show_id
-          matched_show_title = tvshow.ttdb_show_title.gsub(":", '')
-          matched_episode = Episode.where("ttdb_season_number = ? AND ttdb_episode_number = ? AND ttdb_show_id = ?", season_number, episode_number, match_ttdb_id)
-          if matched_episode.empty?
-            puts "No Matched Episode; checking ttdb"
-            if attempt == 1
-              JdbHelper.update_show(tvshow.ttdb_show_title)
-              Renamer.rename(dirty_name, 2)
-            end
-          else
-            episode_match = true
-            matched_episode_title = matched_episode.first.ttdb_episode_title.gsub('/',' ').gsub('?','')
-            #If on the first try the episode title is TBA, try to update_show that shit, otherwise name it TBA
-            if matched_episode_title == "TBA"
-              unless attempt == 2
-              JdbHelper.update_show(clean_show_name)
-              Episode.reload
-              Renamer.rename(dirty_name, 2)
-              end
-            end
-          end
-        end
-      end
-=end
-      #
-      #
-      #END OF CODE FIX NEEDED
-      #
-      #
-      

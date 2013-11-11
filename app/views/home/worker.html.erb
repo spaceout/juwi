@@ -1,5 +1,10 @@
 <h3>Lets get some shit done!</h3>
-Here is what you were looking for: <%= @blerm  %>
+<br />
+Here is what you were looking for: 
+<br />
+<% @blerm.each do |bermty|  %>
+  <%= bermty %><br />
+<% end %>
 <br />
 <%= link_to("Home", root_path)  %>
 <br />

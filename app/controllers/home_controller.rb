@@ -5,13 +5,23 @@ class HomeController < ApplicationController
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(2)
   end
   def update
-    require 'rake'
-    Rake::Task.clear
-    juwi::Application.load_tasks
+    require 're_namer'
 
-    #Rake::Task['update'].invoke
+
     @blerm = "BOO!"
+    render 'home'
+  end
+  def rename
+    require 'xmlsimple'
+    require 're_namer'
+    require 'fileutils'
 
-    render 'worker'
+    config = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
+    rename_input_dir = config["renamedir"]
+    rename_output_dir = config["destinationdir"]
+    @blerm = Renamer.process_dir(rename_input_dir, rename_output_dir)
+
+    #@blerm = "BOO!"
+    render 'home/worker'
   end
 end

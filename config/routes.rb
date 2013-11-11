@@ -14,6 +14,7 @@ Juwi::Application.routes.draw do
     get :missing
   end
   root :to => 'home#index'
+  match 'rename' => 'home#rename'
 end
 
 

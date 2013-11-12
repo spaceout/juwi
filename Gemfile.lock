@@ -38,6 +38,10 @@ GEM
       execjs
     coffee-script-source (1.6.1)
     curb (0.8.3)
+    daemons (1.1.9)
+    daemons-rails (1.2.1)
+      daemons
+      multi_json (~> 1.0)
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (1.4.0)
@@ -119,6 +123,7 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   curb
+  daemons-rails
   faye-websocket
   httparty
   jquery-rails

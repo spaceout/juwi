@@ -44,4 +44,4 @@ gem 'mysql'
 gem 'httparty'
 gem 'faye-websocket'
 gem 'ruby-progressbar'
-
+gem 'daemons-rails'

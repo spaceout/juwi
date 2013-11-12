@@ -96,7 +96,6 @@ class XbmcApi
     send_command(command.to_json)
   end
 
-
   def self.send_command(command)
     EM.run {
       ws = Faye::WebSocket::Client.new("ws://#{CONFIG["xbmc_hostname"]}:#{CONFIG["xbmc_port"]}/")

@@ -46,7 +46,11 @@ class FileManipulator
     FileUtils.rm_rf(incoming_folder)
   end
 
-  def escape_glob(s)
-    s.gsub(/[\\\{\}\[\]\*\?]/) { |x| "\\"+x }
+  def self.list_dir(directory)
+    return Dir.glob("#{escape_glob(directory)}/*")
+  end
+
+  def self.escape_glob(directory)
+    return directory.gsub(/[\\\{\}\[\]\*\?]/) { |x| "\\"+x }
   end
 end

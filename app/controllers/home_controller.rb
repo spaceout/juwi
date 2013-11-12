@@ -1,8 +1,16 @@
 class HomeController < ApplicationController
+  CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
   def index
+    require 'xmission_api'
+    require 'file_manipulator'
+    require 'xbmc_daemon'
     @tvshows = Tvshow.all.sort_by(&:ttdb_show_title)
     @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(2)
+    @finished_dir = FileManipulator.list_dir(CONFIG["renamedir"])
+    xmission = XmissionApi.new(:username => CONFIG["transmission_user"],:password => CONFIG["transmission_password"],:url => CONFIG["transmission_url"]) 
+    @transmission_dls = xmission.all
+    @xbmc_daemon_status = XbmcDaemon.status
   end
   def update
     require 're_namer'

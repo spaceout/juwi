@@ -47,7 +47,12 @@ class FileManipulator
   end
 
   def self.list_dir(directory)
-    return Dir.glob("#{escape_glob(directory)}/*")
+    file_list = []
+    dir_list = Dir.glob("#{escape_glob(directory)}/*")
+    dir_list.each do |file|
+      file_list.push(file.split("/").last)
+    end
+    return file_list
   end
 
   def self.escape_glob(directory)

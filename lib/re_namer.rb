@@ -51,7 +51,7 @@ class Renamer
     match_data = /^((?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name)
     #enable overwriting if it is a repack
     overwrite_enable = false
-    if /repack/i.match(dirty_name)
+    if /repack|proper/i.match(dirty_name)
       puts "REPACK FOUND, OVERWRITE ENABLED"
       overwrite_enable = true
     end

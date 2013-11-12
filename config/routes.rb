@@ -15,6 +15,8 @@ Juwi::Application.routes.draw do
   end
   root :to => 'home#index'
   match 'rename' => 'home#rename'
+  match 'startDaemon' => 'home#startDaemon'
+  match 'stopDaemon' => 'home#stopDaemon'
 end
 
 

@@ -14,8 +14,6 @@ class HomeController < ApplicationController
   end
   def update
     require 're_namer'
-
-
     @blerm = "BOO!"
     render 'home'
   end
@@ -28,8 +26,16 @@ class HomeController < ApplicationController
     rename_input_dir = config["renamedir"]
     rename_output_dir = config["destinationdir"]
     @blerm = Renamer.process_dir(rename_input_dir, rename_output_dir)
-
-    #@blerm = "BOO!"
     render 'home/worker'
+  end
+  def startDaemon
+    require 'xbmc_daemon'
+    XbmcDaemon.start
+    redirect_to '/'
+  end
+  def stopDaemon
+    require 'xbmc_daemon'
+    XbmcDaemon.stop
+    redirect_to '/'
   end
 end

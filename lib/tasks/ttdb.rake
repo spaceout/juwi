@@ -2,6 +2,7 @@ namespace :ttdb do
 desc "This updates TTDB data for all shows"
 task :update => :environment do
   require 'data_runner'
+  require 'jdb_helper'
 
   #Figure out how long since last update
   current_time = TtdbHelper.get_time_from_ttdb.to_i
@@ -28,8 +29,7 @@ task :update => :environment do
       currentshow = Tvshow.where(:ttdb_show_id => series["id"])
       next if currentshow.empty?
       #puts currentshow.first.ttdb_show_title
-      Rake::Task["jdb:updateShow"].reenable
-      Rake::Task['jdb:updateShow'].invoke(currentshow.first.ttdb_show_title)
+      JdbHelper.update_show(currentshow.first.ttdb_show_title)
       #DataRunner.update_ttdb_show_data(series["id"].first)
     end
   end

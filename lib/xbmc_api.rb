@@ -7,7 +7,7 @@ class XbmcApi
   def initialize(logger = nil)
     @log = logger || Logger.new(STDOUT)
   end
-
+#  {"jsonrpc":"2.0","method":"VideoLibrary.OnRemove","params":{"data":{"id":19766,"type":"episode"},"sender":"xbmc"}}
   def self.process_message(message)
     parsed_message = JSON.parse(message)
     message_method = parsed_message["method"]
@@ -33,7 +33,7 @@ class XbmcApi
     elsif message_method == "VideoLibrary.OnRemove"
       if parsed_message["params"]["data"]["type"] == "movie"
         puts "Movie Removed from XBMC DB"
-      elsif parsed_message["params"]["data"]["item"]["type"] == "episode"
+      elsif parsed_message["params"]["data"]["type"] == "episode"
         puts "Episode removed from XBMC DB"
         remove_episode(parsed_message["params"]["data"]["id"])
       end

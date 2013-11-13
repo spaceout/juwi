@@ -17,6 +17,9 @@ class Exceptions
     elsif clean_show_name == "eastbound and down"
       clean_show_name = "eastbound & down"
       puts "Exception Found! New show name: #{clean_show_name}"
+    elsif clean_show_name == "dragons defenders of berk"
+      clean_show_name = "dragons riders of berk"
+      puts "Exception Found! New show name: #{clean_show_name}"
     end
     return clean_show_name,season_number,episode_number
   end

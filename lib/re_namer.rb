@@ -19,7 +19,7 @@ class Renamer
               output.push("OVERWRITE IS ENABLED REMOVING #{destination}")
               File.unlink(destination)
               puts "REMOVED #{destination}"
-              ouput.push("REMOVED #{destination}")
+              output.push("REMOVED #{destination}")
               puts "Moving #{dir_entry} to #{destination}"
               output.push("Moving #{dir_entry} to #{destination}")
               FileUtils.mv(dir_entry, destination)
@@ -48,7 +48,7 @@ class Renamer
     if attempt == 2
       puts "second try"
     end
-    match_data = /^((?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name)
+    match_data = /^((?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name.gsub("720p", ""))
     #enable overwriting if it is a repack
     overwrite_enable = false
     if /repack|proper/i.match(dirty_name)

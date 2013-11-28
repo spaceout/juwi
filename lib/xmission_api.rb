@@ -38,6 +38,12 @@ class XmissionApi
     response
   end
 
+  def upload_link(url, destination)
+    puts "Uploading: #{url}"
+    response = post(:method => "torrent-add",:arguments => {:filename => url})
+    response
+  end
+
   def post(options)
     JSON::parse(http_post(options).body)
   end

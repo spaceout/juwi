@@ -6,26 +6,26 @@ XBMC Daemon Status: <%= @xbmc_daemon_status %>
   <%= button_to("Start", :action => "startDaemon", :controller => "home") %>
 <% end %>
 <h3>Downloads in Transmission</h3>
-
-<table>
+<table border = "1">
   <tr>
-    <th>ID</th>
     <th>Name</th>
-    <th>Status</th>
     <th>Size</th>
     <th>Percent</th>
   </tr>
   <% @transmission_dls.each do |dl_item| %>
     <tr>
-      <td><%= dl_item["id"] %></td>
       <td><%= dl_item["name"] %></td>
-      <td><%= dl_item["isFinished"] %></td>
       <td><%= dl_item["totalSize"]/1024 %></td>
       <td><%= dl_item["percentDone"]*100 %> </td>
     </tr>
 <% end %>
 </table>
-
+<br \>
+Upload Torrent
+<%= form_tag({:controller => "home", :action => "upload_torrent"}, method: :get) do %>
+  <%= text_field_tag :torrent %>
+  <%= submit_tag 'Upload Torrent', name: nil %>
+<% end%>
 <h3>Files in "Finished" Directory</h3>
 <%= button_to("rename", :action => "rename", :controller => "home") %>
 <table>

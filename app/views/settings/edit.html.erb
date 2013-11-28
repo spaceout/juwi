@@ -1,0 +1,6 @@
+<%= form_for @setting do |f| %>
+  <br /><%= "Name: #{@setting.name}" %><br />
+  <%= f.label :value %>:
+  <%= f.text_field :value %><br />
+  <%= f.submit %>
+<% end %>

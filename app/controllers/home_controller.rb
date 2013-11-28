@@ -12,16 +12,10 @@ class HomeController < ApplicationController
     @transmission_dls = xmission.all
     @xbmc_daemon_status = XbmcDaemon.status
   end
-  def update
-    require 're_namer'
-    @blerm = "BOO!"
-    render 'home'
-  end
   def rename
     require 'xmlsimple'
     require 're_namer'
     require 'fileutils'
-
     config = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
     rename_input_dir = config["renamedir"]
     rename_output_dir = config["destinationdir"]
@@ -36,6 +30,12 @@ class HomeController < ApplicationController
   def stopDaemon
     require 'xbmc_daemon'
     XbmcDaemon.stop
+    redirect_to '/'
+  end
+  def upload_torrent
+    require 'xmission_api'
+    xmission = XmissionApi.new(:username => CONFIG["transmission_user"],:password => CONFIG["transmission_password"],:url => CONFIG["transmission_url"])
+    xmission.upload_link(params[:torrent], CONFIG["renamedir"])
     redirect_to '/'
   end
 end

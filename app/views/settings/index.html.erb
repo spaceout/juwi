@@ -1,0 +1,15 @@
+<h3> <%= "Listing #{@settings.count} Settings" %></h3>
+
+<table>
+  <tr>
+    <th>Setting</th>
+    <th>value</th>
+  </tr>
+
+  <% @settings.each do |setting| %>
+    <tr>
+      <td><%= setting.name%>
+      <td><%= setting.value %></td>
+    </tr>
+<% end %>
+</table>

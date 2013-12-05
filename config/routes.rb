@@ -23,6 +23,8 @@ Juwi::Application.routes.draw do
   match 'startDaemon' => 'home#startDaemon'
   match 'stopDaemon' => 'home#stopDaemon'
   match 'upload_torrent' => 'home#upload_torrent'
+  match 'xbmc_update' => 'home#xbmc_update'
+  match 'process_downloads' => 'home#process_downloads'
 end
 
 

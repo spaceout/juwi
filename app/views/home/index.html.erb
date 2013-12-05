@@ -27,7 +27,6 @@ Upload Torrent
   <%= submit_tag 'Upload Torrent', name: nil %>
 <% end%>
 <h3>Files in "Finished" Directory</h3>
-<%= button_to("rename", :action => "rename", :controller => "home") %>
 <table>
   <tr>
     <th>Files</th>
@@ -38,6 +37,10 @@ Upload Torrent
   </tr>
 <% end %>
 </table>
+<div style="float:left;"><%= button_to("process downloads", :action => "process_downloads", :controller => "home") %></div>
+<div style="float:left;"><%= button_to("rename", :action => "rename", :controller => "home") %></div>
+<div style="float:left;"><%= button_to("update xbmc", :action => "xbmc_update", :controller => "home") %></div>
+<div style="clear:both;"></div>
 
 <h3>Library statistics</h3>
 Total Shows <%= @tvshows.count  %><br />

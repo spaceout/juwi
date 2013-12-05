@@ -9,6 +9,7 @@ class XmissionApi
   attr_accessor :fields
   attr_accessor :debug_mode
 
+  CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
   TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir"]
 
   def initialize(options)
@@ -64,4 +65,16 @@ class XmissionApi
     end
     response
   end
+
+  def self.remove_finished_downloads(xmission)
+    puts "Removing finished downloads from transmission"
+    xmission.all.each do |download|
+      if download["isFinished"] == true && download["downloadDir"] == CONFIG["base_path"] + "/"
+        puts "Removing #{download["name"]} from Transmission"
+        xmission.remove(download["id"])
+      end
+    end
+    puts "Done with removing finished downloads from transmission"
+  end
+
 end

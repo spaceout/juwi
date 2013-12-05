@@ -38,4 +38,15 @@ class HomeController < ApplicationController
     xmission.upload_link(params[:torrent], CONFIG["renamedir"])
     redirect_to '/'
   end
+  def xbmc_update
+    require 'xbmc_api'
+    XbmcApi.compose_command("VideoLibrary.Scan")
+    redirect_to '/'
+  end
+  def process_downloads
+    xmission = XmissionApi.new(:username => CONFIG["transmission_user"],:password => CONFIG["transmission_password"],:url => CONFIG["transmission_url"])
+    XmissionApi.remove_finished_downloads(xmission)
+    FileManipulator.process_finished_directory(CONFIG["base_path"], CONFIG["min_videosize"])
+    redirect_to '/'
+  end
 end

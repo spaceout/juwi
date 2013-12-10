@@ -2,7 +2,8 @@ require 'curb'
 
 class CurlHelper
 
-  def self.get_http_data(url)
+  def self.get_http_data(url,attempts)
+    puts "Fetching: #{url}"
     body_data = ""
     curl = Curl::Easy.new
     curl.follow_location = true
@@ -11,7 +12,17 @@ class CurlHelper
       body_data << data
       data.size
     end
-    curl.perform
+    begin
+      curl.perform
+    rescue
+      if attempts != 0
+        puts "Failed downling #{url} trying again"
+        CurlHelper.get_http_data(url, attempts - 1)
+      elsif attempts == 0
+        puts "ERROR DOWNLOADING #{url}"
+        return false
+      end
+    end
     return body_data
   end
 

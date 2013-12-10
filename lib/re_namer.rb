@@ -35,7 +35,7 @@ class Renamer
         end
       else
         puts "No match for #{dir_entry}"
-        ouput.push("No match for #{dir_entry}")
+        output.push("No match for #{dir_entry}")
       end
     end
     return output

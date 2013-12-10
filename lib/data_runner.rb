@@ -7,6 +7,16 @@ CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"
 
 class DataRunner
 
+  def self.update_ttdb_data(ttdb_id)
+    #delete the existing zip file
+    #download new zip
+    #import all data from zip
+  end
+
+
+
+
+
   def self.import_new_show_from_xdb(showid)
     xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
     xdbtvshows = xbmcdb[:tvshow]

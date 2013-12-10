@@ -13,8 +13,6 @@ class JdbHelper
       show_ttdbid = currentshow.first.ttdb_show_id
       show_xdbid = currentshow.first.xdb_show_id
       puts "Found #{showname} in JDB TTDBID = #{show_ttdbid} XDBID = #{show_xdbid}"
-      currentshow.first.destroy
-      puts "removed #{showname} from JDB"
       File.delete("#{TTDBCACHE}#{show_ttdbid}.zip")
       puts "deleted TTDB zip cache file"
       puts "getting zip and importing show"
@@ -23,9 +21,6 @@ class JdbHelper
       xdbepisodes.where("idShow = #{show_xdbid}").each do |episode|
         DataRunner.sync_episode_data(episode[:idEpisode])
       end
-      puts "updating TVR data for #{showname}"
-      updatedshow = Tvshow.where(:ttdb_show_title => showname).first
-      TvrHelper.update_tvrage_data(updatedshow.ttdb_show_title, updatedshow.id)
     end
     xbmcdb.disconnect
     puts "Completed drop and re-import of #{showname}"

@@ -46,7 +46,7 @@ class TtdbHelper
       url = "http://thetvdb.com/api/#{CONFIG['ttdbapikey']}/updates/updates_month.xml"
     end
     begin
-      data = XmlSimple.xml_in(CurlHelper.get_http_data(url), { 'SuppressEmpty' => '' })
+      data = XmlSimple.xml_in(CurlHelper.get_http_data(url,2), { 'SuppressEmpty' => '' })
     rescue
       puts "Something happened getting update XML from TTDB"
     end
@@ -88,4 +88,6 @@ class TtdbHelper
       puts "Something happened downloading image from TTDB"
     end
   end
+
+
 end

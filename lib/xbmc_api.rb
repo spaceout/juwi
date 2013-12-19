@@ -1,13 +1,10 @@
-CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 require 'net/telnet'
 require 'logger'
-require 'data_runner'
 
 class XbmcApi
   def initialize(logger = nil)
     @log = logger || Logger.new(STDOUT)
   end
-#  {"jsonrpc":"2.0","method":"VideoLibrary.OnRemove","params":{"data":{"id":19766,"type":"episode"},"sender":"xbmc"}}
   def self.process_message(message)
     parsed_message = JSON.parse(message)
     message_method = parsed_message["method"]
@@ -98,7 +95,7 @@ class XbmcApi
 
   def self.send_command(command)
     EM.run {
-      ws = Faye::WebSocket::Client.new("ws://#{CONFIG["xbmc_hostname"]}:#{CONFIG["xbmc_port"]}/")
+      ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
       ws.onopen = lambda do |event|
         puts "successfully established connection"
         ws.send(command)

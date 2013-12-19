@@ -2,8 +2,7 @@ class JdbHelper
   def self.update_show(showname)
     require 'mysql'
     require 'sequel'
-    require 'data_runner'
-    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+    xbmcdb = Sequel.connect(Setting.get_value("xbmcdb"))
     xdbepisodes = xbmcdb[:episode]
     puts "Searching for #{showname} in JDB"
     currentshow = Tvshow.where(:ttdb_show_title => showname)
@@ -25,5 +24,33 @@ class JdbHelper
     xbmcdb.disconnect
     puts "Completed drop and re-import of #{showname}"
   end
+  def self.sync_show_data(jdb_id)
+    #FOR SHOWS
+    #xdb_show_location
+    #xdb_show_id
+    #FOR EPISODES
+    #xdb_show_id
+  
+  end
+
+  def self.sync_episode_data(episodeid)
+    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+    xdbepisodes = xbmcdb[:episode]
+    episode = xdbepisodes.where("idEpisode = #{episodeid}").first
+    puts "Syncing #{episode[:c00]}"
+    jdbepisode = Episode.where(
+      :xdb_show_id => episode[:idShow],
+      :ttdb_season_number => episode[:c12],
+      :ttdb_episode_number => episode[:c13]
+    ).first
+    unless jdbepisode.nil?
+      jdbepisode.update_attributes(
+      :xdb_episode_id => episode[:idEpisode],
+      :xdb_episode_location => episode[:c18]
+    )
+    end
+    xbmcdb.disconnect
+  end
+
 end
 

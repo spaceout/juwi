@@ -7,8 +7,7 @@ require 'xbmc_api'
 
 desc "Process rars zips and folders in download folder"
 task :processDownloads => :environment do
-  CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
-  xmission = XmissionApi.new(:username => CONFIG["transmission_user"],:password => CONFIG["transmission_password"],:url => CONFIG["transmission_url"])
-  XmissionApi.remove_finished_downloads(xmission)
-  FileManipulator.process_finished_directory(CONFIG["base_path"], CONFIG["min_videosize"])
+  xmission = XmissionApi.new(:username => Setting.get_value("transmission_user"),:password => Setting.get_value("transmission_password"),:url => Setting.get_value("transmission_url"))
+  XmissionApi.remove_finished_downloads(xmission, (Setting.get_value("finished_path")+"/"))
+  FileManipulator.process_finished_directory(Setting.get_value("finished_path"), Setting.get_value("min_videosize"))
 end

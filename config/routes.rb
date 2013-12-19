@@ -13,11 +13,7 @@ Juwi::Application.routes.draw do
     resources :episodes, :only => [:index, :show]
     get :missing
   end
-  resources :settings, :only => [:index, :show, :edit, :update]  do
-    collection do
-
-    end
-  end
+  resources :settings
   root :to => 'home#index'
   match 'rename' => 'home#rename'
   match 'startDaemon' => 'home#startDaemon'

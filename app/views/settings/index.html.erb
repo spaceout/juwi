@@ -1,15 +1,20 @@
-<h3> <%= "Listing #{@settings.count} Settings" %></h3>
+<h3> <%= "Listing all Settings" %></h3>
 
 <table>
   <tr>
     <th>Setting</th>
     <th>value</th>
+    <th>notes</th>
+    <th>updated_at</th>
   </tr>
 
   <% @settings.each do |setting| %>
     <tr>
-      <td><%= setting.name%>
-      <td><%= setting.value %></td>
-    </tr>
+      <td><%= link_to(setting.name, edit_setting_path(setting))%>
+       <td><%= setting.value %></td>
+       <td><%= setting.notes %></td>
+       <td><%= setting.updated_at %></td>
+   </tr>
 <% end %>
 </table>
+<%= button_to("new", new_setting_path, :method => :get) %>

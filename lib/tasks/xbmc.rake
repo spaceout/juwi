@@ -23,9 +23,8 @@ namespace :xbmc do
     require 'eventmachine'
     require 'xbmc_api'
     def xbmcconnect
-    config = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
       EM.run {
-        ws = Faye::WebSocket::Client.new("ws://#{config["xbmc_hostname"]}:#{config["xbmc_port"]}/")
+        ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
         ws.onopen = lambda do |event|
           puts "successfully established connection"
         end

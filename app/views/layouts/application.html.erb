@@ -18,6 +18,17 @@ Episodes |<%= link_to("All", episodes_path) %> |
 <%= link_to("Missing", episodes_missing_path)  %> |
 <br />
 <%= link_to("Settings", settings_path) %>
+<% if flash[:error] -%>
+    <p class='error'>ERROR: <%=h flash[:error] %></p>
+<% end -%>
+<% if flash[:notice] -%>
+    <p class='notice'>NOTICE: <%=h flash[:notice] %></p>
+<% end -%>
+<% if flash[:alert] -%>
+    <p class='alert'>ALERT: <%=h flash[:alert] %></p>
+<% end -%>
+
+
 <%= yield %>
 
 </body>

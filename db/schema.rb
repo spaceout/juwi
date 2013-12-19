@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131108194334) do
+ActiveRecord::Schema.define(:version => 20131211014349) do
 
   create_table "episodes", :force => true do |t|
     t.integer  "tvshow_id"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(:version => 20131108194334) do
     t.datetime "updated_at", :null => false
     t.string   "name"
     t.string   "value"
+    t.string   "notes"
   end
 
   create_table "tvshows", :force => true do |t|

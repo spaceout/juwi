@@ -9,7 +9,6 @@ class XmissionApi
   attr_accessor :fields
   attr_accessor :debug_mode
 
-  CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
   TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir"]
 
   def initialize(options)
@@ -52,24 +51,24 @@ class XmissionApi
   def http_post(options)
     post_options = {
       :body => options.to_json,
-      :headers => {"x-transmission-session-id" => session_id},
+      :headers => {"x-transmission-session-id" => Setting.get_value("xmission_token")},
       :basic_auth => basic_auth
     }
     response = HTTParty.post(url, post_options)
     if(response.code == 409)
       @log.info "Bad Session ID changing..."
-      @session_id = response.headers["x-transmission-session-id"]
-      @log.info "New Session ID: #{@session_id}"
+      Setting.set_value("xmission_token", response.headers["x-transmission-session-id"])
+      @log.info "New Session ID: #{Setting.get_value("xmission_token")}"
       @log.info "Retrying Post"
       response = http_post(options)
     end
     response
   end
 
-  def self.remove_finished_downloads(xmission)
+  def self.remove_finished_downloads(xmission, finished_path)
     puts "Removing finished downloads from transmission"
     xmission.all.each do |download|
-      if download["isFinished"] == true && download["downloadDir"] == CONFIG["base_path"] + "/"
+      if download["isFinished"] == true && download["downloadDir"] == finished_dir
         puts "Removing #{download["name"]} from Transmission"
         xmission.remove(download["id"])
       end

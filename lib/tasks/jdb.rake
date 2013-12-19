@@ -1,16 +1,14 @@
-CONFIG = YAML.load_file(File.join(Rails.root,'/settings/settings.yml'))["config"]
 namespace :jdb do
   desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
   task :update => :environment do
     require 'sequel'
     require 'mysql'
-    require 'data_runner'
 
-    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
-    last_xdb_show_id = Settings.where(:name => "last_xdb_show_id").first.value
-    last_xdb_episode_id = Settings.where(:name => "last_xdb_episode_id").first.value
+    last_xdb_show_id = Setting.get_value("last_xdb_show_id")
+    last_xdb_episode_id = Setting.get_value("last_xdb_episode_id")
 
     #Search for new XDB series
     puts "Searching for new Shows in XDB"
@@ -19,7 +17,7 @@ namespace :jdb do
       new_shows.each do |show|
         DataRunner.import_new_show_from_xdb(show[:idShow])
       end
-      Settings.where(:name => "last_xdb_show_id").first.update_attributes(:value => xdbtvshows.order(:idShow).last[:idShow])
+      Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
     end
 
     #Search and sync newly added XDB episodes
@@ -29,7 +27,7 @@ namespace :jdb do
       new_episodes.each do |episode|
         DataRunner.sync_episode_data(episode[:idEpisode])
       end
-      Settings.where(:name => "last_xdb_episode_id").first.update_attributes(:value => xdbepisodes.order(:idEpisode).last[:idEpisode])
+      Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
     end
 
     #Remove shows deleted from XBMC
@@ -60,9 +58,8 @@ namespace :jdb do
   task :verify => :environment do
     require 'sequel'
     require 'mysql'
-    require 'data_runner'
 
-    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
     xdbtvshows.each do |tvshow|
       if Tvshow.where(:xdb_show_id => tvshow[:idShow]).empty?
@@ -77,9 +74,8 @@ namespace :jdb do
   task :syncData => :environment do
     require 'sequel'
     require 'mysql'
-    require 'data_runner'
 
-    xbmcdb = Sequel.connect(CONFIG['xbmcdb'])
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbepisodes = xbmcdb[:episode]
     xdbepisodes.each do |episode|
       DataRunner.sync_episode_data(episode[:idEpisode])

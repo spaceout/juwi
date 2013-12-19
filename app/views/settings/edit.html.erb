@@ -1,6 +1,2 @@
-<%= form_for @setting do |f| %>
-  <br /><%= "Name: #{@setting.name}" %><br />
-  <%= f.label :value %>:
-  <%= f.text_field :value %><br />
-  <%= f.submit %>
-<% end %>
+<%= render 'form' %>
+<%= button_to("delete", @setting, method: :delete, data: {confirm: "Are you sure?"}) %>

@@ -22,4 +22,20 @@ class TvshowsController < ApplicationController
     @tvshow = Tvshow.find(params[:id])
   end
 
+  def edit
+    @tvshow = Tvshow.find(params[:id])
+  end
+
+  def update
+    require 'tvr_helper'
+    @tvshow = Tvshow.find(params[:id])
+    if @tvshow.update_attributes(params[:tvshow])
+      TvrHelper.update_tvrage_data(@tvshow.ttdb_show_id)
+      flash[:notice] = "TV Show Updated"
+    else
+      flash[:alert] = "Couldn't Update TV Show, fucker"
+    end
+    redirect_to action: "show"
+  end
+
 end

@@ -3,6 +3,7 @@ namespace :jdb do
   task :update => :environment do
     require 'sequel'
     require 'mysql'
+    require 'jdb_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
@@ -15,7 +16,16 @@ namespace :jdb do
     new_shows = xdbtvshows.where("idShow > #{last_xdb_show_id}")
     unless new_shows.empty?
       new_shows.each do |show|
-        DataRunner.import_new_show_from_xdb(show[:idShow])
+        show_ttdbid = show[:c12]
+        show_xdbid = show[:idShow]
+        TtdbHelper.get_zip_from_ttdb(show_ttdbid)
+        TtdbHelper.update_ttdb_show_data(show_ttdbid)
+        TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
+        JdbHelper.update_jdb_show_data(show_ttdbid)
+        TvrHelper.update_tvrage_data(show_ttdbid)
+        xdbepisodes.where("idShow = #{show_xdbid}").each do |episode|
+          JdbHelper.sync_episode_data(episode[:idEpisode])
+        end
       end
       Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
     end
@@ -25,7 +35,7 @@ namespace :jdb do
     new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
     unless new_episodes.empty?
       new_episodes.each do |episode|
-        DataRunner.sync_episode_data(episode[:idEpisode])
+        JdbHelper.sync_episode_data(episode[:idEpisode])
       end
       Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
     end
@@ -53,6 +63,14 @@ namespace :jdb do
     end
   xbmcdb.disconnect
   end
+
+  desc "This refreshes all data for a single show passed in as argument"
+  task :update_show, [:showname] => :environment do |t, args|
+    require 'jdb_helper'
+    showname = args[:showname] || 'none'
+    JdbHelper.update_show(showname)
+  end
+
 
   desc "This checks sync with XDB"
   task :verify => :environment do

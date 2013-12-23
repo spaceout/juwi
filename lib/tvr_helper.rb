@@ -3,16 +3,16 @@ require 'curl_helper'
 class TvrHelper
   def self.get_tvrage_data(showname)
     rage_show = showname.gsub(" ", "%20").gsub("&", "and")
-    tvrage_data = CurlHelper.get_http_data("http://services.tvrage.com/tools/quickinfo.php?show=#{rage_show}", 2)
+    tvrage_data = CurlHelper.get_http_data("http://services.tvrage.com/tools/quickinfo.php?show=#{rage_show}")
     tvrage = Hash[*tvrage_data.gsub!("<pre>","").gsub!("\n","@").split("@")]
     return tvrage
   end
 
-  def self.update_tvrage_data(tvshow, jdbid)
-    currentshow = Tvshow.find(jdbid)
-    print "Updating TVR for: #{tvshow}"
-    sanitized_title = tvshow.split("(").first
-    tvragedata = TvrHelper.get_tvrage_data(sanitized_title)
+  def self.update_tvrage_data(ttdb_showid)
+    current_show = Tvshow.find_by_ttdb_show_id(ttdb_showid)
+    title = current_show.tvr_search_name
+    puts "Updating TVR for: #{title}"
+    tvragedata = TvrHelper.get_tvrage_data(title)
     #Process latest/next tvrage episode info
     tvr_latest_episode = tvragedata['Latest Episode']
     if tvr_latest_episode != nil
@@ -31,7 +31,7 @@ class TvrHelper
       tvr_next_episode_date = tvr_next_episode.split("^")[2]
     end
     #update tvr data
-    currentshow.update_attributes(
+    current_show.update_attributes(
       :tvr_show_id => tvragedata['Show ID'],
       :tvr_latest_season_number => tvr_latest_season_number,
       :tvr_latest_episode_number => tvr_latest_episode_number,

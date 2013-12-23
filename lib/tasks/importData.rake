@@ -12,7 +12,12 @@ namespace :jdb do
     ttdbtime = TtdbHelper.get_time_from_ttdb
     #import every show
     xdbtvshows.each do |show|
-      DataRunner.import_new_show_from_xdb(show[:idShow])
+     TtdbHelper.update_all_ttdb_data(show[:c12])
+     TvrHelper.update_tvrage_data(show[:c12])
+     JdbHelper.update_jdb_show_data(show[:c12])
+     xdbepisodes.where("idShow = #{show_xdbid}").each do |episode|
+       JdbHelper.update_jdb_episode_data(episode[:idEpisode])
+     end
     end
     #Update last show/episode and time scrapped from xdb
     Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])

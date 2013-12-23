@@ -11,12 +11,6 @@ namespace :xbmc do
     XbmcApi.compose_command("VideoLibrary.Clean")
   end
 
-  desc "This will check rando command with XBMC Daemon"
-  task :rando => :environment do
-    require 'xbmc_api'
-    XbmcApi.compose_command("Player.GetActivePlayers")
-  end
-  
   desc "This is to test the XBMC Daemon in verbose mode"
   task :daemon_test => :environment do
     require 'faye/websocket'

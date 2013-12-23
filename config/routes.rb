@@ -5,7 +5,7 @@ Juwi::Application.routes.draw do
   
   match 'episodes/recently_aired' => 'all_episodes#recently_aired'
   match "episodes/:episode_id" => 'all_episodes#show'
-  resources :tvshows, :only => [:index, :show] do
+  resources :tvshows, :only => [:index, :show, :edit, :update] do
     collection do
       get :forcast
       get :recently_canceled

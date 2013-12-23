@@ -1,10 +1,11 @@
 require 'xmlsimple'
 require 'curl_helper'
 require 'zip/zipfilesystem'
+require 'scrubber'
 
 class TtdbHelper
 
-  def self.update_ttdb_data(ttdb_id)
+  def self.update_ttdb_show_data(ttdb_id)
     puts "Updating Show with ttdb id of #{ttdb_id}"
     ttdbdata = TtdbHelper.ttdb_xml_show_data("#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_id}.zip", "en.xml")
     currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_id)
@@ -22,11 +23,33 @@ class TtdbHelper
       :ttdb_show_network => ttdbdata['Series'].first['Network'].first,
       :ttdb_show_status => ttdbdata['Series'].first['Status'].first,
       :ttdb_show_runtime => ttdbdata['Series'].first['Runtime'].first,
-      :jdb_clean_show_title => Scrubber.clean_show_title(ttdb_show_title)
-      )
-      ttdbdata['Episode'].each do |episode|
-      #Create episode db entry
-      currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(ttdb_episode_id)
+      :jdb_clean_show_title => Scrubber.clean_show_title(ttdbdata['Series'].first['SeriesName'].first)
+    )
+  end
+
+  def self.update_ttdb_episode_data(ttdb_show_id, ttdb_episode_id)
+    currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
+    episode = TtdbHelper.get_episode_from_ttdb(ttdb_episode_id)['Episode'].first
+    currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(ttdb_episode_id)
+    currentEpisode.update_attributes(
+      :ttdb_episode_title => episode['EpisodeName'].first,
+      :ttdb_season_number => episode['SeasonNumber'].first,
+      :ttdb_episode_number => episode['EpisodeNumber'].first,
+      :ttdb_episode_id => episode['id'].first,
+      :ttdb_episode_overview => episode['Overview'].first,
+      :ttdb_episode_last_updated => episode['lastupdated'].first,
+      :ttdb_show_id => episode['seriesid'].first,
+      :ttdb_episode_airdate => episode['FirstAired'].first,
+      :ttdb_episode_rating => episode['Rating'].first,
+      :ttdb_episode_rating_count => episode['RatingCount'].first,
+    )
+  end
+
+  def self.update_all_ttdb_episode_data(ttdb_show_id)
+    currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
+    ttdbdata = TtdbHelper.ttdb_xml_show_data("#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_show_id}.zip", "en.xml")
+    ttdbdata['Episode'].each do |episode|
+      currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(episode['id'].first)
       currentEpisode.update_attributes(
         :ttdb_episode_title => episode['EpisodeName'].first,
         :ttdb_season_number => episode['SeasonNumber'].first,
@@ -38,10 +61,27 @@ class TtdbHelper
         :ttdb_episode_airdate => episode['FirstAired'].first,
         :ttdb_episode_rating => episode['Rating'].first,
         :ttdb_episode_rating_count => episode['RatingCount'].first,
-        )
+      )
     end
+  end
 
+  def self.update_all_ttdb_data(show_ttdbid)
+    zip_file = "#{File.join(Rails.root,'/ttdbdata/')}#{show_ttdbid}.zip"
+    if File.exist?(zip_file)
+      puts "deleting file #{zip_file}"
+      File.delete(zip_file)
+    end
+    puts "getting zip and importing show"
+    TtdbHelper.get_zip_from_ttdb(show_ttdbid)
+    puts "updating ttdb show data for #{show_ttdbid}"
+    TtdbHelper.update_ttdb_show_data(show_ttdbid)
+    puts "updating ttdb episode data for #{show_ttdbid}"
+    TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
+  end
 
+  def self.search_ttdb(search_string)
+    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{search_string}&language=en"), { 'SuppressEmpty' => '' })
+    return data
   end
 
   def self.ttdb_xml_show_data(zipfile, insidefile)
@@ -91,21 +131,19 @@ class TtdbHelper
     elsif update_interval == 3
       url = "http://thetvdb.comapi/#{Setting.get_value("ttdb_api_key")}/updates/updates_month.xml"
     end
-    data = XmlSimple.xml_in(CurlHelper.get_http_data(url,2), { 'SuppressEmpty' => '' })
+    data = XmlSimple.xml_in(CurlHelper.get_http_data(url), { 'SuppressEmpty' => '' })
     return data
   end
 
   def self.get_series_from_ttdb(series_id)
     data = nil
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
-    puts "Something happened getting series XML from TTDB"
     return data
   end
   
   def self.get_episode_from_ttdb(episode_id)
     data = nil
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
-    puts "Something happened getting episode XML from TTDB"
     return data
   end
 

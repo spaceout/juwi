@@ -5,5 +5,8 @@
 <br />
 <%= @tvshow.ttdb_show_overview %>
 <br /><br />
-<%= link_to 'Episodes', tvshow_episodes_path(@tvshow) %>|
-<%= link_to 'Back', tvshows_path %>
+<%= link_to('TTDB URL', "http://thetvdb.com/?tab=series&id=#{@tvshow.ttdb_show_id}") %>|
+<%= link_to('TVR URL', @tvshow.tvr_show_url) %>|
+<%= link_to('Episodes', tvshow_episodes_path(@tvshow)) %>|
+<%= link_to('Edit', edit_tvshow_path(@tvshow)) %>|
+<%= link_to('Back', tvshows_path) %>

@@ -78,7 +78,7 @@ class Renamer
             return "#"
           end
         else
-          matched_episode_title = matched_episode.first.ttdb_episode_title.gsub('/',' ').gsub('?','')
+          matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'')
           #If on the first try the episode title is TBA, try to update_show that shit, otherwise name it TBA
           if matched_episode_title == "TBA"
             puts "TBA FOUND!"

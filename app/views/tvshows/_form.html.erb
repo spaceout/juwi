@@ -1,0 +1,10 @@
+<%= form_for @tvshow do |f| %>
+  <p>
+    <%= @tvshow.ttdb_show_title %><br />
+  </p>
+  <p>
+    <%= f.label :tvr_search_name %><br />
+    <%= f.text_field :tvr_search_name %>
+  </p>
+  <p><%= f.submit %></p>
+<% end %>

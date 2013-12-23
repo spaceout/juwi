@@ -2,8 +2,9 @@ require 'curb'
 
 class CurlHelper
 
-  def self.get_http_data(url,attempts)
-    puts "Fetching: #{url}"
+  def self.get_http_data(url)
+    attempts = Setting.get_value("http_retries")
+    #puts "Fetching: #{url}"
     body_data = ""
     curl = Curl::Easy.new
     curl.follow_location = true
@@ -27,7 +28,8 @@ class CurlHelper
   end
 
   def self.download_http_data(url, savelocation)
-    puts "Downloading: #{url}"
+    #puts "Downloading: #{url}"
+    attempts = Setting.get_value("http_retries")
     curl = Curl::Easy.new
     curl.follow_location = true
     curl.url = url
@@ -36,7 +38,17 @@ class CurlHelper
         f << data
         data.size
       end
-      curl.perform
+      begin
+        curl.perform
+      rescue
+        if attempts != 0
+          puts "Failed downling #{url} trying again"
+          CurlHelper.get_http_data(url, attempts - 1)
+        elsif attempts == 0
+          puts "ERROR DOWNLOADING #{url}"
+          return false
+        end
+      end
     end
   end
 

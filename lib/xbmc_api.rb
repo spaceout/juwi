@@ -40,7 +40,7 @@ class XbmcApi
 
   def self.add_episode(xdb_ep_id)
     puts "Adding episode with XDBID #{xdb_ep_id}"
-    DataRunner.sync_episode_data(xdb_ep_id)
+    JdbHelper.sync_episode_data(xdb_ep_id)
     puts "Episode Addition complete"
   end
 

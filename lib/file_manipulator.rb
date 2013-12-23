@@ -3,7 +3,7 @@ require "fileutils"
 
 class FileManipulator
 
-    def self.process_rars(incoming_folder)
+  def self.process_rars(incoming_folder)
     puts "Searching #{incoming_folder} for rar files"
     Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*.rar").each do |rar_file|
       puts "Extracting RAR File: #{rar_file}"
@@ -21,7 +21,7 @@ class FileManipulator
   def self.move_videos(incoming_folder, base_path, min_videosize)
     video_extensions = Setting.get_value("video_extension")
     puts "Begin processing #{incoming_folder} for video files"
-    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions.join(",")}}").each do |video_file|
+    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions}}").each do |video_file|
       if File.size(video_file) > min_videosize
         puts "Moving #{video_file} to #{base_path}"
         FileUtils.mv(video_file, base_path)
@@ -32,7 +32,7 @@ class FileManipulator
   def self.delete_folder(incoming_folder, min_videosize)
     video_extensions = Setting.get_value("video_extension")
     puts "Double Checking to make sure #{incoming_folder} is clean"
-    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions.join(",")}}").each do |video_file|
+    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions}}").each do |video_file|
       if File.size(video_file) > min_videosize
         abort("FATAL ERROR #{incoming_folder} IS NOT EMPTY")
       end

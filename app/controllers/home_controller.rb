@@ -20,7 +20,7 @@ class HomeController < ApplicationController
     require 'xmlsimple'
     require 're_namer'
     require 'fileutils'
-@blerm = Renamer.process_dir(Setting.get_value("finished_path"), Setting.get_value("tvshow_base_path"))
+    @rename_results = Renamer.process_dir(Setting.get_value("finished_path"), Setting.get_value("tvshow_base_path"))
     render 'home/worker'
   end
 

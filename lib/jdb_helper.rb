@@ -33,6 +33,12 @@ class JdbHelper
     puts "Completed drop and re-import of #{showname}"
   end
 
+  def self.create_new_show(ttdb_id)
+    TtdbHelper.update_ttdb_show_data(show_ttdbid)
+    TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
+    TvrHelper.update_tvrage_data(show_ttdbid)
+  end
+
   def self.xdbid_to_ttdbid(xdbid)
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
@@ -48,8 +54,7 @@ class JdbHelper
     current_jdb_show = Tvshow.find_by_ttdb_show_id(ttdb_show_id)
     current_jdb_show.update_attributes(
       :xdb_show_location => current_xdb_show[:c16],
-      :xdb_show_id => current_xdb_show[:idShow],
-      :tvr_search_name => current_jdb_show.ttdb_show_title
+      :xdb_show_id => current_xdb_show[:idShow]
     )
     xbmcdb.disconnect
   end

@@ -9,7 +9,11 @@ namespace :ttdb do
     unless updatedata["Series"].nil?
       updatedata["Series"].each do |series|
         show_ttdbid = series['id'].first
-        next if Tvshow.find_by_ttdb_show_id(show_ttdbid) == nil
+        current_jdb_show = Tvshow.find_by_ttdb_id(show_ttdbid)
+        next if current_jdb_show == nil
+        next if current_jdb_show.tvr_show_status == "Canceled/Ended"
+        next if current_jdb_show.tvr_show_status == "Ended"
+        next if current_jdb_show.tvr_show_status == "Canceled"
         TtdbHelper.update_all_ttdb_data(show_ttdbid)
       end
     end
@@ -25,5 +29,13 @@ namespace :ttdb do
       TtdbHelper.get_all_images(tvshow)
     end
   end
+
+  desc "This refreshes all data for a single show passed in as argument"
+  task :search_ttdb, [:showname] => :environment do |t, args|
+    require 'ttdb_helper'
+    showname = args[:showname] || 'none'
+    puts TtdbHelper.search_ttdb(showname)
+  end
+
 
 end

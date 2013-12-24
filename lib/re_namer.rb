@@ -5,37 +5,41 @@ class Renamer
     output = []
     Dir.glob(File.join(rename_input_dir, "*")).each do |dir_entry|
       next if File.directory?(dir_entry)
-      clean_name,overwrite_enable = Renamer.rename(File.basename(dir_entry), 1)
-      if clean_name != "#"
+      rename_result = Renamer.rename(File.basename(dir_entry), 1)
+      puts rename_result
+      if rename_result[:failure].nil?
+        clean_name = rename_result[:success][:new_name]
+        overwrite_enable = rename_result[:success][:overwrite_enable]
         new_path = File.join(rename_output_dir, clean_name.split(" - ").first, "/")
         new_name = clean_name + File.extname(dir_entry)
         destination = new_path + new_name
         if File.directory?(new_path)
           if File.file?(destination)
-            puts "Destination already exists #{destination}"
-            output.push("Destination already exists #{destination}")
             if overwrite_enable == true
-              puts "OVERWRITE IS ENABLED REMOVING #{destination}"
-              output.push("OVERWRITE IS ENABLED REMOVING #{destination}")
               File.unlink(destination)
-              puts "REMOVED #{destination}"
-              output.push("REMOVED #{destination}")
               puts "Moving #{dir_entry} to #{destination}"
-              output.push("Moving #{dir_entry} to #{destination}")
+              output.push(rename_result)
               FileUtils.mv(dir_entry, destination)
+            else
+              puts "Destination already exists #{destination}"
+              rename_result = {:failure => rename_result[:success]}
+              rename_result[:failure][:reason] = "destination file exists"
+              output.push(rename_result)
             end
           else
             puts "Moving #{dir_entry} to #{destination}"
-            output.push("Moving #{dir_entry} to #{destination}")
+            output.push({:success => {:old_name => dir_entry, :new_name => destination}})
             FileUtils.mv(dir_entry, destination)
           end
         else
           puts "Destination directory #{new_path} not found"
-          output.push("Destination directory #{new_path} not found")
+          rename_result = {:failure => rename_result[:success]}
+          rename_result[:failure][:reason] = "destination folder does not exist: #{new_path}"
+          output.push(rename_result)
         end
       else
         puts "No match for #{dir_entry}"
-        output.push("No match for #{dir_entry}")
+        output.push(rename_result)
       end
     end
     return output
@@ -56,7 +60,7 @@ class Renamer
       overwrite_enable = true
     end
     if match_data == nil
-      return "#"
+      return {:failure => {:old_name => dirty_name, :reason => "no match data"}}
     else
       dirty_show_title = match_data[1].gsub(/20\d\d/, '')
       season_number = match_data[2].to_i
@@ -75,11 +79,10 @@ class Renamer
             Renamer.rename(dirty_name, 2)
           elsif attempt == 2
             puts "No Episode Found for: #{matched_show_title} - s#{season_number}e#{episode_number}"
-            return "#"
+            return {:failure => {:old_name => dirty_name, :reason => "episode not found"}}
           end
         else
           matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'')
-          #If on the first try the episode title is TBA, try to update_show that shit, otherwise name it TBA
           if matched_episode_title == "TBA"
             puts "TBA FOUND!"
             if attempt == 1
@@ -88,11 +91,11 @@ class Renamer
             end
           end
         rename_to = matched_show_title  +  " - s" '%02d' % season_number + "e" + '%02d' % episode_number + " - " + matched_episode_title
-        return rename_to,overwrite_enable
+        return {:success => {:old_name => dirty_name, :new_name => rename_to, :overwrite_enable => overwrite_enable}}
         end
       else
         puts "Show Not found #{clean_show_title}"
-        return "#"
+        return {:failure => {:old_name => dirty_name, :reason => "show not found", :show_title => dirty_show_title}}
       end
     end
   end

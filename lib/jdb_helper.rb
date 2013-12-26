@@ -37,6 +37,8 @@ class JdbHelper
     TtdbHelper.update_ttdb_show_data(show_ttdbid)
     TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
     TvrHelper.update_tvrage_data(show_ttdbid)
+    show_name = Tvshow.find_by_ttdb_show_id(ttdb_id).ttdb_show_title
+    Dir.mkdir("#{Settings.get_value(tvshow_base_path)}/#{Scrubber.clean_folder_name(show_name)}")
   end
 
   def self.xdbid_to_ttdbid(xdbid)

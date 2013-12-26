@@ -10,7 +10,7 @@ class Scrubber
   end
 
   def self.clean_folder_name(dirty_folder_name)
-    clean_folder_name = dirty_folder_name.gsub(/[\/?:'"]/,  '')
+    clean_folder_name = dirty_folder_name.gsub(/[\/?:"]/,  '')
     return clean_folder_name
   end
 

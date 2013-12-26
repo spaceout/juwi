@@ -7,14 +7,19 @@ namespace :ttdb do
     puts "Getting updates XML from ttdb"
     updatedata = TtdbHelper.get_updates_from_ttdb
     unless updatedata["Series"].nil?
+      update_set = []
       updatedata["Series"].each do |series|
         show_ttdbid = series['id'].first
-        current_jdb_show = Tvshow.find_by_ttdb_id(show_ttdbid)
+        current_jdb_show = Tvshow.find_by_ttdb_show_id(show_ttdbid)
         next if current_jdb_show == nil
         next if current_jdb_show.tvr_show_status == "Canceled/Ended"
         next if current_jdb_show.tvr_show_status == "Ended"
         next if current_jdb_show.tvr_show_status == "Canceled"
-        TtdbHelper.update_all_ttdb_data(show_ttdbid)
+        update_set.push(show_ttdbid)
+      end
+      puts "Updating #{update_set.count} Series"
+      update_set.each do |ttdb_id| 
+        TtdbHelper.update_all_ttdb_data(ttdb_id)
       end
     end
     #Reset last update time
@@ -30,7 +35,7 @@ namespace :ttdb do
     end
   end
 
-  desc "This refreshes all data for a single show passed in as argument"
+  desc "This searches TTDB for showname and returns ttdb IDs"
   task :search_ttdb, [:showname] => :environment do |t, args|
     require 'ttdb_helper'
     showname = args[:showname] || 'none'

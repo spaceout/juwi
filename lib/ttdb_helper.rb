@@ -6,7 +6,6 @@ require 'scrubber'
 class TtdbHelper
 
   def self.update_ttdb_show_data(ttdb_id)
-    puts "Updating Show with ttdb id of #{ttdb_id}"
     ttdbdata = TtdbHelper.ttdb_xml_show_data("#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_id}.zip", "en.xml")
     currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_id)
     currentShow.update_attributes(
@@ -82,6 +81,7 @@ class TtdbHelper
     TtdbHelper.update_ttdb_show_data(show_ttdbid)
     puts "updating ttdb episode data for #{show_ttdbid}"
     TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
+    puts "done with show #{show_ttdbid}"
   end
 
   def self.search_ttdb(search_string)

@@ -39,9 +39,10 @@ class XbmcApi
   end
 
   def self.add_episode(xdb_ep_id)
+    require 'jdb_helper'
+
     puts "Adding episode with XDBID #{xdb_ep_id}"
     JdbHelper.sync_episode_data(xdb_ep_id)
-    puts "Episode Addition complete"
   end
 
   def self.remove_episode(xdb_ep_id)
@@ -50,22 +51,20 @@ class XbmcApi
     episode.update_attributes(
         :xdb_episode_id => nil,
         :xdb_episode_location => nil
-        )
-    "un-sync complete"
+    )
   end
 
   def self.add_tvshow(xdb_show_id)
+    require 'jdb_helper'
+
     puts "Adding new show with XDBID #{xdb_show_id}"
-    DataRunner.import_new_show_from_xdb(xdb_show_id)
-    puts "Import of new TV show complete"
+    JdbHelper.create_new_show(JdbHelper.xdbid_to_ttdbid(xdb_show_id))
   end
 
   def self.remove_tvshow(xdb_show_id)
-    puts xdb_show_id
     tvshow = Tvshow.where(:xdb_show_id => xdb_show_id).first
     puts "Destroying #{tvshow.ttdb_show_title} and all episodes"
     tvshow.destroy
-    puts "TV Show removal complete"
   end
 
   def self.compose_command(method)

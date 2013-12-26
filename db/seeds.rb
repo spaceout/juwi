@@ -1,25 +1,18 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+Setting.delete_all
+Setting.create(:name => "ttdb_last_scrape", :notes => "Time of last scrape from TTDB in Unix Epoch time")
+Setting.create(:name => "last_xdb_show_id", :notes => "last TVshow ID scrapped from XBMC DB")
+Setting.create(:name => "last_xdb_episode_id", :notes => "last episode scrapped from XBMC DB")
+Setting.create(:name => "xbmcdb", :value => "mysql://xbmc:xbmc@127.0.0.1/MyVideos75", :notes => "used to connect to XBMC SQL database")
+Setting.create(:name => "ttdb_api_key", :notes => "API key from TheTVDB.com")
+Setting.create(:name => "finished_path", :notes => "path where transmission puts a completed downloads no trailing slash")
+Setting.create(:name => "tvshow_base_path", :notes => "root path for tvshows, should contain only folders of individual tvshows, no trailing slash")
+Setting.create(:name => "min_videosize", :value => "60000000", :notes => "Minimum video size to be considered a tvshow as opposed to a sample file")
+Setting.create(:name => "xbmc_hostname", :notes => "resolvable DNS name for XBMC machine")
+Setting.create(:name => "xbmc_port", :value => "9090", :notes => "port the XBMC api is running on, default is 9090")
+Setting.create(:name => "transmission_url", :value => "http://127.0.0.1:9091/transmission/rpc", :notes => "RPC url for transmission")
+Setting.create(:name => "transmission_user", :value => "transmission", :notes => "username for transmission RPC")
+Setting.create(:name => "transmission_password", :value => " transmission", :notes => "password for transmission RPC")
+Setting.create(:name => "video_extensions", :value => ".mkv,.avi,.mp4,.mts,.m2ts", :notes => "PeriodExtensionCommaPeriodExtensionComma")
+Setting.create(:name => "xmission_token", :notes => "current transmission token")
+Setting.create(:name => "http_retries", :value => "2", :notes => "number of http retries")
 
-Setting.create(:name => "xbmcdb", :value => "mysql://xbmc:xbmc@127.0.0.1/MyVideos75")
-Setting.create(:name => "ttdb_api_key")
-Setting.create(:name => "base_path")
-Setting.create(:name => "tvshow_base_path")
-Setting.create(:name => "min_videosize", :value => 60000000)
-Setting.create(:name => "xbmc_hostname")
-Setting.create(:name => "xbmc_port", :value => 9090)
-Setting.create(:name => "transmission_url", :value => "http://127.0.0.1:9091/transmission/rpc")
-Setting.create(:name => "transmission_user", :value => "transmission")
-Setting.create(:name => "transmission_password", :value => "transmission")
-Setting.create(:name => "rename_dir")
-Setting.create(:name => "destination_dir")
-Setting.create(:name => "log_file")
-Setting.create(:name => "ttdb_last_scrape")
-Setting.create(:name => "xdb_last_scrape")
-Setting.create(:name => "last_xdb_show_id")
-Setting.create(:name => "last_xdb_episode_id")

@@ -34,11 +34,21 @@ class JdbHelper
   end
 
   def self.create_new_show(ttdb_id)
-    TtdbHelper.update_ttdb_show_data(show_ttdbid)
-    TtdbHelper.update_all_ttdb_episode_data(show_ttdbid)
-    TvrHelper.update_tvrage_data(show_ttdbid)
-    show_name = Tvshow.find_by_ttdb_show_id(ttdb_id).ttdb_show_title
-    Dir.mkdir("#{Settings.get_value(tvshow_base_path)}/#{Scrubber.clean_folder_name(show_name)}")
+    require 'tvr_helper'
+    require 'ttdb_helper'
+    require 'jdb_helper'
+
+    if Tvshow.find_by_ttdb_show_id(ttdb_id).nil?
+      TtdbHelper.get_zip_from_ttdb(ttdb_id)
+      TtdbHelper.update_ttdb_show_data(ttdb_id)
+      TtdbHelper.update_all_ttdb_episode_data(ttdb_id)
+      show_name = Tvshow.find_by_ttdb_show_id(ttdb_id).ttdb_show_title
+      TvrHelper.update_tvrage_data(ttdb_id)
+      new_path = "#{Setting.get_value('tvshow_base_path')}/#{Scrubber.clean_folder_name(show_name)}"
+      unless File.directory?(new_path)
+        Dir.mkdir(new_path)
+      end
+    end
   end
 
   def self.xdbid_to_ttdbid(xdbid)
@@ -58,6 +68,11 @@ class JdbHelper
       :xdb_show_location => current_xdb_show[:c16],
       :xdb_show_id => current_xdb_show[:idShow]
     )
+    current_jdb_show.episodes.each do |episode|
+      episode.update_attributes(
+        :xdb_show_id => current_xdb_show[:idShow]
+      )
+    end
     xbmcdb.disconnect
   end
 

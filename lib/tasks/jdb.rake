@@ -4,6 +4,8 @@ namespace :jdb do
     require 'sequel'
     require 'mysql'
     require 'jdb_helper'
+    require 'ttdb_helper'
+    require 'tvr_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]

@@ -5,7 +5,7 @@ Juwi::Application.routes.draw do
   
   match 'episodes/recently_aired' => 'all_episodes#recently_aired'
   match "episodes/:episode_id" => 'all_episodes#show'
-  resources :tvshows, :only => [:index, :show, :edit, :update] do
+  resources :tvshows  do
     collection do
       get :forcast
       get :recently_canceled
@@ -21,6 +21,7 @@ Juwi::Application.routes.draw do
   match 'upload_torrent' => 'home#upload_torrent'
   match 'xbmc_update' => 'home#xbmc_update'
   match 'process_downloads' => 'home#process_downloads'
+  get 'ttdbsearch', to: 'home#ttdbsearch', as: 'ttdbsearch'
 end
 
 

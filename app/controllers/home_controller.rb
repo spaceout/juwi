@@ -20,7 +20,16 @@ class HomeController < ApplicationController
     require 'xmlsimple'
     require 're_namer'
     require 'fileutils'
-    @rename_results = Renamer.process_dir(Setting.get_value("finished_path"), Setting.get_value("tvshow_base_path"))
+    @rename_success = []
+    @rename_failure = []
+    rename_results = Renamer.process_dir(Setting.get_value("finished_path"), Setting.get_value("tvshow_base_path"))
+    rename_results.each do |result|
+      if result[:success] != nil
+        @rename_success.push(result)
+      elsif result[:failure] != nil
+        @rename_failure.push(result)
+      end
+    end
     render 'home/worker'
   end
 
@@ -62,6 +71,11 @@ class HomeController < ApplicationController
     XmissionApi.remove_finished_downloads(xmission)
     FileManipulator.process_finished_directory(Setting.get_value("finished_path"), Setting.get_value("min_videosize").to_i)
     redirect_to '/'
+  end
+
+  def ttdbsearch
+    require 'ttdb_helper'
+    @search_results = TtdbHelper.search_ttdb(params[:show_title])
   end
 
 end

@@ -28,7 +28,7 @@ class Renamer
             end
           else
             puts "Moving #{dir_entry} to #{destination}"
-            output.push({:success => {:old_name => dir_entry, :new_name => destination}})
+            output.push({:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}})
             FileUtils.mv(dir_entry, destination)
           end
         else
@@ -95,7 +95,7 @@ class Renamer
         end
       else
         puts "Show Not found #{clean_show_title}"
-        return {:failure => {:old_name => dirty_name, :reason => "show not found", :show_title => dirty_show_title}}
+        return {:failure => {:old_name => dirty_name, :reason => "show not found", :show_title => clean_show_title}}
       end
     end
   end

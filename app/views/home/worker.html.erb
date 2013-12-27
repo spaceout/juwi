@@ -1,8 +1,29 @@
 <h3>Renaming Results</h3>
 <br />
-<% @rename_results.each do |result|  %>
+<% unless @rename_success.empty? %>
+  <h3>SUCCESS</h3>
+  <% @rename_success.each do |success|  %>
+    <%= success[:success] %><br />
+  <% end %>
+<% end %>
 
-  <%= result %><br />
+<br />
+
+<% unless @rename_failure.empty? %>
+  <h3> FAILURE </h3>
+  <table>
+    <tr>
+      <th>File Name</th>
+      <th>Failure Reason</th>
+    </tr>
+  <% @rename_failure.each do |failure| %>
+    <tr>
+      <td><%= failure[:failure][:old_name] %></td>
+      <td><%= failure[:failure][:reason] %></td>
+      <td><%= link_to("search", ttdbsearch_path(show_title: failure[:failure][:show_title])) %> </td>
+    </tr>
+  <% end %>
+  </table>
 <% end %>
 <br />
 <%= link_to("Home", root_path)  %>

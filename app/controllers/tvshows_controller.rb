@@ -38,4 +38,18 @@ class TvshowsController < ApplicationController
     redirect_to action: "show"
   end
 
+  def create
+    require 'jdb_helper'
+    if params[:ttdb_id].nil?
+      flash[:notice] = "Could not add TV Show, entry was nil"
+      redirect_to '/'
+    else
+      JdbHelper.create_new_show(params[:ttdb_id])
+      flash[:notice] = "TV show added #{params[:ttdb_id]}"
+    end
+    redirect_to '/'
+
+
+  end
+
 end

@@ -58,7 +58,9 @@ class XbmcApi
     require 'jdb_helper'
 
     puts "Adding new show with XDBID #{xdb_show_id}"
-    JdbHelper.create_new_show(JdbHelper.xdbid_to_ttdbid(xdb_show_id))
+    ttdb_id = JdbHelper.xdbid_to_ttdbid(xdb_show_id)
+    JdbHelper.create_new_show(ttdb_id)
+    JdbHelper.update_jdb_show_data(ttdb_id)
   end
 
   def self.remove_tvshow(xdb_show_id)

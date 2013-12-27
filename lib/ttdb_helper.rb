@@ -24,7 +24,7 @@ class TtdbHelper
       :ttdb_show_runtime => ttdbdata['Series'].first['Runtime'].first,
       :jdb_clean_show_title => Scrubber.clean_show_title(ttdbdata['Series'].first['SeriesName'].first)
     )
-    if currentShow.ttdb_show_title == nil
+    if currentShow.tvr_search_name == nil
       currentShow.update_attributes(
         :tvr_search_name => currentShow.ttdb_show_title
       )
@@ -85,7 +85,7 @@ class TtdbHelper
   end
 
   def self.search_ttdb(search_string)
-    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{search_string}&language=en"), { 'SuppressEmpty' => '' })
+    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{URI.encode(search_string)}&language=en"), { 'SuppressEmpty' => '' })
     result_set = []
     data["Series"].each do |result|
       result_set.push(

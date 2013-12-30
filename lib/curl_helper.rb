@@ -17,7 +17,7 @@ class CurlHelper
       curl.perform
     rescue
       if attempts != 0
-        puts "Failed downling #{url} trying again"
+        puts "Failed downloading #{url} trying again"
         CurlHelper.get_http_data(url)
       elsif attempts == 0
         puts "ERROR DOWNLOADING #{url}"
@@ -42,8 +42,8 @@ class CurlHelper
         curl.perform
       rescue
         if attempts != 0
-          puts "Failed downling #{url} trying again"
-          CurlHelper.get_http_data(url)
+          puts "Failed downloading #{url} trying again"
+          CurlHelper.get_http_data(url, savelocation)
         elsif attempts == 0
           puts "ERROR DOWNLOADING #{url}"
           return false

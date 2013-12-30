@@ -12,7 +12,11 @@ class HomeController < ApplicationController
       :password => Setting.get_value("transmission_password"),
       :url => Setting.get_value("transmission_url")
     )
-    @transmission_dls = xmission.all
+    begin
+      @transmission_dls = xmission.all
+    rescue
+      @transmission_dls = nil
+    end
     @xbmc_daemon_status = XbmcDaemon.status
   end
 

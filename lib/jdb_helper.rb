@@ -4,6 +4,8 @@ class JdbHelper
     require 'mysql'
     require 'sequel'
     require 'ttdb_helper'
+    require 'jdb_helper'
+    require 'tvr_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value("xbmcdb"))
     xdbepisodes = xbmcdb[:episode]

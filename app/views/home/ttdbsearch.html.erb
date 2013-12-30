@@ -1,0 +1,21 @@
+<h3>TTDB Search Results for </h3>
+<% if @search_results != nil  %>
+  <table>
+    <tr>
+      <th>ttdbid</th>
+      <th>show title</th>
+      <th>first aired</th>
+    </tr>
+  <% @search_results.each do |result| %>
+    <tr>
+      <td><%= result[:series][:ttdb_id] %></td>
+      <td><%= result[:series][:ttdb_title] %></td>
+      <td><%= result[:series][:ttdb_first_aired] %></td>
+      <td><%= button_to("Add Show to JDB", :controller => "tvshows", :action => "create", :ttdb_id => result[:series][:ttdb_id]) %></td>
+    </tr>
+  <% end %>
+  </table>
+<% end %>
+<br />
+<%= link_to("Home", root_path)  %>
+

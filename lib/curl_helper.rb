@@ -38,15 +38,19 @@ class CurlHelper
         f << data
         data.size
       end
-      begin
-        curl.perform
-      rescue
-        if attempts != 0
-          puts "Failed downloading #{url} trying again"
-          CurlHelper.get_http_data(url, savelocation)
-        elsif attempts == 0
-          puts "ERROR DOWNLOADING #{url}"
-          return false
+      success = false
+      while success == false
+        begin
+          curl.perform
+          success == true
+        rescue
+          attempts -= 1
+          if attempts != 0
+            puts "Failed downloading #{url} trying again"
+          elsif attempts == 0
+            puts "ERROR DOWNLOADING #{url}"
+            return false
+          end
         end
       end
     end

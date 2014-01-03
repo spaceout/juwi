@@ -1,13 +1,23 @@
 <h3>Renaming Results</h3>
 <br />
+<% if @rename_success.empty? and @rename_failure.empty? %>
+  <h3>No Results</h3>
+<% end %>
 <% unless @rename_success.empty? %>
   <h3>SUCCESS</h3>
-  <% @rename_success.each do |success|  %>
-    <%= success[:success] %><br />
-  <% end %>
+  <table>
+    <tr>
+      <th>Original Name</th>
+      <th>New Name</th>
+    </tr>
+    <% @rename_success.each do |success|  %>
+      <tr>
+        <td><%= success[:success][:old_name] %></td>
+        <td><%= success[:success][:new_name] %></td>
+      </tr>
+    <% end %>
+  </table>
 <% end %>
-
-<br />
 
 <% unless @rename_failure.empty? %>
   <h3> FAILURE </h3>
@@ -27,5 +37,3 @@
 <% end %>
 <br />
 <%= link_to("Home", root_path)  %>
-<br />
-<br />

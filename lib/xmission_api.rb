@@ -40,7 +40,7 @@ class XmissionApi
 
   def upload_link(url, destination)
     puts "Uploading: #{url}"
-    response = post(:method => "torrent-add",:arguments => {:filename => url})
+    response = post(:method => "torrent-add",:arguments => {:filename => url, :'download-dir' => "#{Setting.get_value("finished_path")}/"})
     response
   end
 

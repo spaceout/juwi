@@ -4,7 +4,6 @@ class CurlHelper
 
   def self.get_http_data(url)
     attempts = Setting.get_value("http_retries").to_i
-    #puts "Fetching: #{url}"
     body_data = ""
     curl = Curl::Easy.new
     curl.follow_location = true
@@ -16,19 +15,14 @@ class CurlHelper
     begin
       curl.perform
     rescue
-      if attempts != 0
-        puts "Failed downloading #{url} trying again"
-        CurlHelper.get_http_data(url)
-      elsif attempts == 0
-        puts "ERROR DOWNLOADING #{url}"
-        return false
-      end
+      puts "Failed downloading #{url} trying again"
+      puts "ERROR DOWNLOADING #{url}" if attempts == 0
+      retry if attempts > 0
     end
     return body_data
   end
 
   def self.download_http_data(url, savelocation)
-    #puts "Downloading: #{url}"
     attempts = Setting.get_value("http_retries").to_i
     curl = Curl::Easy.new
     curl.follow_location = true
@@ -38,20 +32,13 @@ class CurlHelper
         f << data
         data.size
       end
-      success = false
-      while success == false
-        begin
-          curl.perform
-          success == true
-        rescue
-          attempts -= 1
-          if attempts != 0
-            puts "Failed downloading #{url} trying again"
-          elsif attempts == 0
-            puts "ERROR DOWNLOADING #{url}"
-            return false
-          end
-        end
+      begin
+        curl.perform
+      rescue
+        attempts -= 1
+        puts "Failed downloading #{url} trying again"
+        puts "ERROR DOWNLOADING #{url}" if attempts == 0
+        retry if attempts > 0
       end
     end
   end

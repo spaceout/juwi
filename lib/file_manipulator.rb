@@ -3,6 +3,7 @@ require "fileutils"
 
 class FileManipulator
 
+  #Checks folder and sub-folders for rar files and unrars them
   def self.process_rars(incoming_folder)
     puts "Searching #{incoming_folder} for rar files"
     Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*.rar").each do |rar_file|
@@ -18,6 +19,7 @@ class FileManipulator
     puts "Completed rar processing on #{incoming_folder}"
   end
 
+  #checks sub folders for video files larger then min_videosize and moves them to the base_path
   def self.move_videos(incoming_folder, base_path, min_videosize)
     video_extensions = Setting.get_value("video_extension")
     puts "Begin processing #{incoming_folder} for video files"
@@ -29,6 +31,7 @@ class FileManipulator
     end
   end
 
+  #deletes folder if there are no video files larger them min_videosize
   def self.delete_folder(incoming_folder, min_videosize)
     video_extensions = Setting.get_value("video_extension")
     puts "Double Checking to make sure #{incoming_folder} is clean"
@@ -41,6 +44,7 @@ class FileManipulator
     FileUtils.rm_rf(incoming_folder)
   end
 
+  #takes a directory as input and an array of file contents as the output
   def self.list_dir(directory)
     file_list = []
     dir_list = Dir.glob("#{escape_glob(directory)}/*")
@@ -50,10 +54,12 @@ class FileManipulator
     return file_list
   end
 
+  #escapes certain characters
   def self.escape_glob(directory)
     return directory.gsub(/[\\\{\}\[\]\*\?]/) { |x| "\\"+x }
   end
 
+  #Process the finished directory rars/move/delete
   def self.process_finished_directory(base_path, min_videosize)
     puts "Procesing Directory"
     Dir.chdir(base_path)

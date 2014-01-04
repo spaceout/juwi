@@ -18,7 +18,8 @@ namespace :ttdb do
         update_set.push(show_ttdbid)
       end
       puts "Updating #{update_set.count} Series"
-      update_set.each do |ttdb_id| 
+      update_set.each do |ttdb_id|
+        Tvshow.find_by_ttdb_show_id(ttdb_id).episodes.destroy
         TtdbHelper.update_all_ttdb_data(ttdb_id)
       end
     end
@@ -28,7 +29,8 @@ namespace :ttdb do
 
   ####GET ALL TTDB IMAGES####
   desc "This will download all images for current tvshows"
-  task :getImages => :environment do
+  task :get_images => :environment do
+    require 'ttdb_helper'
     Tvshow.all.each do |tvshow|
       next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
       TtdbHelper.get_all_images(tvshow)

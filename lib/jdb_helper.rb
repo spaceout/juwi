@@ -50,6 +50,8 @@ class JdbHelper
       unless File.directory?(new_path)
         Dir.mkdir(new_path)
       end
+    else
+      JdbHelper.update_jdb_show_data(ttdb_id)
     end
   end
 

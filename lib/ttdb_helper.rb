@@ -172,6 +172,5 @@ class TtdbHelper
     if tvshow.ttdb_show_poster != nil
       CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
     end
-    puts "Something happened downloading image from TTDB"
   end
 end

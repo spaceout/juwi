@@ -39,10 +39,9 @@ class XbmcApi
   end
 
   def self.add_episode(xdb_ep_id)
-    require 'jdb_helper'
-
+    require 'xdb_helper'
     puts "Adding episode with XDBID #{xdb_ep_id}"
-    JdbHelper.sync_episode_data(xdb_ep_id)
+    XdbHelper.update_xdb_episode_data(xdb_ep_id)
   end
 
   def self.remove_episode(xdb_ep_id)
@@ -56,11 +55,12 @@ class XbmcApi
 
   def self.add_tvshow(xdb_show_id)
     require 'jdb_helper'
+    require 'xdb_helper'
 
     puts "Adding new show with XDBID #{xdb_show_id}"
     ttdb_id = JdbHelper.xdbid_to_ttdbid(xdb_show_id)
     JdbHelper.create_new_show(ttdb_id)
-    JdbHelper.update_jdb_show_data(ttdb_id)
+    XdbHelper.update_xdb_show_data(ttdb_id)
   end
 
   def self.remove_tvshow(xdb_show_id)

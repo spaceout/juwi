@@ -15,6 +15,7 @@ class CurlHelper
     begin
       curl.perform
     rescue
+      attempts -= 1
       puts "Failed downloading #{url} trying again"
       puts "ERROR DOWNLOADING #{url}" if attempts == 0
       retry if attempts > 0

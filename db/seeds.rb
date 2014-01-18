@@ -11,7 +11,7 @@ Setting.create(:name => "xbmc_hostname", :notes => "resolvable DNS name for XBMC
 Setting.create(:name => "xbmc_port", :value => "9090", :notes => "port the XBMC api is running on, default is 9090")
 Setting.create(:name => "transmission_url", :value => "http://127.0.0.1:9091/transmission/rpc", :notes => "RPC url for transmission")
 Setting.create(:name => "transmission_user", :value => "transmission", :notes => "username for transmission RPC")
-Setting.create(:name => "transmission_password", :value => " transmission", :notes => "password for transmission RPC")
+Setting.create(:name => "transmission_password", :value => "transmission", :notes => "password for transmission RPC")
 Setting.create(:name => "video_extensions", :value => ".mkv,.avi,.mp4,.mts,.m2ts", :notes => "PeriodExtensionCommaPeriodExtensionComma")
 Setting.create(:name => "xmission_token", :notes => "current transmission token")
 Setting.create(:name => "http_retries", :value => "2", :notes => "number of http retries")

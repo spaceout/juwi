@@ -4,6 +4,9 @@ namespace :jdb do
     require 'xmlsimple'
     require 'sequel'
     require 'mysql'
+    require 'xdb_helper'
+    require 'ttdb_helper'
+    require 'tvr_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
@@ -14,9 +17,9 @@ namespace :jdb do
     xdbtvshows.each do |show|
      TtdbHelper.update_all_ttdb_data(show[:c12])
      TvrHelper.update_tvrage_data(show[:c12])
-     JdbHelper.update_jdb_show_data(show[:c12])
-     xdbepisodes.where("idShow = #{show_xdbid}").each do |episode|
-       JdbHelper.update_jdb_episode_data(episode[:idEpisode])
+     XdbHelper.update_xdb_show_data(show[:c12])
+     xdbepisodes.where("idShow = #{show[:idShow]}").each do |episode|
+       XdbHelper.update_xdb_episode_data(episode[:idEpisode])
      end
     end
     #Update last show/episode and time scrapped from xdb

@@ -1,12 +1,9 @@
 namespace :jdb do
   desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
   task :update => :environment do
-    require 'sequel'
-    require 'mysql'
     require 'jdb_helper'
     require 'ttdb_helper'
     require 'tvr_helper'
-    require 'xdb_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]

@@ -1,7 +1,11 @@
+require 'fileutils'
+require 'jdb_helper'
+require 'exceptions'
+require 'scrubber'
+
 class Renamer
 
   def self.process_dir(rename_input_dir, rename_output_dir)
-    require 'fileutils'
     output = []
     Dir.glob(File.join(rename_input_dir, "*")).each do |dir_entry|
       next if File.directory?(dir_entry)
@@ -46,9 +50,6 @@ class Renamer
   end
 
   def self.rename(dirty_name, attempt)
-    require 'jdb_helper'
-    require 'exceptions'
-    require 'scrubber'
     if attempt == 2
       puts "second try"
     end

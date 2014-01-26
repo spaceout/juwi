@@ -16,8 +16,8 @@ Juwi::Application.routes.draw do
   resources :settings
   root :to => 'home#index'
   match 'rename' => 'home#rename'
-  match 'startDaemon' => 'home#startDaemon'
-  match 'stopDaemon' => 'home#stopDaemon'
+  match 'start_daemon' => 'daemons#start_daemon'
+  match 'stop_daemon' => 'daemons#stop_daemon'
   match 'upload_torrent' => 'home#upload_torrent'
   match 'xbmc_update' => 'home#xbmc_update'
   match 'process_downloads' => 'home#process_downloads'

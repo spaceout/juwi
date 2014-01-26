@@ -37,18 +37,6 @@ class HomeController < ApplicationController
     render 'home/worker'
   end
 
-  def startDaemon
-    require 'xbmc_daemon'
-    XbmcDaemon.start
-    redirect_to '/'
-  end
-
-  def stopDaemon
-    require 'xbmc_daemon'
-    XbmcDaemon.stop
-    redirect_to '/'
-  end
-
   def upload_torrent
     require 'xmission_api'
     xmission = XmissionApi.new(
@@ -72,7 +60,7 @@ class HomeController < ApplicationController
       :password => Setting.get_value("transmission_password"),
       :url => Setting.get_value("transmission_url")
     )
-    XmissionApi.remove_finished_downloads(xmission)
+    xmission.remove_finished_downloads
     FileManipulator.process_finished_directory(Setting.get_value("finished_path"), Setting.get_value("min_videosize").to_i)
     redirect_to '/'
   end

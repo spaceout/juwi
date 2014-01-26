@@ -1,9 +1,10 @@
+require 'ttdb_helper'
+require 'scrubber'
+require 'tvr_helper'
+require 'jdb_helper'
+
 class Tvshow < ActiveRecord::Base
   has_many :episodes, :dependent => :destroy
-
-  require 'ttdb_helper'
-  require 'scrubber'
-  require 'tvr_helper'
 
   def self.create_new_show(ttdb_show_id)
     puts "getting zip"

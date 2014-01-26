@@ -1,10 +1,14 @@
 require 'net/telnet'
 require 'logger'
+require 'faye/websocket'
+require 'eventmachine'
+require 'jdb_helper'
 
 class XbmcApi
   def initialize(logger = nil)
     @log = logger || Logger.new(STDOUT)
   end
+
   def self.process_message(message)
     parsed_message = JSON.parse(message)
     message_method = parsed_message["method"]
@@ -16,7 +20,6 @@ class XbmcApi
       puts "XBMC DB clean initiated"
     elsif message_method == "VideoLibrary.OnCleanFinished"
       puts "XBMC DB clean complete"
-
     elsif message_method == "VideoLibrary.OnUpdate"
       if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] == "episode"
         puts "New episode added to XBMC DB"
@@ -26,7 +29,6 @@ class XbmcApi
       elsif parsed_message["params"]["data"]["item"]["type"] = "movie"
         puts "New Movie added to XBMC DB"
       end
-
     elsif message_method == "VideoLibrary.OnRemove"
       if parsed_message["params"]["data"]["type"] == "movie"
         puts "Movie Removed from XBMC DB"
@@ -34,45 +36,33 @@ class XbmcApi
         puts "Episode removed from XBMC DB"
         remove_episode(parsed_message["params"]["data"]["id"])
       end
-
     end
   end
 
-  def self.add_episode(xdb_ep_id)
-    require 'xdb_helper'
-    puts "Adding episode with XDBID #{xdb_ep_id}"
-    XdbHelper.update_xdb_episode_data(xdb_ep_id)
+  def self.add_episode(xdb_episode_id)
+    puts "Adding episode with XDBID #{xdb_episode_id}"
+    Tvshow.update_xdb_episode_data(xdb_episode_id)
   end
 
-  def self.remove_episode(xdb_ep_id)
-    episode = Episode.where(:xdb_episode_id => xdb_ep_id).first
+  def self.remove_episode(xdb_episode_id)
+    episode = Episode.find_by_xdb_episode_id(xdb_episode_id)
     puts "un-syncing #{episode.tvshow.ttdb_show_title} - s#{episode.ttdb_season_number}e#{episode.ttdb_episode_number}"
-    episode.update_attributes(
-        :xdb_episode_id => nil,
-        :xdb_episode_location => nil
-    )
+    Tvshow.remove_xdb_episode_data(episode.ttdb_episode_id)
   end
 
   def self.add_tvshow(xdb_show_id)
-    require 'jdb_helper'
-    require 'xdb_helper'
-
     puts "Adding new show with XDBID #{xdb_show_id}"
-    ttdb_id = JdbHelper.xdbid_to_ttdbid(xdb_show_id)
-    JdbHelper.create_new_show(ttdb_id)
-    XdbHelper.update_xdb_show_data(ttdb_id)
+    ttdb_show_id = JdbHelper.xdbid_to_ttdbid(xdb_show_id)
+    Tvshow.create_and_sync_new_show(ttdb_show_id)
   end
 
   def self.remove_tvshow(xdb_show_id)
-    tvshow = Tvshow.where(:xdb_show_id => xdb_show_id).first
+    tvshow = Tvshow.find_by_xdb_show_id(xdb_show_id)
     puts "Destroying #{tvshow.ttdb_show_title} and all episodes"
     tvshow.destroy
   end
 
   def self.compose_command(method)
-    require 'faye/websocket'
-    require 'eventmachine'
-
     command = {
       "jsonrpc" => "2.0",
       "method" => "#{method}",

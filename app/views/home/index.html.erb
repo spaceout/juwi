@@ -1,9 +1,9 @@
 <h3>System Status</h3>
 XBMC Daemon Status: <%= @xbmc_daemon_status %>
 <% if @xbmc_daemon_status == :running %>
-  <%= button_to("Stop", :action => "stopDaemon", :controller => "home") %>
+  <%= button_to("Stop", :action => "stop_daemon", :controller => "daemons") %>
 <% else %>
-  <%= button_to("Start", :action => "startDaemon", :controller => "home") %>
+  <%= button_to("Start", :action => "start_daemon", :controller => "daemons") %>
 <% end %>
 <h3>Downloads in Transmission</h3>
 <table border = "1">

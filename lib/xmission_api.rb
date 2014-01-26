@@ -65,12 +65,12 @@ class XmissionApi
     response
   end
 
-  def self.remove_finished_downloads(xmission)
+  def remove_finished_downloads
     puts "Removing finished downloads from transmission"
-    xmission.all.each do |download|
+    all.each do |download|
       if download["isFinished"] == true && download["downloadDir"] == Setting.get_value("finished_path") + "/"
         puts "Removing #{download["name"]} from Transmission"
-        xmission.remove(download["id"])
+        remove(download["id"])
       end
     end
     puts "Done with removing finished downloads from transmission"

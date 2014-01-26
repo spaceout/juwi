@@ -42,6 +42,11 @@ GEM
     daemons-rails (1.2.1)
       daemons
       multi_json (~> 1.0)
+    delayed_job (4.0.0)
+      activesupport (>= 3.0, < 4.1)
+    delayed_job_active_record (4.0.0)
+      activerecord (>= 3.0, < 4.1)
+      delayed_job (>= 3.0, < 4.1)
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (1.4.0)
@@ -123,6 +128,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   curb
   daemons-rails
+  delayed_job_active_record
   faye-websocket
   httparty
   jquery-rails

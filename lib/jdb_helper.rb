@@ -6,7 +6,7 @@ class JdbHelper
     if currentshow.nil?
       puts "No Show Found matching #{showname}"
     else
-      ttdb_show_id = currentshow.first.ttdb_show_id
+      ttdb_show_id = currentshow.ttdb_show_id
       Tvshow.update_all_ttdb_data(ttdb_show_id)
     end
     puts "Completed drop and re-import of #{showname}"

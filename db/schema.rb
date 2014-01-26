@@ -11,7 +11,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131223162244) do
+ActiveRecord::Schema.define(:version => 20140125223232) do
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0, :null => false
+    t.integer  "attempts",   :default => 0, :null => false
+    t.text     "handler",                   :null => false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "episodes", :force => true do |t|
     t.integer  "tvshow_id"
@@ -30,6 +46,7 @@ ActiveRecord::Schema.define(:version => 20131223162244) do
     t.integer  "ttdb_episode_rating_count"
     t.datetime "created_at",                :null => false
     t.datetime "updated_at",                :null => false
+    t.string   "state"
   end
 
   create_table "settings", :force => true do |t|

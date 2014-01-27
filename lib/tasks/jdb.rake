@@ -84,10 +84,6 @@ namespace :jdb do
 
   desc "This will populate the data from cache zip files"
   task :import_data => :environment do
-    require 'xdb_helper'
-    require 'ttdb_helper'
-    require 'tvr_helper'
-
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
     ttdbtime = TtdbHelper.get_time_from_ttdb

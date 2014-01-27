@@ -1,0 +1,41 @@
+<%= form_for(@name_deviation) do |f| %>
+  <% if @name_deviation.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@name_deviation.errors.count, "error") %> prohibited this name_deviation from being saved:</h2>
+
+      <ul>
+      <% @name_deviation.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :tvshow_id %><br />
+    <%= f.number_field :tvshow_id %>
+  </div>
+  <div class="field">
+    <%= f.label :season_number %><br />
+    <%= f.number_field :season_number %>
+  </div>
+  <div class="field">
+    <%= f.label :episode_number %><br />
+    <%= f.number_field :episode_number %>
+  </div>
+  <div class="field">
+    <%= f.label :tvshow_title %><br />
+    <%= f.text_field :tvshow_title %>
+  </div>
+  <div class="field">
+    <%= f.label :enabled %><br />
+    <%= f.check_box :enabled %>
+  </div>
+  <div class="field">
+    <%= f.label :type %><br />
+    <%= f.text_field :type %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

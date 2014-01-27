@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  tvshow_id: 1
+  season_number: 1
+  episode_number: 1
+  tvshow_title: MyString
+  enabled: false
+  type: 
+
+two:
+  tvshow_id: 1
+  season_number: 1
+  episode_number: 1
+  tvshow_title: MyString
+  enabled: false
+  type: 

@@ -1,4 +1,7 @@
 Juwi::Application.routes.draw do
+  resources :name_deviations
+
+
   match 'update' => 'home#update'
   match 'episodes' => 'all_episodes#index'
   match 'episodes/missing' => 'all_episodes#missing'
@@ -12,6 +15,7 @@ Juwi::Application.routes.draw do
     end
     resources :episodes, :only => [:index, :show]
     get :missing
+    resources :name_deviations
   end
   resources :settings
   root :to => 'home#index'

@@ -1,0 +1,33 @@
+<h1>Listing name_deviations</h1>
+
+<table>
+  <tr>
+    <th>Tvshow</th>
+    <th>Season number</th>
+    <th>Episode number</th>
+    <th>Tvshow title</th>
+    <th>Enabled</th>
+    <th>Type</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @name_deviations.each do |name_deviation| %>
+  <tr>
+    <td><%= name_deviation.tvshow_id %></td>
+    <td><%= name_deviation.season_number %></td>
+    <td><%= name_deviation.episode_number %></td>
+    <td><%= name_deviation.tvshow_title %></td>
+    <td><%= name_deviation.enabled %></td>
+    <td><%= name_deviation.type %></td>
+    <td><%= link_to 'Show', name_deviation %></td>
+    <td><%= link_to 'Edit', edit_name_deviation_path(name_deviation) %></td>
+    <td><%= link_to 'Destroy', name_deviation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Name deviation', new_name_deviation_path %>

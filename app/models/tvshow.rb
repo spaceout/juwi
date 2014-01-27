@@ -5,6 +5,7 @@ require 'jdb_helper'
 
 class Tvshow < ActiveRecord::Base
   has_many :episodes, :dependent => :destroy
+  has_many :name_deviations, :dependent => :destroy
 
   def self.create_new_show(ttdb_show_id)
     puts "getting zip"

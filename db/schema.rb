@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140125223232) do
+ActiveRecord::Schema.define(:version => 20140126153310) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -47,6 +47,17 @@ ActiveRecord::Schema.define(:version => 20140125223232) do
     t.datetime "created_at",                :null => false
     t.datetime "updated_at",                :null => false
     t.string   "state"
+  end
+
+  create_table "name_deviations", :force => true do |t|
+    t.integer  "tvshow_id"
+    t.integer  "season_number"
+    t.integer  "episode_number"
+    t.string   "tvshow_title"
+    t.boolean  "enabled"
+    t.string   "type"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "settings", :force => true do |t|

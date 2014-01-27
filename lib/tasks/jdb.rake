@@ -83,20 +83,17 @@ namespace :jdb do
   end
 
   desc "This will populate the data from cache zip files"
-  task :importData => :environment do
+  task :import_data => :environment do
     require 'xdb_helper'
     require 'ttdb_helper'
     require 'tvr_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
-    #set initial scrape time for ttdb
     ttdbtime = TtdbHelper.get_time_from_ttdb
-    #import every show
     xdbtvshows.each do |show|
      Tvshow.create_and_sync_new_show(show[:c12])
     end
-    #Update last show/episode and time scrapped from xdb
     Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
     Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
     Setting.set_value("xdb_last_scrape", DateTime.current)

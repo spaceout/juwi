@@ -10,14 +10,14 @@ Transmission Daemon(Does not exist):
       - set tracker state to "downloading/not found"
 - Event on finished
   - Remove download from xmission
-  - change state on ep to "finished downloading"
+  - change state on episode to "finished downloading"
   - Pass episode to the file processor
 - Event on Removed
   - Delete the tracker
   - Cleanup any misc data
 
 XBMC Daemon
-- listens to xbmc websocket for new eps, tvshows and removed eps and tvshows
+- listens to xbmc websocket for new episodes, tvshows and removed episodes and tvshows
 - syncs/unsyncs episodes create new shows, delete removed shows
 
 Scheduled_Updater
@@ -29,7 +29,7 @@ FileProcessor:
 - Get folder name from the tracker torrent_name
 - Removes the episode file from a folder unrars if necessary and deletes the folder when its done
 - Returns the episode file name
-- change state on ep to "processed"
+- change state on episode to "processed"
 - Pass to renamer
 
 Renamer:
@@ -40,22 +40,31 @@ Renamer:
 TTDBAPI
 - Fetches ttdb data(zip or xml) and returns xml_simple-ified hash
 - Updates all ttdb_ data in both tvshow and episode except ttdb_show_id
-- Search ttdb and return results (title, ttdbid, first aired date)
+- Search ttdb and return results (title, ttdb id, first aired date)
 
 TVRAPI
 - Fetches tvr data and returns a hash
 - Source of all tvr_ data in tvshow table excecpt tvr_search_name
 - tvr_search_name is initially ttdb_show_title but can be edited to return the appropriate tvshow from the API
 
+XMISSIONAPI
+- Responsible for all transmission communication and actions
+- Remove torrents (delete local data if bad torrent)
+- add torrents/magenets/hashes
+
+XBMCAPI
+- Handles one off communication to XBMC eg update library
+- Handles incoming messages from XBMC Daemon
 
 Scrubber
 - input dirty name, get clean name
   - for jdb_clean_show_title
   - Illegal filename characters in output filenames
+
 *******Name Deviations********
-hate this name, wish i could use exceptions
+Hate this name, wish i could use exceptions
 Name deviations are when scene numbering and ttdb numbering dont match up
-you can adjust:
+You can adjust:
  - season number
  - episode number
  - Show title

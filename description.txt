@@ -1,0 +1,162 @@
+****BACKGROUND PROCESSES****
+Transmission Daemon(Does not exist):
+- Polls transmission every 5 seconds
+- Event on new download
+  - try to match torrent name to a show/episode else check file
+    - Match
+      - create tracker and fill in appropriate DB info "downloading"
+    - No Match
+      - create tracker entry with as much info as possible
+      - set tracker state to "downloading/not found"
+- Event on finished
+  - Remove download from xmission
+  - change state on ep to "finished downloading"
+  - Pass episode to the file processor
+- Event on Removed
+  - Delete the tracker
+  - Cleanup any misc data
+
+XBMC Daemon
+- listens to xbmc websocket for new eps, tvshows and removed eps and tvshows
+- syncs/unsyncs episodes create new shows, delete removed shows
+
+Scheduled_Updater
+- Runs periodic updates of both TTDB and TVR data every 24hrs
+
+******FUNCTIONS*************
+FileProcessor:
+- Gets passed a tracker object
+- Get folder name from the tracker torrent_name
+- Removes the episode file from a folder unrars if necessary and deletes the folder when its done
+- Returns the episode file name
+- change state on ep to "processed"
+- Pass to renamer
+
+Renamer:
+- Renames/Moves file
+- Overwriting gets enabled if proper is found in torrent name OR file name
+- Changes state to renamed
+
+TTDBAPI
+- Fetches ttdb data(zip or xml) and returns xml_simple-ified hash
+- Updates all ttdb_ data in both tvshow and episode except ttdb_show_id
+- Search ttdb and return results (title, ttdbid, first aired date)
+
+TVRAPI
+- Fetches tvr data and returns a hash
+- Source of all tvr_ data in tvshow table excecpt tvr_search_name
+- tvr_search_name is initially ttdb_show_title but can be edited to return the appropriate tvshow from the API
+
+
+Scrubber
+- input dirty name, get clean name
+  - for jdb_clean_show_title
+  - Illegal filename characters in output filenames
+*******Name Deviations********
+hate this name, wish i could use exceptions
+Name deviations are when scene numbering and ttdb numbering dont match up
+you can adjust:
+ - season number
+ - episode number
+ - Show title
+
+*******Data Sources********
+TTDB:
+http://thetvdb.com/wiki/index.php?title=Programmers_API
+Date comes in two different formats:
+  - XML for individual show or episode
+  - Zip file containing all show and episode information
+TTDB Time is seconds since the epoch
+Search functionality is good
+
+TVR:
+http://services.tvrage.com/
+Data comes in plain HTML more like plain text
+No way to easily sync data to TTDB 100% due to fuzzy search logic
+
+XBMC Database:
+XBMC Database (external mysql database)
+:tvshow                        XBMC tvshow table
+  :c12                         Unique TTDB show identifier       Source of ttdb_show_id
+  :c16                         Location of tvshow folder         Source of xdb_shhow_location
+  :idShow                      Unique XBMC DB show identifier    Source of xdb_show_id
+  :c00                         Show title
+:episode                       XBMC episode table
+  :idEpisode                   Unique XBMC DB episode identifier Source of xdb_episode_id
+  :c18                         Location of episode file          Source of xdb_episode_location
+  :idShow                      Unique XBMC DB show identifier
+  :c00                         Episodes title
+  :c12                         Episodes season number
+  :c13                         Episodes episode number
+
+*******RAILS DATABASE DESCRIPTIONS********
+-EXISTING
+*NEW
+
+Tvshows
+- tvshow_id
+- ttdb_show_id                 Unique TTDB show identifier
+- ttdb_show_overview           Plot summary of show
+- ttdb_show_last_updated       TTDB time the show data was last updated
+- ttdb_show_banner             Path to ttdb show banner
+- ttdb_show_fanart             Path to ttdb show fanart
+- ttdb_show_poster             Path to ttdb show poster
+- ttdb_show_network            TV Network show (last) aired on
+- ttdb_show_status             TTDB Show status (returning or canceled)
+- ttdb_show_runtime            Runtime of each episode in minutes
+- ttdb_show_title              Show title
+- tvr_show_id                  Unique TVR show identifier
+- tvr_latest_season_number     Latest episodes season number
+- tvr_latest_episode_number    Latest episodes episode number
+- tvr_latest_episode_title     Latest episodes title
+- tvr_latest_episode_date      Latest episodes airdate
+- tvr_next_season_number       Next episodes season number
+- tvr_next_episode_number      Next episodes episode number
+- tvr_next_episode_title       Next episodes title
+- tvr_next_episode_date        Next episodes airdate
+- tvr_show_url                 TVR URL for show info
+- tvr_show_started             Shows first airdate
+- tvr_show_ended               Shows last airdate
+- tvr_show_status              TVR Show status (returning or canceled)
+- tvr_search_name              Name used to search TVR API, initially its ttdb_show_title
+- xdb_show_location            Location of tvshow folder
+- xbd_show_id                  Unique XBMC DB show identifier
+- jdb_clean_show_title         Generated from scrubbing the ttdb_show_title
+
+Episodes
+- episode_id
+- tvshow_id
+- ttdb_episode_title           Episodes title
+- ttdb_season_number           Episodes season number
+- ttdb_episode_number          Episodes episode number
+- ttdb_episode_id              Unique TTDB episode identifier
+- ttdb_episode_overview        Episode plot summary
+- ttdb_episode_last_updated    TTDB time the episode data was last updated
+- ttdb_show_id                 Unique TTDB show identifier
+- ttdb_episode_airdate         Date episode aired
+- xdb_episode_id               Unique XBMC DB episode identifier
+- xdb_episode_location         Location of episode file
+- xdb_show_id                  Unique XBMC DB show identifier
+- state                        Not quite sure yet!
+
+Settings
+- name                         Setting name
+- value                        Setting value
+- notes                        Setting description
+
+Name_deviations
+- tvshow_id                    Parents tvshow_id
+- season_number                Delta season number
+- episode_number               Delta episode number
+- tvshow_title                 Replacement tvshow title
+- enabled                      is this deviation enabled
+- type                         type (title, episode, season)
+
+Tracker DB
+* hash_string                  unique torrent identifier in xmission
+* torrent_name                 torrents name
+* jdb_episode_id               episode_id from episode table
+* jdb_tvshow_id                tvshow_id from tvshow table
+* state                        current state
+* overwrite                    overwrite enable for proper/repack
+

@@ -21,13 +21,13 @@
     <td><%= name_deviation.tvshow_title %></td>
     <td><%= name_deviation.enabled %></td>
     <td><%= name_deviation.type %></td>
-    <td><%= link_to 'Show', name_deviation %></td>
-    <td><%= link_to 'Edit', edit_name_deviation_path(name_deviation) %></td>
-    <td><%= link_to 'Destroy', name_deviation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <td><%= link_to 'Show', tvshow_name_deviation_path(name_deviation.tvshow_id, name_deviation.id) %></td>
+    <td><%= link_to 'Edit', edit_tvshow_name_deviation_path(name_deviation.tvshow_id, name_deviation.id) %></td>
+    <td><%= link_to 'Destroy', tvshow_name_deviation_path(name_deviation.tvshow_id, name_deviation.id), method: :delete, data: { confirm: 'Are you sure?' } %></td>
   </tr>
 <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New Name deviation', new_name_deviation_path %>
+<%= link_to 'New Name deviation', new_tvshow_name_deviation_path %>

@@ -1,4 +1,5 @@
 require 'sequel'
+require 'xmission_api'
 class JuwiHelper
 
   @@xbmcdb = nil

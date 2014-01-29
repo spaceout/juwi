@@ -2,7 +2,8 @@ class NameDeviationsController < ApplicationController
   # GET /name_deviations
   # GET /name_deviations.json
   def index
-    @name_deviations = NameDeviation.all
+    @tvshow = Tvshow.find(params[:tvshow_id])
+    @name_deviations = @tvshow.name_deviation.all
 
     respond_to do |format|
       format.html # index.html.erb

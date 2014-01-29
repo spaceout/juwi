@@ -86,6 +86,7 @@ namespace :jdb do
   task :import_data => :environment do
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
+    xdbepisodes = xbmcdb[:episode]
     ttdbtime = TtdbHelper.get_time_from_ttdb
     xdbtvshows.each do |show|
      Tvshow.create_and_sync_new_show(show[:c12])

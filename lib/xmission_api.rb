@@ -9,7 +9,7 @@ class XmissionApi
   attr_accessor :fields
   attr_accessor :debug_mode
 
-  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir"]
+  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir","hashString"]
 
   def initialize(options)
     @url = options[:url]

@@ -108,6 +108,7 @@ class Tvshow < ActiveRecord::Base
     puts "updating ttdb episode data for #{ttdb_show_id}"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
     puts "resynching with XDB"
+    Tvshow.update_xdb_show_data(ttdb_show_id)
     Tvshow.update_all_xdb_episode_data(ttdb_show_id)
   end
 
@@ -160,7 +161,7 @@ class Tvshow < ActiveRecord::Base
   def self.update_xdb_show_data(ttdb_show_id)
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
-    current_xdb_show = xdbtvshows.where("c12 = #{ttdb_show_id}").first
+    current_xdb_show = xdbtvshows.where(:c12 => ttdb_show_id).first
     current_jdb_show = Tvshow.find_by_ttdb_show_id(ttdb_show_id)
     current_jdb_show.update_attributes(
       :xdb_show_location => current_xdb_show[:c16],
@@ -177,7 +178,7 @@ class Tvshow < ActiveRecord::Base
   def self.update_xdb_episode_data(xdb_episode_id)
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbepisodes = xbmcdb[:episode]
-    episode = xdbepisodes.where("idEpisode = #{xdb_episode_id}").first
+    episode = xdbepisodes.where(:idEpisode => xdb_episode_id).first
     puts "Syncing #{episode[:c00]}"
     jdbepisode = Episode.where(
       :xdb_show_id => episode[:idShow],

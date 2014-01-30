@@ -1,5 +1,13 @@
+Abbreviations used:
+JDB = JUWI Database (tvshows and episodes)
+XDB = XBMC Video Library (external mysql database)
+TTDB = TheTVDB.com
+TVR = TVRage.com
+
+Initial data for JDB comes from importing all episodes currently in XDB
+
 ****BACKGROUND PROCESSES****
-Transmission Daemon(Does not exist):
+Transmission Daemon(FUTURE):
 - Polls transmission every 5 seconds
 - Event on new download
   - try to match torrent name to a show/episode else check file
@@ -17,11 +25,41 @@ Transmission Daemon(Does not exist):
   - Cleanup any misc data
 
 XBMC Daemon
-- listens to xbmc websocket for new episodes, tvshows and removed episodes and tvshows
-- syncs/unsyncs episodes create new shows, delete removed shows
+- Opens websocket connection using eventmachine to XBMC
+  - Able to act on:
+    - New Episode
+      - adds XDB_ data to episode
+    - New TVshow
+      - creates and syncs a new show
+    - Removed Episode
+      - removes XDB_ data from episode
+    - Removed TVshow
+      - Deletes show and episodes from JDB
+    - On screensaver
+    - Off screensaver
+    - Start Playing
+    - Stop Playing
+  - Able to trigger in XBMC
+    - Scan for new tvshows/episodes
+    - Start XBMC DB clean
+    - Play specific file form XBMC library (FUTURE)
 
-Scheduled_Updater
-- Runs periodic updates of both TTDB and TVR data every 24hrs
+Scheduled_Updater(FUTURE)
+- Update TTDB data once every 24 hrs
+  - Only update shows that are currently airing
+- Updates TVR info once every 24 hrs
+  - Only updates shows that are currently airing
+  - Only update TVR data if a show not canceled aired that day
+
+RSS Poller (FUTURE)
+- Poll multiple torrent RSS feeds
+- Weight feeds so if an episode shows up in multiple feeds
+- "wait" for an HD version if SD comes out first
+- Release the SD version after a period of time if the HD is not found
+- Ability to tie certain TVshows to specific feeds
+- Ability to download the s01e01 of all new shows(never miss a new show)
+- only download episodes which do not exist in my DB
+- Uses TRACKER to keep track of RSS episodes (hold the SD while waiting for the HD)
 
 ******FUNCTIONS*************
 FileProcessor:
@@ -29,7 +67,7 @@ FileProcessor:
 - Get folder name from the tracker torrent_name
 - Removes the episode file from a folder unrars if necessary and deletes the folder when its done
 - Returns the episode file name
-- change state on episode to "processed"
+- change state on tracker to "processed"
 - Pass to renamer
 
 Renamer:
@@ -61,6 +99,14 @@ Scrubber
   - for jdb_clean_show_title
   - Illegal filename characters in output filenames
 
+RSS Processor (FUTURE)
+- Takes in an RSS feed XML and extracts data
+  - Torrent Name
+  - Tvshow
+  - Episode
+  - Quality
+- Checks JDB to see if i have the show/episode and adds to TRACKER if not
+
 *******Name Deviations********
 Hate this name, wish i could use exceptions
 Name deviations are when scene numbering and ttdb numbering dont match up
@@ -87,7 +133,7 @@ XBMC Database:
 XBMC Database (external mysql database)
 :tvshow                        XBMC tvshow table
   :c12                         Unique TTDB show identifier       Source of ttdb_show_id
-  :c16                         Location of tvshow folder         Source of xdb_shhow_location
+  :c16                         Location of tvshow folder         Source of xdb_show_location
   :idShow                      Unique XBMC DB show identifier    Source of xdb_show_id
   :c00                         Show title
 :episode                       XBMC episode table
@@ -161,7 +207,7 @@ Name_deviations
 - enabled                      is this deviation enabled
 - type                         type (title, episode, season)
 
-Tracker DB
+Tracker DB (FUTURE)
 * hash_string                  unique torrent identifier in xmission
 * torrent_name                 torrents name
 * jdb_episode_id               episode_id from episode table
@@ -169,3 +215,8 @@ Tracker DB
 * state                        current state
 * overwrite                    overwrite enable for proper/repack
 
+RSSFeeds (FUTURE)
+* URL                          url for rss feed
+* Name                         plain name for feed
+* Interval                     polling interval for feed in seconds
+* tvshow_ids                   associated TVshow(s) for feed

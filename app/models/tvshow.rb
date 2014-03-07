@@ -179,16 +179,12 @@ class Tvshow < ActiveRecord::Base
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbepisodes = xbmcdb[:episode]
     episode = xdbepisodes.where(:idEpisode => xdb_episode_id).first
-    puts episode
     puts "Syncing #{episode[:c00]}"
     jdbepisode = Episode.where(
       :xdb_show_id => episode[:idShow],
       :ttdb_season_number => episode[:c12],
       :ttdb_episode_number => episode[:c13]
     ).first
-    puts "******************************************"
-    puts jdbepisode.ttdb_episode_title
-    puts "******************************************"
     unless jdbepisode.nil?
       jdbepisode.update_attributes(
       :xdb_episode_id => episode[:idEpisode],

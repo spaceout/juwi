@@ -15,7 +15,7 @@ class Tvshow < ActiveRecord::Base
     puts "updating ttdb episode data"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
     puts "updating tvr information"
-    Tvshow.update_tvrage_data(ttdb_show_id) 
+    Tvshow.update_tvrage_data(ttdb_show_id)
   end
 
   def self.create_and_sync_new_show(ttdb_show_id)
@@ -64,9 +64,13 @@ class Tvshow < ActiveRecord::Base
   def self.update_ttdb_episode_data(ttdb_episode_id)
     episode = TtdbHelper.get_episode_from_ttdb(ttdb_episode_id)['Episode'].first
     ttdb_show_id = episode['seriesid'].first
-    currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
-    currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(ttdb_episode_id)
-    currentEpisode.update_attributes(
+    current_show = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
+    #current_episode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(ttdb_episode_id)
+    current_episode = current_show.episodes.where(
+      ttdb_season_number: episode['SeasonNumber'].first,
+      ttdb_episode_number: episode['EpisodeNumber'].first
+    ).first_or_initialize
+    current_episode.update_attributes(
       :ttdb_episode_title => episode['EpisodeName'].first,
       :ttdb_season_number => episode['SeasonNumber'].first,
       :ttdb_episode_number => episode['EpisodeNumber'].first,
@@ -79,11 +83,15 @@ class Tvshow < ActiveRecord::Base
   end
 
   def self.update_all_ttdb_episode_data(ttdb_show_id)
-    currentShow = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
+    current_show = Tvshow.find_or_initialize_by_ttdb_show_id(ttdb_show_id)
     ttdbdata = TtdbHelper.ttdb_xml_show_data("#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_show_id}.zip", "en.xml")
     ttdbdata['Episode'].each do |episode|
-      currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(episode['id'].first)
-      currentEpisode.update_attributes(
+      #currentEpisode = currentShow.episodes.find_or_initialize_by_ttdb_episode_id(episode['id'].first)
+      current_episode = current_show.episodes.where(
+        ttdb_season_number: episode['SeasonNumber'].first,
+        ttdb_episode_number: episode['EpisodeNumber'].first
+      ).first_or_initialize
+      current_episode.update_attributes(
         :ttdb_episode_title => episode['EpisodeName'].first,
         :ttdb_season_number => episode['SeasonNumber'].first,
         :ttdb_episode_number => episode['EpisodeNumber'].first,
@@ -97,17 +105,17 @@ class Tvshow < ActiveRecord::Base
   end
 
   def self.update_all_ttdb_data(ttdb_show_id)
-    puts "deleting zip"
+    #puts "deleting zip"
     TtdbHelper.delete_ttdb_zip(ttdb_show_id)
-    puts "getting new zip"
+    #puts "getting new zip"
     TtdbHelper.get_zip_from_ttdb(ttdb_show_id)
-    puts "deleting all episodes"
+    #puts "deleting all episodes"
     Tvshow.find_by_ttdb_show_id(ttdb_show_id).episodes.destroy
-    puts "updating ttdb show data for #{ttdb_show_id}"
+    #puts "updating ttdb show data for #{ttdb_show_id}"
     Tvshow.update_ttdb_show_data(ttdb_show_id)
-    puts "updating ttdb episode data for #{ttdb_show_id}"
+    #puts "updating ttdb episode data for #{ttdb_show_id}"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
-    puts "resynching with XDB"
+    #puts "resynching with XDB"
     Tvshow.update_xdb_show_data(ttdb_show_id)
     Tvshow.update_all_xdb_episode_data(ttdb_show_id)
   end
@@ -178,17 +186,13 @@ class Tvshow < ActiveRecord::Base
   def self.update_xdb_episode_data(xdb_episode_id)
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbepisodes = xbmcdb[:episode]
-    episode = xdbepisodes.where(:idEpisode => xdb_episode_id).first
-    puts "Syncing #{episode[:c00]}"
-    jdbepisode = Episode.where(
-      :xdb_show_id => episode[:idShow],
-      :ttdb_season_number => episode[:c12],
-      :ttdb_episode_number => episode[:c13]
-    ).first
-    unless jdbepisode.nil?
+    xdb_ep = xdbepisodes.where(:idEpisode => xdb_episode_id).first
+    puts "Syncing #{xdb_ep[:c00]}"
+    jdbepisode = Episode.where(xdb_show_id: xdb_ep[:idShow], ttdb_season_number: xdb_ep[:c12], ttdb_episode_number: xdb_ep[:c13]).first
+    if jdbepisode != nil
       jdbepisode.update_attributes(
-      :xdb_episode_id => episode[:idEpisode],
-      :xdb_episode_location => episode[:c18]
+      xdb_episode_id: xdb_ep[:idEpisode],
+      xdb_episode_location: xdb_ep[:c18]
     )
     end
     xbmcdb.disconnect

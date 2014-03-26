@@ -38,7 +38,7 @@ class TtdbHelper
   def self.delete_ttdb_zip(ttdb_show_id)
     zip_file = "#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_show_id}.zip"
     if File.exist?(zip_file)
-      puts "deleting file #{zip_file}"
+      #puts "deleting file #{zip_file}"
       File.delete(zip_file)
       return true
     end

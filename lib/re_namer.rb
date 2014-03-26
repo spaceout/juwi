@@ -53,7 +53,7 @@ class Renamer
     if attempt == 2
       puts "second try"
     end
-    match_data = /^((?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name.gsub("720p", ""))
+    match_data = /^((?:The.100)|(?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name.gsub("720p", ""))
     #enable overwriting if it is a repack
     overwrite_enable = false
     if /repack|proper/i.match(dirty_name)

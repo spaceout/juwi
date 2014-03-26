@@ -22,4 +22,5 @@ Juwi::Application.routes.draw do
   match 'xbmc_update' => 'home#xbmc_update'
   match 'process_downloads' => 'home#process_downloads'
   get 'ttdbsearch', to: 'home#ttdbsearch', as: 'ttdbsearch'
+  match "/delayed_job" => DelayedJobWeb, :anchor => false, via: [:get, :post]
 end

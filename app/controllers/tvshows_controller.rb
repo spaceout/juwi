@@ -44,7 +44,7 @@ class TvshowsController < ApplicationController
       flash[:notice] = "Could not add TV Show, entry was nil"
       redirect_to '/'
     else
-      JdbHelper.create_new_show(params[:ttdb_id])
+      Tvshow.create_new_show(params[:ttdb_id])
       flash[:notice] = "TV show added #{params[:ttdb_id]}"
     end
     redirect_to '/'

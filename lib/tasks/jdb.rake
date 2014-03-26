@@ -1,4 +1,17 @@
 namespace :jdb do
+  desc "cleans up the TBA dupes"
+  task :tba_fix => :environment do
+    Episode.where(ttdb_episode_title: "TBA").each do |tba_episode|
+      if tba_episode.tvshow.episodes.where(
+        ttdb_season_number: tba_episode.ttdb_season_number,
+        ttdb_episode_number: tba_episode.ttdb_episode_number
+      ).where('ttdb_episode_title != ?', "TBA").count == 1
+        puts "found match"
+        puts tba_episode.inspect
+      end
+    end
+  end
+
   desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
   task :update => :environment do
     require 'jdb_helper'

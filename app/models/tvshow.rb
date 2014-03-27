@@ -127,7 +127,7 @@ class Tvshow < ActiveRecord::Base
   def self.update_tvrage_data(ttdb_show_id)
     current_show = Tvshow.find_by_ttdb_show_id(ttdb_show_id)
     title = current_show.tvr_search_name
-    puts "Updating TVR for: #{title}"
+    #puts "Updating TVR for: #{title}"
     tvragedata = TvrHelper.get_tvrage_data(title)
     tvr_latest_episode = tvragedata['Latest Episode']
     if tvr_latest_episode != nil

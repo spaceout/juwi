@@ -1,7 +1,10 @@
 namespace :tvr do
   desc "This updates tvrage data for non cancelled/ended shows"
   task :update => :environment do
+    require 'ruby-progressbar'
+    progressbar = ProgressBar.create(:title => "TVR Update", :total => Tvshow.all.count)
     Tvshow.all.each do |tvshow|
+      progressbar.increment
       next if ["Canceled/Ended", "Ended", "Canceled"].include?(tvshow.tvr_show_status)
       Tvshow.update_tvrage_data(tvshow.ttdb_show_id)
     end

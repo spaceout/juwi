@@ -64,6 +64,7 @@ class FileManipulator
     puts "Procesing Directory"
     Dir.chdir(base_path)
     Dir.glob("*").each do |dir_entry|
+      puts "DIR ENTRY IS: #{dir_entry}"
       if File.directory?(dir_entry)
         FileManipulator.process_rars(dir_entry)
         FileManipulator.move_videos(dir_entry, base_path, min_videosize)

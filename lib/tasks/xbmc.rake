@@ -11,6 +11,12 @@ namespace :xbmc do
     XbmcApi.compose_command("VideoLibrary.Clean")
   end
 
+  desc "This will start the xbmc daemon fo realz"
+  task :daemon_start => :environment do
+    require 'xbmc_daemon'
+    XbmcDaemon.start
+  end
+
   desc "This is to test the XBMC Daemon in verbose mode"
   task :daemon_test => :environment do
     require 'faye/websocket'

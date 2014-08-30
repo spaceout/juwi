@@ -6,7 +6,7 @@ class FileManipulator
   #Checks folder and sub-folders for rar files and unrars them
   def self.process_rars(incoming_folder)
     puts "Searching #{incoming_folder} for rar files"
-    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*.rar").each do |rar_file|
+    Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*.rar").first do |rar_file|
       puts "Extracting RAR File: #{rar_file}"
       `unrar e \"#{rar_file}\" \"#{File.dirname(rar_file)}\"`
       if $? == 0

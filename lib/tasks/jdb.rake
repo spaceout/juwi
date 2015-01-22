@@ -70,6 +70,7 @@ namespace :jdb do
   task :update_show, [:showname] => :environment do |t, args|
     require 'jdb_helper'
     showname = args[:showname] || 'none'
+    #Tvshow.where(ttdb_show_name: "#{showname}").first.episodes.destroy
     JdbHelper.update_show(showname)
   end
 

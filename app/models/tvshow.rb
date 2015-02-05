@@ -144,6 +144,11 @@ class Tvshow < ActiveRecord::Base
       tvr_next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
       tvr_next_episode_title = tvr_next_episode.split("^")[1]
       tvr_next_episode_date = tvr_next_episode.split("^")[2]
+    else
+      tvr_next_season_number = nil
+      tvr_next_episode_number = nil
+      tvr_next_episode_title = nil
+      tvr_next_episode_date = nil
     end
     current_show.update_attributes(
       :tvr_show_id => tvragedata['Show ID'],

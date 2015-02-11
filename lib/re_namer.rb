@@ -83,7 +83,7 @@ class Renamer
             return {:failure => {:old_name => dirty_name, :reason => "episode not found"}}
           end
         else
-          matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'')
+          matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'').gsub('’','\'')
           if matched_episode_title == "TBA"
             puts "TBA FOUND!"
             if attempt == 1

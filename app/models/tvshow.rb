@@ -129,6 +129,7 @@ class Tvshow < ActiveRecord::Base
     title = current_show.tvr_search_name
     #puts "Updating TVR for: #{title}"
     tvragedata = TvrHelper.get_tvrage_data(title)
+    return if tvragedata == nil;
     tvr_latest_episode = tvragedata['Latest Episode']
     if tvr_latest_episode != nil
       tvr_latest_episode.force_encoding("utf-8")

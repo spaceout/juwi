@@ -36,6 +36,7 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'debugger'
+gem 'json'
 gem 'rubyzip'
 gem 'xml-simple'
 gem 'curb'

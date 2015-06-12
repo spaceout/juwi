@@ -18,5 +18,5 @@
 %h3= "Library statistics"
 %h1= "Total Shows " = @tvshows.count
 %h1= "Total Episodes " = @episodes.count
-%h1= "Missing Episodes" <%= @episodes.missing.count %><br />
-%h1= "Collection Grade" <%= @completeness  %><br />
+%h1= "Missing Episodes" @episodes.missing.count
+%h1= "Collection Grade" @completeness

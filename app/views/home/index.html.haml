@@ -1,1 +1,22 @@
-This is going to be some text
+%h3= "Downloads in Transmission"
+%table.table
+  %thead
+    %tr
+      %th= "Name"
+      %th= "Size"
+      %th= "Percent"
+  %tbody
+    = unless @transmission_dls == nil
+      = @transmission_dls.each do |dl_item|
+        %tr
+          %td= dl_item["name"]
+          %td= dl_item["totalSize"]
+          %td= dl_item["percentDone"]*100
+%h3= "Upload Torrent"
+
+
+%h3= "Library statistics"
+%h1= "Total Shows " = @tvshows.count
+%h1= "Total Episodes " = @episodes.count
+%h1= "Missing Episodes" <%= @episodes.missing.count %><br />
+%h1= "Collection Grade" <%= @completeness  %><br />

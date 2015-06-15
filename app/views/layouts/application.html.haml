@@ -1,13 +1,13 @@
 !!!
 %html
   %head
-    %meta{content: "width=device-widthdth, initial-scale=1.0", name: "viewport"}
+    %meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}
     %title= content_for?(:title) ? yield(:title) : "JUWI"
     = stylesheet_link_tag "application", :media => "all"
     = csrf_meta_tags
     = javascript_include_tag "application"
   %body
-    -#= render 'layouts/navigation'
+    = render "layouts/navigation"
     .container
       .content
         .row

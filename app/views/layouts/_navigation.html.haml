@@ -6,3 +6,23 @@
         %span.icon-bar
         %span.icon-bar
       %a.navbar-brand(href="#")JUWI
+    .collapse.navbar-collapse(id="bs-example-navbar-collapse-1")
+      %ul.nav.navbar-nav
+        %li.active
+          %a(href="#")Link
+        %li.dropdown
+          %a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false")
+            Dropdown
+            %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li
+              %a(href="#")Yeah1
+            %li
+              %a(href="#")Yeah2
+            %li.divider
+            %li
+              %a(href="#")Yeah3
+      = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "navbar-form navbar-right") do
+        .form-group
+          %input{:name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}
+          %button{:type => "submit", :class => "btn btn-primary btn-sm"} Upload Torrent

@@ -1,0 +1,15 @@
+%h3= "TTDB Search Results for"
+- if @search_results != nil
+  %table.table.table-hover
+    %thead
+      %tr
+        %th= "Show Title"
+        %th= "First Aired"
+        %th= "ttdbid"
+    %tbody
+      - @search_results.each do |result|
+        %tr
+          %td= result[:series][:ttdb_title]
+          %td= result[:series][:ttdb_first_aired]
+          %td= result[:series][:ttdb_id]
+          %td= button_to "Add Show to JDB", {:controller => "tvshows", :action => "create", :ttdb_id => result[:series][:ttdb_id]}, :class => "btn btn-primary btn-sm"

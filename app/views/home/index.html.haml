@@ -14,13 +14,10 @@
               %td= dl_item["name"]
               %td= dl_item["totalSize"]
               %td= dl_item["percentDone"]*100
-    .row
-      = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "form-inline") do
-        .col-xs-6
-          .form-group
-            %input{:id => "torrent_submit", :name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}
-        .col-xs-6
-          %button{:type => "submit", :class => "btn btn-primary"} Upload Torrent
+    = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "form-inline") do
+      .form-group
+        %input{:id => "torrent_submit", :name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}
+      %button{:type => "submit", :class => "btn btn-primary"} Upload Torrent
   .col-xs-6
     %h4= "Files in Finished Directory"
     %table.table.table-hover
@@ -32,7 +29,7 @@
           %td= file
 .row
   .col-xs-4
-    %h5= "Library statistics"
+    %h5= "Library Statistics"
     %h5= "TV Shows #{@tvshows.count}"
     %h5= "Total Episodes #{@episodes.count}"
     %h5= "Missing Episodes #{@episodes.missing.count}"

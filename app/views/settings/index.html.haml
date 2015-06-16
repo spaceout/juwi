@@ -1,0 +1,16 @@
+%h3= "Listing all Settings"
+%table.table.table-hover
+  %thead
+    %tr
+      %th= "Setting"
+      %th= "value"
+      %th= "notes"
+      %th= "updated_at"
+  %tbody
+    - @settings.each do |setting|
+      %tr
+        %td= link_to(setting.name, edit_setting_path(setting))
+        %td= setting.value
+        %td= setting.notes
+        %td= setting.updated_at.in_time_zone("Eastern Time (US & Canada)").time
+= button_to "new", new_setting_path, :method => :get, :class => "btn btn-primary btn-sm"

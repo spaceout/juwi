@@ -11,13 +11,9 @@
         - unless @transmission_dls == nil
           - @transmission_dls.each do |dl_item|
             %tr
-              %td= dl_item["name"]
+              %td= dl_item["name"].gsub(".","-")
               %td= dl_item["totalSize"]
               %td= dl_item["percentDone"]*100
-    = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "form-inline") do
-      .form-group
-        %input{:id => "torrent_submit", :name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}
-      %button{:type => "submit", :class => "btn btn-primary"} Upload Torrent
   .col-xs-6
     %h4= "Files in Finished Directory"
     %table.table.table-hover

@@ -1,0 +1,44 @@
+%nav.navbar.navbar-default
+  .container-fluid
+    .navbar-header
+      %button.navbar-toggle.collapsed(data-toggle="collapse" data-target="#navbar-collapse-1")
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      = link_to "JUWI", root_path, :class => "navbar-brand", :role => "button"
+    .collapse.navbar-collapse(id="navbar-collapse-1")
+      %ul.nav.navbar-nav
+        %li.dropdown
+          %a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false")
+            TV Shows
+            %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li
+              = link_to  tvshows_path do
+                All
+                -#%span.badge #{@tvshows.count}
+            %li
+              = link_to "Forcast", forcast_tvshows_path
+            %li.divider
+            %li
+              = link_to "Recently Canceled", recently_canceled_tvshows_path
+        %li.dropdown
+          %a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false")
+            Episodes
+            %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li
+              = link_to episodes_path do
+                All
+                -#%span.badge #{@episodes.count}
+            %li
+              = link_to "Recently Aired", episodes_recently_aired_path
+            %li.divider
+            %li
+              = link_to "Missing", episodes_missing_path
+        %li
+          = link_to "Settings", settings_path
+      = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "navbar-form navbar-right") do
+        .form-group
+          %input{:name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}
+          %button{:type => "submit", :class => "btn btn-primary btn-sm"} Upload Torrent

@@ -1,0 +1,36 @@
+.row
+  .col-xs-6
+    %h4= "Downloads in Transmission"
+    %table.table.table-hover
+      %thead
+        %tr
+          %th= "Name"
+          %th= "Size"
+          %th= "Percent"
+      %tbody
+        - unless @transmission_dls == nil
+          - @transmission_dls.each do |dl_item|
+            %tr
+              %td= dl_item["name"].gsub(".","-")
+              %td= dl_item["totalSize"]
+              %td= dl_item["percentDone"]*100
+  .col-xs-6
+    %h4= "Files in Finished Directory"
+    %table.table.table-hover
+      %thead
+        %tr
+          %th= "Files"
+      - @finished_dir.each do |file|
+        %tr
+          %td= file
+.row
+  .col-xs-4
+    %h5= "Library Statistics"
+    %h5= "TV Shows #{@tvshows.count}"
+    %h5= "Total Episodes #{@episodes.count}"
+    %h5= "Missing Episodes #{@episodes.missing.count}"
+    %h5= "Collection Grade #{@completeness}"
+  .col-xs-4
+    = button_to "Process Downloads", {:action => "process_downloads", :controller => "home"}, :class => "btn btn-primary btn-sm"
+    = button_to "Rename", {:action => "rename", :controller => "home"}, :class => "btn btn-primary btn-sm"
+    = button_to "Update XBMC", {:action => "xbmc_update", :controller => "home"}, :class => "btn btn-primary btn-sm"

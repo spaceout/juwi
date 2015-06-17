@@ -1,0 +1,14 @@
+%h3= "Listing #{@episodes.count} Episodes"
+%table.table.table-hover
+  %thead
+    %tr
+      %th= "Episode"
+      %th= "Episode Airdate"
+      %th= "XBMC Episode ID"
+  %tbody
+    - @episodes.each do |episode|
+      %tr
+        %td= episode.tvshow.ttdb_show_title + " - " + "s" '%02d' % episode.ttdb_season_number + "e" + '%02d' % episode.ttdb_episode_number + " - " + episode.ttdb_episode_title
+        %td= episode.ttdb_episode_airdate
+        %td= episode.xdb_episode_id
+        %td= link_to 'show', "/episodes/#{episode.id}"

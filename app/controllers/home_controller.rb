@@ -45,7 +45,7 @@ class HomeController < ApplicationController
       :url => Setting.get_value("transmission_url")
     )
     xmission.upload_link(params[:torrent], Setting.get_value("finished_dir"))
-    redirect_to '/'
+    redirect_to(:back)
   end
 
   def xbmc_update

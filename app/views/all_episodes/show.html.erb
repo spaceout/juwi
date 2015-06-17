@@ -1,9 +1,0 @@
-<h3><%=@episode.tvshow.ttdb_show_title + " - " + 
-    "s" '%02d' % @episode.ttdb_season_number + "e" + 
-    '%02d' % @episode.ttdb_episode_number + " - " + 
-    @episode.ttdb_episode_title %>
-</h3>
-<br />
-<%= @episode.ttdb_episode_overview %>
-<br /><br />
-<%= link_to 'Back', episodes_path %>

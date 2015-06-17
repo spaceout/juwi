@@ -1,0 +1,13 @@
+= form_for @setting, :html => {:class => "form form-inline"} do |f|
+  .form-group
+    %p
+      = f.label :name
+      = f.text_field :name, :class => "form-control"
+    %p
+      = f.label :value
+      = f.text_field :value, :class => "form-control"
+    %p
+      = f.label :notes
+      = f.text_field :notes, :class => "form-control"
+  %p
+  = f.submit "Update Setting", {:class => "btn btn-primary btn-sm"}

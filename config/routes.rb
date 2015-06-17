@@ -1,5 +1,6 @@
 Juwi::Application.routes.draw do
   resources :torrents
+  resources :name_deviations
 
 
   match 'update' => 'home#update'

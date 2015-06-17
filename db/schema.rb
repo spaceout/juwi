@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140126153310) do
+ActiveRecord::Schema.define(:version => 20150617175842) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -66,6 +66,19 @@ ActiveRecord::Schema.define(:version => 20140126153310) do
     t.string   "name"
     t.string   "value"
     t.string   "notes"
+  end
+
+  create_table "torrents", :force => true do |t|
+    t.string   "hash_string"
+    t.datetime "time_started"
+    t.datetime "time_completed"
+    t.string   "name"
+    t.integer  "size"
+    t.string   "status"
+    t.integer  "percent"
+    t.boolean  "completed"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "tvshows", :force => true do |t|

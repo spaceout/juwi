@@ -1,0 +1,33 @@
+%h1 Listing torrents
+
+%table
+  %tr
+    %th Hash string
+    %th Time started
+    %th Time completed
+    %th Name
+    %th Size
+    %th Status
+    %th Percent
+    %th Completed
+    %th
+    %th
+    %th
+
+  - @torrents.each do |torrent|
+    %tr
+      %td= torrent.hash_string
+      %td= torrent.time_started
+      %td= torrent.time_completed
+      %td= torrent.name
+      %td= torrent.size
+      %td= torrent.status
+      %td= torrent.percent
+      %td= torrent.completed
+      %td= link_to 'Show', torrent
+      %td= link_to 'Edit', edit_torrent_path(torrent)
+      %td= link_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Torrent', new_torrent_path

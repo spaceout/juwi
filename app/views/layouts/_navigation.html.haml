@@ -38,6 +38,8 @@
               = link_to "Missing", episodes_missing_path
         %li
           = link_to "Settings", settings_path
+        %li
+          = link_to "Jobs", "/delayed_job"      
       = form_tag({:controller => "home", :action => "upload_torrent"}, method: :get, class: "navbar-form navbar-right") do
         .form-group
           %input{:name => "torrent", :type => "text", :class => "form-control", placeholder: "Torrent or Magnet URL"}

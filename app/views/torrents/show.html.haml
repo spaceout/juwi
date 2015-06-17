@@ -1,0 +1,30 @@
+%p#notice= notice
+
+%p
+  %b Hash string:
+  = @torrent.hash_string
+%p
+  %b Time started:
+  = @torrent.time_started
+%p
+  %b Time completed:
+  = @torrent.time_completed
+%p
+  %b Name:
+  = @torrent.name
+%p
+  %b Size:
+  = @torrent.size
+%p
+  %b Status:
+  = @torrent.status
+%p
+  %b Percent:
+  = @torrent.percent
+%p
+  %b Completed:
+  = @torrent.completed
+
+= link_to 'Edit', edit_torrent_path(@torrent)
+\|
+= link_to 'Back', torrents_path

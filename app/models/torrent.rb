@@ -1,5 +1,6 @@
 class Torrent < ActiveRecord::Base
-  attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started
+  serialize :files
+  attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started, :files
 
   def self.xmission_check
     require 'xmission_api'
@@ -10,65 +11,33 @@ class Torrent < ActiveRecord::Base
     )
     current_torrents = xmission.all
     current_torrents.each do |torrent|
-      if torrent["downloadDir"] == Setting.get_value('finished_path')
-        #process_torrent(torrent)
+      if torrent["downloadDir"] == "#{Setting.get_value('finished_path')}/"
+        process_torrent(torrent)
       end
     end
   end
 
-
-  def process_torrent(dl_torrent)
-    db_torrent = Torrent.find_by_hash_string(torrent["hashString"])
-    if db_torrent.nil?
-      if torrent["totalSize"] == 0
-        torrent["name"] = "MAGNET LINK"
-      Torrent.create(
-        :completed => torrent["isDone"],
-        :hash_string => torrent["hashString"],
-        :name => torrent["name"],
-        :percent => torrent["percentDone"],
-        :size => torrent["totalSize"],
-        :status => "Downloading",
-        :time_started => Time.now
-      )
-    else
-      if torrent["isDone"] == false
+  def self.process_torrent(dl_torrent)
+    if dl_torrent["totalSize"] == 0
+      dl_torrent["name"] = "MAGNET LINK"
+    end
+    db_torrent = Torrent.find_or_initialize_by_hash_string(dl_torrent["hashString"])
+    if dl_torrent["isFinished"]
+      if !db_torrent.completed
         db_torrent.update_attributes(
-          :percent => torrent["percentDone"],
-          :completed => torrent["isDone"],
+        :time_completed => Time.now,
+        :status => "Completed"
         )
       end
     end
+    db_torrent.update_attributes(
+      :completed => dl_torrent["isFinished"],
+      :hash_string => dl_torrent["hashString"],
+      :name => dl_torrent["name"],
+      :percent => dl_torrent["percentDone"] * 100,
+      :size => dl_torrent["totalSize"],
+      :time_started => dl_torrent["addedDate"],
+      :files => dl_torrent["files"]
+    )
   end
 end
-
-=begin
-    torrent = Torrent.create(hashString)
-    torrent.update_attributes(
-      :completed => torrent["isDone"],
-      :hash_string => torrent["hashString"],
-      :name => torrent[name],
-      :percent => torrent[percentDone],
-      :size => torrent[totalSize],
-      :status => "Downloading",
-      :time_started => Time.now
-    )
-
-    #check download dir is the correct one, ignore other torrents
-      #search for hashString
-      #if not found
-        #New Torrent
-        #insert ID, time_started, Name (if not null, remember about magnet links), PercentDone, totalSize, isfinished, downloadDir and hashString
-      #if found
-        #if isFinished is NOT true
-        #update name if not null
-        #update percentdone and isFinished
-
-puts "id = #{torrent["id"]}"
-puts "name = #{torrent["name"]}"
-puts "percentDone = #{torrent["percentDone"]}"
-puts "totalSize = #{torrent["totalSize"]}"
-puts "isFinished = #{torrent["isFinished"]}"
-puts "downloadDir = #{torrent["downloadDir"]}"
-puts "hashString = #{torrent["hashString"]}"
-=end

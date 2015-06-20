@@ -10,6 +10,7 @@
     %th Status
     %th Percent
     %th Completed
+    %th Files
     %th
     %th
     %th
@@ -24,6 +25,7 @@
       %td= torrent.status
       %td= torrent.percent
       %td= torrent.completed
+      -#%td= torrent.files
       %td= link_to 'Show', torrent
       %td= link_to 'Edit', edit_torrent_path(torrent)
       %td= link_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }

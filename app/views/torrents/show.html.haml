@@ -24,6 +24,10 @@
 %p
   %b Completed:
   = @torrent.completed
+%p
+  %b Files:
+  - @torrent.files.each do |torrent|
+    =torrent["name"]
 
 = link_to 'Edit', edit_torrent_path(@torrent)
 \|

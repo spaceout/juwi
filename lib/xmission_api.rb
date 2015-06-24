@@ -1,6 +1,6 @@
 require 'httparty'
 require 'json'
-require "logger"
+require 'logger'
 
 class XmissionApi
   attr_accessor :session_id

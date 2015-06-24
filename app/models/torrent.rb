@@ -10,6 +10,7 @@ class Torrent < ActiveRecord::Base
       :url => Setting.get_value("transmission_url")
     )
     current_torrents = xmission.all
+    #cleanup_torrents(current_torrents)
     current_torrents.each do |torrent|
       if torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
         process_torrent(torrent)
@@ -27,7 +28,7 @@ class Torrent < ActiveRecord::Base
     if [nil,0].include?(db_torrent.size)
       if dl_torrent["totalSize"] != 0
         db_torrent.update_attributes(
-        :status => "Downloading"
+          :status => "Downloading"
         )
       end
     end
@@ -49,4 +50,22 @@ class Torrent < ActiveRecord::Base
       :time_started => Time.at(dl_torrent["addedDate"]).utc.to_datetime,
     )
   end
+
+  def self.cleanup(current_torrents)
+    hash_list = []
+    unless current_torrents.empty?
+      current_torrents.each do |torrent|
+        hash_list.push(torrent["hashString"])
+      end
+    end
+    active_dls = Torrent.where('status != ?', 'Download Completed')
+    unless active_dls.nil?
+      active_dls.each do |dl|
+        unless hash_list.include?(dl.hash_string)
+          #do something HomeController
+        end
+      end
+    end
+  end
+
 end

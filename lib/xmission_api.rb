@@ -9,7 +9,7 @@ class XmissionApi
   attr_accessor :fields
   attr_accessor :debug_mode
 
-  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir","hashString", "files", "rateDownload", "addedDate"]
+  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir","hashString", "files", "rateDownload", "addedDate", "status", "eta"]
 
   def initialize(options)
     @url = options[:url]
@@ -39,7 +39,7 @@ class XmissionApi
   end
 
   def upload_link(url, destination)
-    puts "Uploading: #{url}"
+    @log.info "Uploading: #{url}"
     response = post(:method => "torrent-add",:arguments => {:filename => url, :'download-dir' => "#{Setting.get_value("finished_path")}/"})
     response
   end
@@ -66,14 +66,31 @@ class XmissionApi
   end
 
   def remove_finished_downloads
-    puts "Removing finished downloads from transmission"
+    @log.info "Removing finished downloads from transmission"
     all.each do |download|
-      if download["isFinished"] == true && download["downloadDir"] == Setting.get_value("finished_path") + "/"
-        puts "Removing #{download["name"]} from Transmission"
+      if download["isFinished"] == true && download["downloadDir"].chomp("/") == Setting.get_value("finished_path")
+        @log.info "Removing #{download["name"]} from Transmission"
         remove(download["id"])
       end
     end
-    puts "Done with removing finished downloads from transmission"
+    @log.info "Done with removing finished downloads from transmission"
   end
 
 end
+
+=begin
+
+STATUS CODE DEFINITIONS
+TR_STATUS_STOPPED        = 0, /* Torrent is stopped */
+TR_STATUS_CHECK_WAIT     = 1, /* Queued to check files */
+TR_STATUS_CHECK          = 2, /* Checking files */
+TR_STATUS_DOWNLOAD_WAIT  = 3, /* Queued to download */
+TR_STATUS_DOWNLOAD       = 4, /* Downloading */
+TR_STATUS_SEED_WAIT      = 5, /* Queued to seed */
+TR_STATUS_SEED           = 6  /* Seeding */
+
+ETA CODE DEFINITIONS
+Unknown   = -2
+Complete  = -1
+
+=end

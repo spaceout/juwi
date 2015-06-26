@@ -32,9 +32,9 @@ class XmissionApi
     response["arguments"]["torrents"].first
   end
 
-  def remove(id)
-    @log.info "Remove Torrent: #{id}"
-    response = post(:method => "torrent-remove",:arguments => {:ids => [id]})
+  def remove(id, delete_local_data=false)
+    @log.info "Remove Torrent: #{id} Delete Local Data: #{delete_local_data}"
+    response = post(:method => "torrent-remove",:arguments => {:ids => [id], :'delete-local-data'=> delete_local_data})
     response
   end
 

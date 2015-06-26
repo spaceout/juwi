@@ -1,4 +1,17 @@
 class TorrentsController < ApplicationController
+
+def remove_torrent
+  require 'xmission_api'
+  xmission = XmissionApi.new(
+    :username => Setting.get_value("transmission_user"),
+    :password => Setting.get_value("transmission_password"),
+    :url => Setting.get_value("transmission_url")
+  )
+  xmission.remove(Torrent.find(params[:id]).xmission_id)
+  redirect_to(:back)
+end
+
+
   # GET /torrents
   # GET /torrents.json
   def index

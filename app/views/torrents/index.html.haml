@@ -23,5 +23,6 @@
         %td= link_to 'Show', torrent
         -#%td= link_to 'Edit', edit_torrent_path(torrent)
         %td= link_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }
+        %td= link_to 'Remove Torrent', "torrents/remove_torrent/#{torrent.id}", :id => torrent.id
 %br
 = link_to 'New Torrent', new_torrent_path

@@ -1,6 +1,5 @@
-%h1 Listing torrents
-
-%table
+%h1 Listing #{Torrent.count} Torrents
+%table.table.table-hover
   %thead
     %tr
       %th Name
@@ -8,7 +7,6 @@
       %th Size
       %th Percent
       %th Completed
-      %th Files
       %th
       %th
       %th
@@ -23,6 +21,5 @@
         %td= link_to 'Show', torrent
         -#%td= link_to 'Edit', edit_torrent_path(torrent)
         %td= link_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }
-        %td= link_to 'Remove Torrent', "torrents/remove_torrent/#{torrent.id}", :id => torrent.id
 %br
 = link_to 'New Torrent', new_torrent_path

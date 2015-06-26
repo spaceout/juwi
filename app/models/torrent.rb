@@ -17,6 +17,7 @@ class Torrent < ActiveRecord::Base
           process_torrent(torrent)
         end
       end
+      remove_completed_torrents
     end
   end
 
@@ -53,7 +54,6 @@ class Torrent < ActiveRecord::Base
   end
 
   def self.cleanup_torrents(current_torrents)
-    puts "its cleanup time"
     hash_list = []
     unless current_torrents.empty?
       current_torrents.each do |torrent|
@@ -66,7 +66,8 @@ class Torrent < ActiveRecord::Base
       active_dls.each do |dl|
         unless hash_list.include?(dl.hash_string)
           dl.update_attributes(
-            :status => 9
+            :status => 9,
+            :xmission_id => nil
           )
         end
       end
@@ -74,13 +75,13 @@ class Torrent < ActiveRecord::Base
   end
 
   def self.is_xmission_online?
-    matches = /(\b(?:\d{1,3}\.){3}\d{1,3}\b)\:(\d\d\d\d)/.match(Setting.get_value("transmission_url"))
-    ip = matches[1]
+    matches = /http:\/\/(.+):(\d+)/.match(Setting.get_value("transmission_url"))
+    host = matches[1]
     port = matches[2]
     begin
       Timeout::timeout(1) do
         begin
-          socket_test = TCPSocket.new(ip, port)
+          socket_test = TCPSocket.new(host, port)
           socket_test.close
           return true
         rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
@@ -91,7 +92,28 @@ class Torrent < ActiveRecord::Base
     end
     return false
   end
+
+  def self.remove_completed_torrents
+    require 'xmission_api'
+    xmission = XmissionApi.new(
+      :username => Setting.get_value("transmission_user"),
+      :password => Setting.get_value("transmission_password"),
+      :url => Setting.get_value("transmission_url")
+    )
+    torrents = Torrent.where("xmission_id IS NOT NULL")
+    torrents.each do |torrent|
+      if torrent.completed && torrent.status == 0
+        xmission.remove(torrent.xmission_id, false)
+        torrent.update_attributes(
+          :xmission_id => nil
+        )
+      end
+    end
+  end
 end
+  #find completed torrents that have not been processed yet (still have xmission_id set)
+  #remove from xmission and set xmission_id to 0 or nil
+  #kick off processing torrent
 
 
 

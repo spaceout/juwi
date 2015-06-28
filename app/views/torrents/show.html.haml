@@ -1,5 +1,4 @@
 %p#notice= notice
-
 %p
   %b Hash string:
   = @torrent.hash_string
@@ -26,8 +25,9 @@
   = @torrent.completed
 %p
   %b Files:
+  %ul
   - @torrent.files.each do |torrent|
-    =torrent["name"]
+    %li=torrent["name"]
 %p
   %b Eta:
   =@torrent.eta
@@ -37,8 +37,4 @@
 %p
   %b Rate Download
   =@torrent.rate_download
-
-
-= link_to 'Edit', edit_torrent_path(@torrent)
-\|
 = link_to 'Back', torrents_path

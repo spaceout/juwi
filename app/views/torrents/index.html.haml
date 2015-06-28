@@ -13,13 +13,9 @@
   %tbody
     - @torrents.each do |torrent|
       %tr
-        %td= torrent.name
+        %td= link_to torrent.name, torrent
         %td= torrent.status
         %td= torrent.size
         %td= torrent.percent
         %td= torrent.completed
-        %td= link_to 'Show', torrent
-        -#%td= link_to 'Edit', edit_torrent_path(torrent)
         %td= link_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }
-%br
-= link_to 'New Torrent', new_torrent_path

@@ -17,7 +17,6 @@ class HomeController < ApplicationController
     rescue
       @transmission_dls = nil
     end
-    @xbmc_daemon_status = XbmcDaemon.status
   end
 
   def rename

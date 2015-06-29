@@ -27,7 +27,7 @@ class Torrent < ActiveRecord::Base
     current_status = dl_torrent["status"]
 
     if dl_torrent_size == 0
-      dl_torrent["name"] = "MAGNET LINK"
+      dl_torrent["name"] = "MAG LINK #{dl_torrent["name"]}"
     end
 
     if dl_torrent["isFinished"]

@@ -15,7 +15,7 @@ end
   # GET /torrents
   # GET /torrents.json
   def index
-    @torrents = Torrent.all
+    @torrents = (Torrent.all.sort_by &:time_started).reverse!
 
     respond_to do |format|
       format.html # index.html.erb

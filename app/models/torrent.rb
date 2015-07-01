@@ -110,10 +110,32 @@ class Torrent < ActiveRecord::Base
       end
     end
   end
+
+  def process_completed_torrent
+    if torrent.files.count == 0
+      return
+    elsif torrent.files.count == 1
+      #check if it is a movie file
+      puts "only one file, processing dis shit #{torrent.files.first["name"]}"
+      #go rename the single file
+      #update the file hash to include "renamed_to: #RENAME NAME"
+      #update "processing_completed :DateTime" on the torrent object
+    else
+      #Find the movie file in the folder
+      torrent.files.each do |torrent_file|
+        if torrent_file["length"] >= Setting.get_value("min_videosize").to_i
+          #check if its a video file
+          puts "processing dis shit #{torrent_file["name"]}"
+          #process this file
+          #update the file hash to include new name
+          #move onto the next file in da array
+        end
+      end
+    end
+  end
+
 end
-  #find completed torrents that have not been processed yet (still have xmission_id set)
-  #remove from xmission and set xmission_id to 0 or nil
-  #kick off processing torrent
+
 
 
 

@@ -129,9 +129,19 @@ class Torrent < ActiveRecord::Base
           #process this file
           #update the file hash to include new name
           #move onto the next file in da array
+          #remember to delete the root folder when compreto
         end
       end
     end
+  end
+
+  def self.is_video_file?(filename)
+    #false if it is a directory
+    return false if File.directory?(filename["name"])
+    #True if it has a video extension and the size is big enough
+    video_extnames = Setting.get_value("video_extensions").split(',')
+    return true if video_extnames.include?(File.extname(filename["name"])) && filename["length"] >= Setting.get_value("min_videosize").to_i
+    return false
   end
 
 end

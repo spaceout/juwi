@@ -135,21 +135,21 @@ class Torrent < ActiveRecord::Base
     end
   end
 
+  def self.is_video_file?(torrent_file)
+    video_extnames = Setting.get_value("video_extensions").split(',')
+    return true if video_extnames.include?(File.extname(torrent_file["name"])) && torrent_file["length"] >= Setting.get_value("min_videosize").to_i
+  end
+end
+=begin
   def self.is_video_file?(filename)
     #false if it is a directory
     return false if File.directory?(filename["name"])
     #True if it has a video extension and the size is big enough
     video_extnames = Setting.get_value("video_extensions").split(',')
-    return true if video_extnames.include?(File.extname(filename["name"])) && filename["length"] >= Setting.get_value("min_videosize").to_i
+    return true if video_extnames.include?(File.extname(filename["name"])) #&& filename["length"] >= Setting.get_value("min_videosize").to_i
     return false
   end
-
 end
-
-
-
-
-=begin
 
 STATUS CODE DEFINITIONS
 TR_STATUS_STOPPED        = 0, /* Torrent is stopped */
@@ -165,4 +165,12 @@ ETA CODE DEFINITIONS
 Unknown   = -2
 Complete  = -1
 
+require 're_namer2'
+Torrent.all.each do |torrent|
+  torrent.files.each do |torrent_file|
+    if Torrent.is_video_file?(torrent_file)
+      Renamer.process_file(torrent_file["name"], "/mnt/blah/blah/")
+    end
+  end
+end
 =end

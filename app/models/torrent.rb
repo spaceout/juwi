@@ -112,44 +112,56 @@ class Torrent < ActiveRecord::Base
   end
 
   def process_completed_torrent
-    if torrent.files.count == 0
-      return
-    elsif torrent.files.count == 1
-      #check if it is a movie file
-      puts "only one file, processing dis shit #{torrent.files.first["name"]}"
-      #go rename the single file
-      #update the file hash to include "renamed_to: #RENAME NAME"
-      #update "processing_completed :DateTime" on the torrent object
-    else
-      #Find the movie file in the folder
-      torrent.files.each do |torrent_file|
-        if torrent_file["length"] >= Setting.get_value("min_videosize").to_i
-          #check if its a video file
-          puts "processing dis shit #{torrent_file["name"]}"
-          #process this file
-          #update the file hash to include new name
-          #move onto the next file in da array
-          #remember to delete the root folder when compreto
-        end
+    #no files = nothing to rename
+    require 're_namer2'
+    return if files.count == 0
+    #go through each file in the completed torrent
+    files.each do |torrent_file|
+      #check if it is a video file
+      if Torrent.is_video_file?(torrent_file)
+        puts "processing dis shit #{torrent_file["name"]}"
+        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file["name"]), "/")
+        puts result
+        #update the file hash to include new name
+        #move onto the next file in da array
+        #remember to delete the root folder when compreto
+      else
+        puts "NOPE"
       end
     end
   end
 
   def self.is_video_file?(torrent_file)
+    torrent_file_path = File.join(Setting.get_value("finished_path"), torrent_file["name"])
+    return false if File.directory?(torrent_file_path)
     video_extnames = Setting.get_value("video_extensions").split(',')
     return true if video_extnames.include?(File.extname(torrent_file["name"])) && torrent_file["length"] >= Setting.get_value("min_videosize").to_i
   end
-end
-=begin
-  def self.is_video_file?(filename)
-    #false if it is a directory
-    return false if File.directory?(filename["name"])
-    #True if it has a video extension and the size is big enough
-    video_extnames = Setting.get_value("video_extensions").split(',')
-    return true if video_extnames.include?(File.extname(filename["name"])) #&& filename["length"] >= Setting.get_value("min_videosize").to_i
-    return false
+
+  def self.torrent_status(status_num)
+    case status_num
+    when 0
+      return "Stopped"
+    when 1
+      return "Queued to Check"
+    when 2
+      return "Checking Files"
+    when 3
+      return "Queued to Download"
+    when 4
+      return "Downloading"
+    when 5
+      return "Queued to Seed"
+    when 6
+      return "Seeding"
+    when 9
+      return "Lost in Transmission"
+    else
+      return "Unknown Status"
+    end
   end
 end
+=begin
 
 STATUS CODE DEFINITIONS
 TR_STATUS_STOPPED        = 0, /* Torrent is stopped */

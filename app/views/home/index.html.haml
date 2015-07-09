@@ -24,6 +24,34 @@
         %tr
           %td= file
 .row
+  .col-xs-12.col-sm-4
+    %table.table.table-hover
+      %thead
+        %tr
+          %th= "Aired Yesterday"
+      %tbody
+        -@aired_yesterday.each do |episode|
+          %tr
+            %td= episode.tvshow.ttdb_show_title + " - " + "s" '%02d' % episode.ttdb_season_number + "e" + '%02d' % episode.ttdb_episode_number + " - " + episode.ttdb_episode_title
+  .col-xs-12.col-sm-4
+    %table.table.table-hover
+      %thead
+        %tr
+          %th= "Airing Today"
+      %tbody
+        -@airing_today.each do |episode|
+          %tr
+            %td= episode.tvshow.ttdb_show_title + " - " + "s" '%02d' % episode.ttdb_season_number + "e" + '%02d' % episode.ttdb_episode_number + " - " + episode.ttdb_episode_title
+  .col-xs-12.col-sm-4
+    %table.table.table-hover
+      %thead
+        %tr
+          %th= "Airing Tomorrow"
+      %tbody
+        -@airing_tomorrow.each do |episode|
+          %tr
+            %td= episode.tvshow.ttdb_show_title + " - " + "s" '%02d' % episode.ttdb_season_number + "e" + '%02d' % episode.ttdb_episode_number + " - " + episode.ttdb_episode_title
+.row
   .col-xs-4
     %h5= "Library Statistics"
     %h5= "TV Shows #{@tvshows.count}"

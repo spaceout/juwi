@@ -7,6 +7,9 @@ class HomeController < ApplicationController
     @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
     @finished_dir = FileManipulator.list_dir(Setting.get_value("finished_path"))
+    @aired_yesterday = Episode.where(:ttdb_episode_airdate => Date.yesterday)
+    @airing_today = Episode.where(:ttdb_episode_airdate => Date.today)
+    @airing_tomorrow = Episode.where(:ttdb_episode_airdate => Date.tomorrow)
     xmission = XmissionApi.new(
       :username => Setting.get_value("transmission_user"),
       :password => Setting.get_value("transmission_password"),

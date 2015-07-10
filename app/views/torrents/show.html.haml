@@ -25,9 +25,18 @@
   = @torrent.completed
 %p
   %b Files:
-  %ul
-  - @torrent.files.each do |torrent|
-    %li=torrent["name"]
+  %table.table.table-hover
+    %thead
+      %tr
+        %th Name
+        %th Size
+        %th Rename Result
+    %tbody
+      - @torrent.files.each do |torrent_file|
+        %tr
+          %td= torrent_file["name"]
+          %td= torrent_file["length"]
+          %td= torrent_file["rename_result"]
 %p
   %b Eta:
   =@torrent.eta

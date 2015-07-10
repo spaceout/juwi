@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  length: 1
+  bytes_completed: 1
+  rename_status: MyString
+  rename_data: MyString
+  torrent: 
+
+two:
+  name: MyString
+  length: 1
+  bytes_completed: 1
+  rename_status: MyString
+  rename_data: MyString
+  torrent: 

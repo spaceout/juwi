@@ -1,0 +1,24 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @tfile.name
+%p
+  %b Length:
+  = @tfile.length
+%p
+  %b Bytes completed:
+  = @tfile.bytes_completed
+%p
+  %b Rename status:
+  = @tfile.rename_status
+%p
+  %b Rename data:
+  = @tfile.rename_data
+%p
+  %b Torrent:
+  = @tfile.torrent
+
+= link_to 'Edit', edit_torrent_tfile_path(@tfile)
+\|
+= link_to 'Back', tfiles_path

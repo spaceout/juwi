@@ -76,6 +76,25 @@ class XmissionApi
     @log.info "Done with removing finished downloads from transmission"
   end
 
+  def is_online?
+    matches = /http:\/\/(.+):(\d+)/.match(url)
+    host = matches[1]
+    port = matches[2]
+    begin
+      Timeout::timeout(1) do
+        begin
+          socket_test = TCPSocket.new(host, port)
+          socket_test.close
+          return true
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          return false
+        end
+      end
+    rescue Timeout::Error
+    end
+    return false
+  end
+
 end
 
 =begin

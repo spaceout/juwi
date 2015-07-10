@@ -7,14 +7,16 @@
       %th Size
       %th Percent
       %th Completed
+      %th Rename Status
       %th
 
   %tbody
     - @torrents.each do |torrent|
       %tr
         %td= link_to torrent.name, torrent
-        %td= Torrent.torrent_status(torrent.status)
+        %td= torrent.status_word
         %td= Filesize.from("#{torrent.size} B").pretty
         %td= torrent.percent
         %td= torrent.completed
+        %td= torrent.rename_status
         %td= button_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"

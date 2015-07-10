@@ -1,0 +1,29 @@
+%h1 Listing tfiles
+
+%table
+  %tr
+    %th Name
+    %th Length
+    %th Bytes completed
+    %th Rename status
+    %th Rename data
+    %th Torrent
+    %th
+    %th
+    %th
+
+  - @tfiles.each do |tfile|
+    %tr
+      %td= tfile.name
+      %td= tfile.length
+      %td= tfile.bytes_completed
+      %td= tfile.rename_status
+      %td= tfile.rename_data
+      %td= tfile.torrent
+      %td= link_to 'Show', torrent_tfiles_path(tfile, tfile.torrent)
+      %td= link_to 'Edit', edit_torrent_tfile_path(tfile)
+      %td= link_to 'Destroy', tfile, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Tfile', new_torrent_tfile_path

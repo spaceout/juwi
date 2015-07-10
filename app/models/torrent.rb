@@ -113,14 +113,14 @@ class Torrent < ActiveRecord::Base
 
   def process_completed_torrent
     #no files = nothing to rename
-    require 're_namer2'
+    require 're_namer'
     return if files.count == 0
     #go through each file in the completed torrent
     files.each do |torrent_file|
       #check if it is a video file
       if Torrent.is_video_file?(torrent_file)
         puts "processing dis shit #{torrent_file["name"]}"
-        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file["name"]), "/")
+        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file["name"]))
         puts result
         #update the file hash to include new name
         #move onto the next file in da array

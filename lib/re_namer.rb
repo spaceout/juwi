@@ -5,51 +5,61 @@ require 'scrubber'
 
 class Renamer
 
-  def self.process_dir(rename_input_dir, rename_output_dir)
-    output = []
-    Dir.glob(File.join(rename_input_dir, "*")).each do |dir_entry|
-      next if File.directory?(dir_entry)
-      rename_result = Renamer.rename(File.basename(dir_entry), 1)
-      puts rename_result
-      if rename_result[:failure].nil?
-        clean_name = rename_result[:success][:new_name]
-        overwrite_enable = rename_result[:success][:overwrite_enable]
-        new_path = File.join(rename_output_dir, clean_name.split(" - ").first, "/")
-        new_name = clean_name + File.extname(dir_entry)
-        destination = new_path + new_name
-        if File.directory?(new_path)
-          if File.file?(destination)
-            if overwrite_enable == true
-              File.unlink(destination)
-              puts "Moving #{dir_entry} to #{destination}"
-              output.push(rename_result)
-              FileUtils.mv(dir_entry, destination)
-            else
-              puts "Destination already exists #{destination}"
-              rename_result = {:failure => rename_result[:success]}
-              rename_result[:failure][:reason] = "destination file exists"
-              output.push(rename_result)
-            end
-          else
-            puts "Moving #{dir_entry} to #{destination}"
-            output.push({:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}})
-            FileUtils.mv(dir_entry, destination)
-          end
-        else
-          puts "Destination directory #{new_path} not found"
-          rename_result = {:failure => rename_result[:success]}
-          rename_result[:failure][:reason] = "destination folder does not exist: #{new_path}"
-          output.push(rename_result)
-        end
-      else
-        puts "No match for #{dir_entry}"
-        output.push(rename_result)
-      end
+  def self.process_file(filename, rename_output_dir = Settings.get_value("tvshow_base_path"))
+    if File.directory?(filename)
+      rename_result = {:failure=>{:old_name=>filename, :reason=>"This is a Directory, not a File"}}
+      return rename_result
     end
-    return output
+    rename_result = Renamer.rename(File.basename(filename))
+    #if the rename result is successful
+    if rename_result[:failure].nil?
+      clean_name = rename_result[:success][:new_name]
+      overwrite_enable = rename_result[:success][:overwrite_enable]
+      new_path = File.join(rename_output_dir, clean_name.split(" - ").first, "/")
+      new_name = clean_name + File.extname(filename)
+      destination = new_path + new_name
+      #If the directory exists
+      if File.directory?(new_path)
+        #if the file already exists
+        if File.file?(destination)
+          #if overwrite is enabled
+          if overwrite_enable == true
+            #then go ahead and move it because its a repack
+            File.unlink(destination)
+            puts "Moving #{filename} to #{destination}"
+            return rename_result
+#            FileUtils.mv(filename, destination)
+          #else if overwrite is NOT enabled
+          else
+            #then dont move it, because it already exists
+            puts "Destination already exists #{destination}"
+            rename_result = {:failure => rename_result[:success]}
+            rename_result[:failure][:reason] = "destination file exists"
+            return rename_result
+          end
+        #else if the file does NOT exist
+        else
+          #go ahead and move it
+          puts "Moving #{filename} to #{destination}"
+          return {:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}}
+#          FileUtils.mv(filename, destination)
+        end
+      #else if the show directory is not found
+      else
+        #fail out, might be a new show or renamed show
+        puts "Destination directory #{new_path} not found"
+        rename_result = {:failure => rename_result[:success]}
+        rename_result[:failure][:reason] = "destination folder does not exist: #{new_path}"
+        return rename_result
+      end
+    #else if the rename failed
+    else
+      puts "No match for #{filename}"
+      return rename_result
+    end
   end
 
-  def self.rename(dirty_name, attempt)
+  def self.rename(dirty_name, attempt = 1)
     if attempt == 2
       puts "second try"
     end

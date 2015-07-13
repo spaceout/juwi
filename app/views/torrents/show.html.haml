@@ -16,7 +16,7 @@
   = @torrent.size
 %p
   %b Status:
-  = @torrent.status
+  = @torrent.status_to_s
 %p
   %b Percent:
   = @torrent.percent
@@ -31,12 +31,17 @@
         %th Name
         %th Size
         %th Rename Result
+        %th Rename Data
     %tbody
-      - @torrent.files.each do |torrent_file|
+      - @torrent.tfiles.each do |torrent_file|
         %tr
-          %td= torrent_file["name"]
-          %td= torrent_file["length"]
-          %td= torrent_file["rename_result"]
+          %td= torrent_file.name
+          %td= torrent_file.length
+          %td= torrent_file.rename_status
+          %td= torrent_file.rename_data
+%p
+  %b Rename Status:
+  =@torrent.rename_status
 %p
   %b Eta:
   =@torrent.eta

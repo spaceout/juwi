@@ -28,7 +28,7 @@ class Renamer
             File.unlink(destination)
             puts "Moving #{filename} to #{destination}"
             return rename_result
-#            FileUtils.mv(filename, destination)
+            FileUtils.mv(filename, destination)
           #else if overwrite is NOT enabled
           else
             #then dont move it, because it already exists
@@ -42,7 +42,7 @@ class Renamer
           #go ahead and move it
           puts "Moving #{filename} to #{destination}"
           return {:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}}
-#          FileUtils.mv(filename, destination)
+          FileUtils.mv(filename, destination)
         end
       #else if the show directory is not found
       else

@@ -3,53 +3,54 @@ class Torrent < ActiveRecord::Base
   serialize :files
   attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started, :files, :xmission_id, :rate_download, :eta, :rename_status
 
+  require 'xmission_api'
+  @xmission = XmissionApi.new(
+    :username => Setting.get_value("transmission_user"),
+    :password => Setting.get_value("transmission_password"),
+    :url => Setting.get_value("transmission_url")
+  )
+
   def self.xmission_poller
-    require 'xmission_api'
-    xmission = XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url")
-    )
-    if xmission.is_online?
-      current_torrents = xmission.all
-      cleanup_torrents(current_torrents)
+    if @xmission.is_online?
+      current_torrents = @xmission.all
+      cleanup_torrents
       #maybe do a find or initialize by to create/load tbe torrent object to be passed around (like a whore)
-      current_torrents.each do |torrent|
-        if torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
-          process_torrent(torrent)
+      current_torrents.each do |dl_torrent|
+        #if the torrent download directory is set to the finished folder
+        if dl_torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
+          #find or initialize a new torrent object
+          db_torrent = Torrent.find_or_initialize_by_hash_string(dl_torrent["hashString"])
+          #Send it for processing along with the xmission hash
+          db_torrent.process_torrent(torrent)
         end
       end
-      remove_completed_torrents
     else
       puts "boooooo xmission is currently offline"
     end
-
   end
 
-  def self.process_torrent(dl_torrent)
+  #dl_torrent = xmission hash
+  def process_torrent(dl_torrent)
     #create or load a torrent object by hashstring
-    db_torrent = Torrent.find_or_initialize_by_hash_string(dl_torrent["hashString"])
     dl_torrent_size = dl_torrent["totalSize"]
     #if the torrent size is showing 0, its a magnet link
     if dl_torrent_size == 0
       dl_torrent["name"] = "MAG LINK #{dl_torrent["name"]}"
     end
-    #if the download is showing complete and the db entry says its not, it just finished so add the time
+    #if the download is showing complete and the db entry says its not, it just finished process it
     if dl_torrent["isFinished"]
-      if !db_torrent.completed
-        db_torrent.update_attributes(
-          :time_completed => DateTime.now,
-        )
+      if !completed
+        puts "Detected completed torrent, queing processing_completed"
+        delay(:queue => 'renamer').process_completed_torrent
       end
     end
     #update all items in the db torrent entry
-    db_torrent.update_attributes(
+    update_attributes(
       :completed => dl_torrent["isFinished"],
       :hash_string => dl_torrent["hashString"],
       :name => dl_torrent["name"],
       :percent => (dl_torrent["percentDone"] * 100),
       :size => dl_torrent["totalSize"],
-      :files => dl_torrent["files"],
       :time_started => Time.at(dl_torrent["addedDate"]).utc.to_datetime,
       :status => dl_torrent["status"],
       :eta => dl_torrent["eta"],
@@ -58,7 +59,7 @@ class Torrent < ActiveRecord::Base
     )
     #lets update all the files as well
     dl_torrent["files"].each do |torrent_file|
-      db_tfile = db_torrent.tfiles.find_or_initialize_by_name(torrent_file["name"])
+      db_tfile = tfiles.find_or_initialize_by_name(torrent_file["name"])
       db_tfile.update_attributes(
         :name => torrent_file["name"],
         :length => torrent_file["length"],
@@ -67,7 +68,9 @@ class Torrent < ActiveRecord::Base
     end
   end
 
-  def self.cleanup_torrents(current_torrents)
+  #current_torrents = array of all xmission hashes
+  def self.cleanup_torrents
+    current_torrents = @xmission.all
     hash_list = []
     #unless we were passed an empty array, create and array of the current xmission download hashes
     unless current_torrents.empty?
@@ -77,6 +80,11 @@ class Torrent < ActiveRecord::Base
     end
     #0 and 9 do mean that it has been stopped (or lost)
     inactive_status_numbers = [0,9]
+    #
+    #when torrent is stopped but not complete and then removed from xmission you will have status = 0 but complete = false
+    #NOT currently in xmission
+    #Status is anything but
+    #
     #returns all downloads the database THINKS are still active (NOT marked as 0 or 9)
     db_active_dls = Torrent.where("status NOT IN (?)", inactive_status_numbers)
     #unless there are no active dls
@@ -95,17 +103,25 @@ class Torrent < ActiveRecord::Base
   end
 
   def process_completed_torrent
-    #no files = nothing to rename
     require 're_namer'
-    return if tfiles.count == 0
+    #update the time_completed for torrent object
+    update_attributes(:time_completed => DateTime.now)
+        #remove torrent from xmission by id
+    @xmission.remove(xmission_id)
+    #no files = nothing to rename set rename status to false
+    if tfiles.count == 0
+      puts "RENAME FAILURE"
+      update_attributes(:rename_status => false)
+      return
+    end
     #go through each file in the completed torrent
     tfiles.each do |torrent_file|
       #check if it is a video file
       if torrent_file.is_video_file?
         #rename the video file and store the rename result
-        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file["name"]))
+        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file.name))
         #stuff the result back in the tfile entry
-        torrent_file.update_attribute(:rename_result => result)
+        torrent_file.update_attributes(:rename_data => result)
         #if there are no successful entries, mark the torrent rename status as false
         if result[:success].nil?
           puts "RENAME FAILURE"
@@ -114,16 +130,18 @@ class Torrent < ActiveRecord::Base
         elsif result[:failure].nil? && torrent.rename_status != false
           puts "RENAME SUCCESS"
           update_attributes(:rename_status => true)
+          #
+          #delete remaining files/folders from finished directory
+          #
         end
       else
         #if its not a video file, mark rename_result as "SKIP"
-        torrent_file.update_attribute(:rename_result => "SKIP")
-        save
+        torrent_file.update_attributes(:rename_data => "SKIP")
       end
     end
   end
 
-  def status_word
+  def status_to_s
     case status
     when 0
       return "Stopped"
@@ -150,15 +168,10 @@ end
 =begin
 maybe add 'root folder' to Torrent object, makes it easier to clean up (File.rm torrent.root_folder)
 
-
 Situations:
   Download starts while juwi is not running but finishes while it is running - should pick up the half downloaded file no problem
   Download starts AND finishes AND is removed from xmission while juwi is not running - gets the new file from xbmc database
   Download starts with juwi, but finishes when its not running - cleanup torrents should pick this up, mark it as lost in xmission
-
-where should i stick shit that should run at start of server (to clear out certain entries in DB lets say)
-how do i create link_to's with child models
-
 
 ETA CODE DEFINITIONS
 Unknown   = -2

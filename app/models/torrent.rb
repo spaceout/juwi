@@ -1,20 +1,18 @@
 class Torrent < ActiveRecord::Base
   has_many :tfiles, :dependent => :destroy
-  serialize :files
-  attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started, :files, :xmission_id, :rate_download, :eta, :rename_status
+  attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started, :xmission_id, :rate_download, :eta, :rename_status
 
   require 'xmission_api'
   @xmission = XmissionApi.new(
     :username => Setting.get_value("transmission_user"),
     :password => Setting.get_value("transmission_password"),
-    :url => Setting.get_value("transmission_url")
-  )
+    :url => Setting.get_value("transmission_url"))
 
   def self.xmission_poller
     if @xmission.is_online?
       current_torrents = @xmission.all
+      #cleanup torrents no longer found in xmission, makes sure the DB is in good shape
       cleanup_torrents
-      #maybe do a find or initialize by to create/load tbe torrent object to be passed around (like a whore)
       current_torrents.each do |dl_torrent|
         #if the torrent download directory is set to the finished folder
         if dl_torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
@@ -25,18 +23,61 @@ class Torrent < ActiveRecord::Base
         end
       end
     else
-      puts "boooooo xmission is currently offline"
+      puts "xmission is currently offline, poller skipped"
     end
   end
+
+  #current_torrents = array of all xmission hashes
+  def self.cleanup_torrents
+    current_torrents = @xmission.all
+    hash_list = []
+    #unless we were passed an empty array, create and array of the current xmission download hashStrings
+    unless current_torrents.empty?
+      current_torrents.each do |torrent|
+        hash_list.push(torrent["hashString"])
+      end
+    end
+
+    #0 and 9 do mean that it has been stopped (or lost)
+    inactive_status_numbers = [0,9]
+    #
+    #when torrent is stopped but not complete and then removed from xmission you will have status = 0 but complete = false
+    #NOT currently in xmission
+    #completed could be true or false
+    #status could be 0 for stopped but still removed from xmission already
+
+    #
+    #returns all downloads the database THINKS are still active (NOT marked as 0 or 9)
+    db_active_dls = Torrent.where("status NOT IN (?)", inactive_status_numbers)
+    #unless there are no active dls
+    unless db_active_dls.nil?
+      db_active_dls.each do |db_dl|
+        #unless the current active dls in xmission matches the hash string of the current database download entry
+        unless hash_list.include?(db_dl.hash_string)
+          #update the database download entry to be "lost in transmission" (9)
+          db_dl.update_attributes(
+            :status => 9,
+            :xmission_id => nil
+          )
+        end
+      end
+    end
+  end
+
 
   #dl_torrent = xmission hash
   def process_torrent(dl_torrent)
     #create or load a torrent object by hashstring
     dl_torrent_size = dl_torrent["totalSize"]
     #if the torrent size is showing 0, its a magnet link
+
+
+    #remove this in favor of the status_to_s definition of magnet
     if dl_torrent_size == 0
       dl_torrent["name"] = "MAG LINK #{dl_torrent["name"]}"
     end
+
+
     #if the download is showing complete and the db entry says its not, it just finished process it
     if dl_torrent["isFinished"]
       if !completed
@@ -68,40 +109,6 @@ class Torrent < ActiveRecord::Base
     end
   end
 
-  #current_torrents = array of all xmission hashes
-  def self.cleanup_torrents
-    current_torrents = @xmission.all
-    hash_list = []
-    #unless we were passed an empty array, create and array of the current xmission download hashes
-    unless current_torrents.empty?
-      current_torrents.each do |torrent|
-        hash_list.push(torrent["hashString"])
-      end
-    end
-    #0 and 9 do mean that it has been stopped (or lost)
-    inactive_status_numbers = [0,9]
-    #
-    #when torrent is stopped but not complete and then removed from xmission you will have status = 0 but complete = false
-    #NOT currently in xmission
-    #Status is anything but
-    #
-    #returns all downloads the database THINKS are still active (NOT marked as 0 or 9)
-    db_active_dls = Torrent.where("status NOT IN (?)", inactive_status_numbers)
-    #unless there are no active dls
-    unless db_active_dls.nil?
-      db_active_dls.each do |db_dl|
-        #unless the current active dls in xmission matches the hash string of the current database download entry
-        unless hash_list.include?(db_dl.hash_string)
-          #update the database download entry to be "lost in transmission" (9)
-          db_dl.update_attributes(
-            :status => 9,
-            :xmission_id => nil
-          )
-        end
-      end
-    end
-  end
-
   def process_completed_torrent
     require 're_namer'
     #update the time_completed for torrent object
@@ -120,31 +127,67 @@ class Torrent < ActiveRecord::Base
       if torrent_file.is_video_file?
         #rename the video file and store the rename result
         result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file.name))
-        #stuff the result back in the tfile entry
-        torrent_file.update_attributes(:rename_data => result)
-        #if there are no successful entries, mark the torrent rename status as false
+        #if there are no successful entries:
+        #mark the torrent rename status as false
+        #mark the tfile rename status as false
+        #shove the rename data into the tfile
         if result[:success].nil?
           puts "RENAME FAILURE"
           update_attributes(:rename_status => false)
-        #if there are no failure entries and the torrent has not been previously false, set it true
-        elsif result[:failure].nil? && torrent.rename_status != false
+          torrent_file.update_attributes(
+            :rename_status => false,
+            :rename_data => result[:failure]
+          )
+        #if there are no failure entries
+        #mark the torrent rename status as true UNLESS it is already false
+        #mark the tfile rename_status as true
+        #shove the rename data into the tfile
+        elsif result[:failure].nil?
           puts "RENAME SUCCESS"
-          update_attributes(:rename_status => true)
-          #
-          #delete remaining files/folders from finished directory
-          #
+          #if rename status == nil or true update_attributes to be true
+          #if its false, leave it alone
+          unless rename_status == false
+            update_attributes(:rename_status => true)
+          end
+          torrent_file.update_attributes(
+            :rename_status => true,
+            :rename_data => result[:success]
+          )
+        else
+          #if its not success or failure, something happened, false it up
+          update_attributes(:rename_status => false)
         end
       else
         #if its not a video file, mark rename_result as "SKIP"
         torrent_file.update_attributes(:rename_data => "SKIP")
       end
     end
+    #done processing tfiles for the torrent, check rename_status and
+    #if it is true, clean up remaining files from the download
+    if rename_status
+      puts "Rename of torrent successful, initiating cleanup"
+      cleanup_torrent_files
+    end
+  end
+
+  def cleanup_torrent_files
+    #Need to add a "base dir" to the torrent object for cleanup
+    #get base dir if there is one, if not nothing to do, it was a single file
+    #check if it is a directory
+    #MAKE SURE ITS NOT THE FINISHED FOLDER
+    #destroy dat bitch
+
   end
 
   def status_to_s
+    #convert to if...elseif...else...end to handle stopped/abandoned/missing/magnet etc
+    #Status = 4 and size = 0 then its a magnet link (getting metadata)
+    #If status = 4 but rate = 0 and peers = 0 then its Stalled (no peers)
+    #if status = 0 and torrent.completed = true then its done seeding as well
+    #
     case status
     when 0
-      return "Stopped"
+      return "Paused"
     when 1
       return "Queued to Check"
     when 2

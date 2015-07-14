@@ -2,34 +2,41 @@ class Torrent < ActiveRecord::Base
   has_many :tfiles, :dependent => :destroy
   attr_accessible :completed, :hash_string, :name, :percent, :size, :status, :time_completed, :time_started, :xmission_id, :rate_download, :eta, :rename_status
 
-  require 'xmission_api'
-  @xmission = XmissionApi.new(
-    :username => Setting.get_value("transmission_user"),
-    :password => Setting.get_value("transmission_password"),
-    :url => Setting.get_value("transmission_url"))
+  def self.xmission
+    require 'xmission_api'
+    @@xmission ||= XmissionApi.new(
+      :username => Setting.get_value("transmission_user"),
+      :password => Setting.get_value("transmission_password"),
+      :url => Setting.get_value("transmission_url"))
+  end
+
+  def xmission
+    Torrent.xmission
+  end
 
   def self.xmission_poller
-    if @xmission.is_online?
-      current_torrents = @xmission.all
+    if xmission.is_online?
+      current_torrents = xmission.all
       #cleanup torrents no longer found in xmission, makes sure the DB is in good shape
-      cleanup_torrents
       current_torrents.each do |dl_torrent|
         #if the torrent download directory is set to the finished folder
         if dl_torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
           #find or initialize a new torrent object
           db_torrent = Torrent.find_or_initialize_by_hash_string(dl_torrent["hashString"])
           #Send it for processing along with the xmission hash
-          db_torrent.process_torrent(torrent)
+          db_torrent.process_torrent(dl_torrent)
         end
       end
+      cleanup_torrents
     else
       puts "xmission is currently offline, poller skipped"
     end
   end
 
+  #if everything is running well, this will never do anything
   #current_torrents = array of all xmission hashes
   def self.cleanup_torrents
-    current_torrents = @xmission.all
+    current_torrents = xmission.all
     hash_list = []
     #unless we were passed an empty array, create and array of the current xmission download hashStrings
     unless current_torrents.empty?
@@ -37,28 +44,17 @@ class Torrent < ActiveRecord::Base
         hash_list.push(torrent["hashString"])
       end
     end
-
-    #0 and 9 do mean that it has been stopped (or lost)
-    inactive_status_numbers = [0,9]
-    #
-    #when torrent is stopped but not complete and then removed from xmission you will have status = 0 but complete = false
-    #NOT currently in xmission
-    #completed could be true or false
-    #status could be 0 for stopped but still removed from xmission already
-
-    #
-    #returns all downloads the database THINKS are still active (NOT marked as 0 or 9)
-    db_active_dls = Torrent.where("status NOT IN (?)", inactive_status_numbers)
+    #an active db torrent is one that has an xmission_id
+    db_active_dls = Torrent.where("xmission_id IS NOT NULL")
     #unless there are no active dls
     unless db_active_dls.nil?
       db_active_dls.each do |db_dl|
         #unless the current active dls in xmission matches the hash string of the current database download entry
         unless hash_list.include?(db_dl.hash_string)
-          #update the database download entry to be "lost in transmission" (9)
+          #update the database download entry to be lost (9) and nil out xmission_id
           db_dl.update_attributes(
             :status => 9,
-            :xmission_id => nil
-          )
+            :xmission_id => nil)
         end
       end
     end
@@ -69,15 +65,6 @@ class Torrent < ActiveRecord::Base
   def process_torrent(dl_torrent)
     #create or load a torrent object by hashstring
     dl_torrent_size = dl_torrent["totalSize"]
-    #if the torrent size is showing 0, its a magnet link
-
-
-    #remove this in favor of the status_to_s definition of magnet
-    if dl_torrent_size == 0
-      dl_torrent["name"] = "MAG LINK #{dl_torrent["name"]}"
-    end
-
-
     #if the download is showing complete and the db entry says its not, it just finished process it
     if dl_torrent["isFinished"]
       if !completed
@@ -96,25 +83,26 @@ class Torrent < ActiveRecord::Base
       :status => dl_torrent["status"],
       :eta => dl_torrent["eta"],
       :xmission_id => dl_torrent["id"],
-      :rate_download => dl_torrent["rateDownload"]
-    )
+      :rate_download => dl_torrent["rateDownload"])
     #lets update all the files as well
     dl_torrent["files"].each do |torrent_file|
       db_tfile = tfiles.find_or_initialize_by_name(torrent_file["name"])
       db_tfile.update_attributes(
         :name => torrent_file["name"],
         :length => torrent_file["length"],
-        :bytes_completed => torrent_file["bytesCompleted"]
-      )
+        :bytes_completed => torrent_file["bytesCompleted"])
     end
   end
 
   def process_completed_torrent
     require 're_namer'
     #update the time_completed for torrent object
-    update_attributes(:time_completed => DateTime.now)
-        #remove torrent from xmission by id
-    @xmission.remove(xmission_id)
+    #remove xmission ID as well
+    xmission.remove(xmission_id)
+    update_attributes(
+      :time_completed => DateTime.now,
+      :xmission_id => nil)
+    #remove torrent from xmission by id
     #no files = nothing to rename set rename status to false
     if tfiles.count == 0
       puts "RENAME FAILURE"
@@ -171,50 +159,89 @@ class Torrent < ActiveRecord::Base
   end
 
   def cleanup_torrent_files
-    #Need to add a "base dir" to the torrent object for cleanup
-    #get base dir if there is one, if not nothing to do, it was a single file
-    #check if it is a directory
-    #MAKE SURE ITS NOT THE FINISHED FOLDER
-    #destroy dat bitch
-
+    if tfiles.count == 0
+      puts "No files in the torrent? something is wrong here"
+      return
+    elsif tfiles.count == 1
+      puts "Single File Torrent, nothing to cleanup"
+      return
+    else
+      #create the full pathname from successful torrent rename
+      base_dir = File.dirname(
+        File.join(Setting.get_value("finished_path"),
+        tfiles.where(:rename_status => true).first.name))
+      if base_dir == Setting.get_value("finished_path").chomp('/')
+        puts "error, not deleting root download path"
+        return
+      else
+        if File.directory?(base_dir)
+          puts "Removing folder #{base_dir}"
+          FileUtils.rm_r(base_dir)
+        else
+          puts "Not a folder, not removing"
+        end
+      end
+    end
   end
 
   def status_to_s
-    #convert to if...elseif...else...end to handle stopped/abandoned/missing/magnet etc
-    #Status = 4 and size = 0 then its a magnet link (getting metadata)
-    #If status = 4 but rate = 0 and peers = 0 then its Stalled (no peers)
-    #if status = 0 and torrent.completed = true then its done seeding as well
-    #
-    case status
-    when 0
-      return "Paused"
-    when 1
+    if status == 0
+      if completed
+        return "Completed"
+      else
+        return "Paused"
+      end
+    elsif status == 1
       return "Queued to Check"
-    when 2
+    elsif status == 2
       return "Checking Files"
-    when 3
+    elsif status == 3
       return "Queued to Download"
-    when 4
-      return "Downloading"
-    when 5
+    elsif status == 4
+      if size == 0
+        return "Magnet Link"
+      else
+        return "Downloading"
+      end
+    elsif status == 5
       return "Queued to Seed"
-    when 6
+    elsif status == 6
       return "Seeding"
-    when 9
-      return "Lost in Transmission"
+    elsif status == 9
+      return "Lost In Transmission"
     else
       return "Unknown Status"
     end
   end
+
+  def pretty_eta
+    if eta == -2
+      return "unknown"
+    elsif eta == -1
+      return "Complete"
+    else
+      seconds = eta % 60
+      minutes = (eta / 60) % 60
+      hours = eta / (60 * 60)
+      if eta < 59
+        return "#{eta}s"
+      elsif eta 60...3599
+        return format("%02dm %02ds", minutes, seconds)
+      else
+        return format("%02dh %02dm %02ds", hours, minutes, seconds)
+      end
+    end
+  end
+
 end
 
 =begin
 maybe add 'root folder' to Torrent object, makes it easier to clean up (File.rm torrent.root_folder)
 
 Situations:
-  Download starts while juwi is not running but finishes while it is running - should pick up the half downloaded file no problem
   Download starts AND finishes AND is removed from xmission while juwi is not running - gets the new file from xbmc database
-  Download starts with juwi, but finishes when its not running - cleanup torrents should pick this up, mark it as lost in xmission
+    What if there are files in our "finished" dir but no torrents etc.
+    Maybe setup "unprocessed" Files list, could use tfiles to track?
 
 ETA CODE DEFINITIONS
 Unknown   = -2

@@ -1,16 +1,17 @@
 %h1 Listing tfiles
 
 %table.table.table-hover
-  %tr
-    %th Name
-    %th Length
-    %th Bytes completed
-    %th Rename status
-    %th Rename data
-    %th
-    %th
-    %th
-
+  %thead
+    %tr
+      %th Name
+      %th Length
+      %th Bytes completed
+      %th Rename status
+      %th Rename data
+      %th
+      %th
+      %th
+  %tbody
   - @tfiles.each do |tfile|
     %tr
       %td= tfile.name

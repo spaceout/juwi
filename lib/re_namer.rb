@@ -27,8 +27,8 @@ class Renamer
             #then go ahead and move it because its a repack
             File.unlink(destination)
             puts "Moving #{filename} to #{destination}"
-            return rename_result
             FileUtils.mv(filename, destination)
+            return rename_result
           #else if overwrite is NOT enabled
           else
             #then dont move it, because it already exists
@@ -41,8 +41,8 @@ class Renamer
         else
           #go ahead and move it
           puts "Moving #{filename} to #{destination}"
-          return {:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}}
           FileUtils.mv(filename, destination)
+          return {:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}}
         end
       #else if the show directory is not found
       else

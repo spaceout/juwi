@@ -1,29 +1,4 @@
 .row
-  .col-xs-12.col-sm-6
-    %h4= "Downloads in Transmission"
-    %table.table.table-hover
-      %thead
-        %tr
-          %th= "Name"
-          %th= "Size"
-          %th= "Percent"
-      %tbody
-        - unless @transmission_dls == nil
-          - @transmission_dls.each do |dl_item|
-            %tr
-              %td= dl_item["name"].gsub(".","-")
-              %td= dl_item["totalSize"]
-              %td= (dl_item["percentDone"]*100).round(2)
-  .col-xs-12.col-sm-6
-    %h4= "Files in Finished Directory"
-    %table.table.table-hover
-      %thead
-        %tr
-          %th= "Files"
-      - @finished_dir.each do |file|
-        %tr
-          %td= file
-.row
   .col-xs-12.col-sm-4
     %table.table.table-hover
       %thead

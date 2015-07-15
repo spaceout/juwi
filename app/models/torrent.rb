@@ -33,8 +33,6 @@ class Torrent < ActiveRecord::Base
     end
   end
 
-  #if everything is running well, this will never do anything
-  #current_torrents = array of all xmission hashes
   def self.cleanup_torrents
     current_torrents = xmission.all
     hash_list = []
@@ -59,7 +57,6 @@ class Torrent < ActiveRecord::Base
       end
     end
   end
-
 
   #dl_torrent = xmission hash
   def process_torrent(dl_torrent)
@@ -124,7 +121,7 @@ class Torrent < ActiveRecord::Base
           update_attributes(:rename_status => false)
           torrent_file.update_attributes(
             :rename_status => false,
-            :rename_data => result[:failure]
+            :rename_data => result[:failure][:reason]
           )
         #if there are no failure entries
         #mark the torrent rename status as true UNLESS it is already false
@@ -139,7 +136,7 @@ class Torrent < ActiveRecord::Base
           end
           torrent_file.update_attributes(
             :rename_status => true,
-            :rename_data => result[:success]
+            :rename_data => result[:success][:new_name]
           )
         else
           #if its not success or failure, something happened, false it up
@@ -167,9 +164,7 @@ class Torrent < ActiveRecord::Base
       return
     else
       #create the full pathname from successful torrent rename
-      base_dir = File.dirname(
-        File.join(Setting.get_value("finished_path"),
-        tfiles.where(:rename_status => true).first.name))
+      base_dir = File.join(Setting.get_value("finished_path"), name)
       if base_dir == Setting.get_value("finished_path").chomp('/')
         puts "error, not deleting root download path"
         return
@@ -218,7 +213,11 @@ class Torrent < ActiveRecord::Base
     if eta == -2
       return "Unknown"
     elsif eta == -1
-      return "Complete"
+      if percent == 100
+        return "Complete"
+      else
+        return "Unknown"
+      end
     elsif eta == nil
       return "Unknown"
     else
@@ -238,7 +237,6 @@ class Torrent < ActiveRecord::Base
 end
 
 =begin
-maybe add 'root folder' to Torrent object, makes it easier to clean up (File.rm torrent.root_folder)
 
 Situations:
   What do you do with a failed renamed torrent
@@ -249,14 +247,9 @@ Situations:
         options: search/add new show, delete, manual rename
       Unknown Episode
         options: delete, manual rename
-      
 
   Download starts AND finishes AND is removed from xmission while juwi is not running - gets the new file from xbmc database
     What if there are files in our "finished" dir but no torrents etc.
     Maybe setup "unprocessed" Files list, could use tfiles to track?
-
-ETA CODE DEFINITIONS
-Unknown   = -2
-Complete  = -1
 
 =end

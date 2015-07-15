@@ -7,7 +7,7 @@ class Renamer
 
   def self.process_file(filename, rename_output_dir = Setting.get_value("tvshow_base_path"))
     if File.directory?(filename)
-      rename_result = {:failure=>{:old_name=>filename, :reason=>"This is a Directory, not a File"}}
+      rename_result = {:failure=>{:reason=>"This is a Directory, not a File"}}
       return rename_result
     end
     rename_result = Renamer.rename(File.basename(filename))
@@ -20,29 +20,36 @@ class Renamer
       destination = new_path + new_name
       #If the directory exists
       if File.directory?(new_path)
-        #if the file already exists
-        if File.file?(destination)
-          #if overwrite is enabled
-          if overwrite_enable == true
-            #then go ahead and move it because its a repack
-            File.unlink(destination)
+        #if the source file exists
+        if File.file?(filename)
+          #if the file already exists
+          if File.file?(destination)
+            #if overwrite is enabled
+            if overwrite_enable == true
+              #then go ahead and move it because its a repack
+              puts "Moving #{filename} to #{destination}"
+              File.unlink(destination)
+              FileUtils.mv(filename, destination)
+              return rename_result
+            #else if overwrite is NOT enabled
+            else
+              #then dont move it, because it already exists
+              puts "Destination already exists #{destination}"
+              rename_result = {:failure => rename_result[:success]}
+              rename_result[:failure][:reason] = "destination file exists"
+              return rename_result
+            end
+          #else if the file does NOT exist
+          else
+            #go ahead and move it
             puts "Moving #{filename} to #{destination}"
             FileUtils.mv(filename, destination)
-            return rename_result
-          #else if overwrite is NOT enabled
-          else
-            #then dont move it, because it already exists
-            puts "Destination already exists #{destination}"
-            rename_result = {:failure => rename_result[:success]}
-            rename_result[:failure][:reason] = "destination file exists"
-            return rename_result
+            return {:success => {:new_name => destination}}
           end
-        #else if the file does NOT exist
         else
-          #go ahead and move it
-          puts "Moving #{filename} to #{destination}"
-          FileUtils.mv(filename, destination)
-          return {:success => {:old_name => rename_result[:success][:old_name], :new_name => destination}}
+          rename_result = {:failure => rename_result[:success]}
+          rename_result[:failure][:reason] = "Source file not found #{filename}"
+          return rename_result
         end
       #else if the show directory is not found
       else
@@ -71,7 +78,7 @@ class Renamer
       overwrite_enable = true
     end
     if match_data == nil
-      return {:failure => {:old_name => dirty_name, :reason => "no match data"}}
+      return {:failure => {:reason => "no match data"}}
     else
       dirty_show_title = match_data[1].gsub(/20\d\d/, '')
       season_number = match_data[2].to_i
@@ -90,7 +97,7 @@ class Renamer
             Renamer.rename(dirty_name, 2)
           elsif attempt == 2
             puts "No Episode Found for: #{matched_show_title} - s#{season_number}e#{episode_number}"
-            return {:failure => {:old_name => dirty_name, :reason => "episode not found"}}
+            return {:failure => {:reason => "episode not found"}}
           end
         else
           matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'').gsub('’','\'')
@@ -102,11 +109,11 @@ class Renamer
             end
           end
         rename_to = matched_show_title  +  " - s" '%02d' % season_number + "e" + '%02d' % episode_number + " - " + matched_episode_title
-        return {:success => {:old_name => dirty_name, :new_name => rename_to, :overwrite_enable => overwrite_enable}}
+        return {:success => {:new_name => rename_to, :overwrite_enable => overwrite_enable}}
         end
       else
         puts "Show Not found #{clean_show_title}"
-        return {:failure => {:old_name => dirty_name, :reason => "show not found", :show_title => clean_show_title}}
+        return {:failure => {:reason => "show not found", :show_title => clean_show_title}}
       end
     end
   end

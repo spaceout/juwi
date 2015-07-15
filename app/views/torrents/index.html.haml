@@ -24,4 +24,5 @@
           %td= torrent.pretty_eta
         %td= torrent.rename_status
         %td= link_to 'Files', torrent_tfiles_path(torrent)
+        %td= button_to 'Remove', torrent, :controller => Torrent, :action => "remove_torrent", :class => "btn btn-primary btn-sm"
         %td= button_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"

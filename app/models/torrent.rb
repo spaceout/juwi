@@ -216,16 +216,18 @@ class Torrent < ActiveRecord::Base
 
   def pretty_eta
     if eta == -2
-      return "unknown"
+      return "Unknown"
     elsif eta == -1
       return "Complete"
+    elsif eta == nil
+      return "Unknown"
     else
       seconds = eta % 60
       minutes = (eta / 60) % 60
       hours = eta / (60 * 60)
       if eta < 59
         return "#{eta}s"
-      elsif eta 60...3599
+      elsif eta.between?(60,3599)
         return format("%02dm %02ds", minutes, seconds)
       else
         return format("%02dh %02dm %02ds", hours, minutes, seconds)
@@ -239,6 +241,16 @@ end
 maybe add 'root folder' to Torrent object, makes it easier to clean up (File.rm torrent.root_folder)
 
 Situations:
+  What do you do with a failed renamed torrent
+    Why did it fail?
+      File Already exists
+        options: replace or delete manual rename
+      Unknown Show
+        options: search/add new show, delete, manual rename
+      Unknown Episode
+        options: delete, manual rename
+      
+
   Download starts AND finishes AND is removed from xmission while juwi is not running - gets the new file from xbmc database
     What if there are files in our "finished" dir but no torrents etc.
     Maybe setup "unprocessed" Files list, could use tfiles to track?

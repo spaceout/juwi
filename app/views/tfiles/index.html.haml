@@ -15,8 +15,8 @@
   - @tfiles.each do |tfile|
     %tr
       %td= tfile.name
-      %td= tfile.length
-      %td= tfile.bytes_completed
+      %td= Filesize.from("#{tfile.length} B").pretty
+      %td= Filesize.from("#{tfile.bytes_completed} B").pretty
       %td= tfile.rename_status
       %td= tfile.rename_data
       %td= link_to 'Destroy', torrent_tfile_path(@torrent, tfile), :method => :delete, :data => { :confirm => 'Are you sure?' }

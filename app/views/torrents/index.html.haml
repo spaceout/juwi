@@ -1,3 +1,4 @@
+<meta http-equiv="refresh" content="5" />
 %h1 Listing #{Torrent.count} Torrents
 %table.table.table-hover
   %thead
@@ -6,7 +7,7 @@
       %th Status
       %th Size
       %th Percent
-      %th Completed
+      %th Eta
       %th Rename Status
       %th
 
@@ -17,7 +18,10 @@
         %td= torrent.status_to_s
         %td= Filesize.from("#{torrent.size} B").pretty
         %td= torrent.percent
-        %td= torrent.completed
+        - if torrent.completed
+          %td= "Complete"
+        - else
+          %td= torrent.pretty_eta
         %td= torrent.rename_status
         %td= link_to 'Files', torrent_tfiles_path(torrent)
         %td= button_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"

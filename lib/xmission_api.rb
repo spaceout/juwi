@@ -40,7 +40,7 @@ class XmissionApi
 
   def stop(id)
     @log.info "Pausing Torrent: #{id}"
-    response = post(:method => "torrent-pause", :arguments => {:ids => [id]})
+    response = post(:method => "torrent-stop", :arguments => {:ids => [id]})
     response
   end
 

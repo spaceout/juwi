@@ -52,4 +52,6 @@
 %p
   %b Rate Download
   =@torrent.rate_download
+
+=button_to 'Destroy', @torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"
 = link_to 'Back', torrents_path

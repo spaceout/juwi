@@ -23,11 +23,11 @@
         - else
           %td= torrent.pretty_eta
         %td= torrent.rename_status
-        %td= link_to 'Files', torrent_tfiles_path(torrent)
-        - unless torrent.xmission_id.nil?
-          %td= button_to 'Remove', torrent, :controller => Torrent, :action => "remove_torrent", :class => "btn btn-primary btn-sm"
-        - else
-          %td
-        %td= button_to 'Start', torrent, :controller => Torrent, :action => "start_torrent", :class => "btn btn-primary btn-sm"
-        %td= button_to 'Stop', torrent, :controller => Torrent, :action => "stop_torrent", :class => "btn btn-primary btn-sm"
-        %td= button_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"
+        %td
+          - unless torrent.xmission_id.nil?
+            = link_to(start_torrent_path(torrent), method: "post", class: "btn btn-success btn-xs") do
+              %span.glyphicon.glyphicon-play
+            = link_to(stop_torrent_path(torrent), method: "post", class: "btn btn-primary btn-xs") do
+              %span.glyphicon.glyphicon-pause
+            = link_to(remove_torrent_path(torrent), method: "post", class: "btn btn-danger btn-xs") do
+              %span.glyphicon.glyphicon-remove

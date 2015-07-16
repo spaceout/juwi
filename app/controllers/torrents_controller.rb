@@ -12,19 +12,19 @@ class TorrentsController < ApplicationController
     Torrent.xmission
   end
 
-  def remove_torrent
+  def remove
     @torrent = Torrent.find(params[:id])
-    xmission.remove(@torrent.xmission_id)
+    xmission.remove(@torrent.xmission_id, true)
     redirect_to(:back)
   end
 
-  def stop_torrent
+  def stop
     @torrent = Torrent.find(params[:id])
     xmission.stop(@torrent.xmission_id)
     redirect_to(:back)
   end
 
-  def start_torrent
+  def start
     @torrent = Torrent.find(params[:id])
     xmission.start(@torrent.xmission_id)
     redirect_to(:back)

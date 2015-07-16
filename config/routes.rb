@@ -1,16 +1,15 @@
 Juwi::Application.routes.draw do
 
-
   resources :torrents do
     resources :tfiles
+    member do
+      post :remove
+      post :start
+      post :stop
+    end
   end
-  match 'torrents/:id' => 'torrents#remove_torrent'
-  match 'torrents/:id' => 'torrents#start_torrent'
-  match 'torrents/:id' => 'torrents#stop_torrent'
-
 
   resources :name_deviations
-
 
   match 'update' => 'home#update'
   match 'episodes' => 'all_episodes#index'

@@ -42,11 +42,13 @@ class XmissionApi
     @log.info "Pausing Torrent: #{id}"
     response = post(:method => "torrent-pause", :arguments => {:ids => [id]})
     response
+  end
 
   def start(id)
     @log.info "Starting Torrent: #{id}"
     response = post(:method => "torrent-start", :arguments => {:ids => [id]})
     response
+  end
 
   def upload_link(url, destination)
     @log.info "Uploading: #{url}"

@@ -28,4 +28,6 @@
           %td= button_to 'Remove', torrent, :controller => Torrent, :action => "remove_torrent", :class => "btn btn-primary btn-sm"
         - else
           %td
+        %td= button_to 'Start', torrent, :controller => Torrent, :action => "start_torrent", :class => "btn btn-primary btn-sm"
+        %td= button_to 'Stop', torrent, :controller => Torrent, :action => "stop_torrent", :class => "btn btn-primary btn-sm"
         %td= button_to 'Destroy', torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"

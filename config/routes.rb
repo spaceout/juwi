@@ -5,7 +5,10 @@ Juwi::Application.routes.draw do
     resources :tfiles
   end
   match 'torrents/:id' => 'torrents#remove_torrent'
-  
+  match 'torrents/:id' => 'torrents#start_torrent'
+  match 'torrents/:id' => 'torrents#stop_torrent'
+
+
   resources :name_deviations
 
 

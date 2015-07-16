@@ -1,14 +1,32 @@
 class TorrentsController < ApplicationController
 
-  def remove_torrent
-    @torrent = Torrent.find(params[:id])
+  def self.xmission
     require 'xmission_api'
-    xmission = XmissionApi.new(
+    @@xmission ||= XmissionApi.new(
       :username => Setting.get_value("transmission_user"),
       :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url")
-    )
+      :url => Setting.get_value("transmission_url"))
+  end
+
+  def xmission
+    Torrent.xmission
+  end
+
+  def remove_torrent
+    @torrent = Torrent.find(params[:id])
     xmission.remove(@torrent.xmission_id)
+    redirect_to(:back)
+  end
+
+  def stop_torrent
+    @torrent = Torrent.find(params[:id])
+    xmission.stop(@torrent.xmission_id)
+    redirect_to(:back)
+  end
+
+  def start_torrent
+    @torrent = Torrent.find(params[:id])
+    xmission.start(@torrent.xmission_id)
     redirect_to(:back)
   end
 

@@ -22,21 +22,31 @@ class XmissionApi
 
   def all
     @log.info "Get All Downloads"
-    response = post(:method => "torrent-get",:arguments => {:fields => fields})
+    response = post(:method => "torrent-get", :arguments => {:fields => fields})
     response["arguments"]["torrents"]
   end
 
   def find(id)
     @log.info "Get Torrent Info for  #{id}"
-    response = post(:method => "torrent-get",:arguments => {:fields => fields,:ids => [id]})
+    response = post(:method => "torrent-get", :arguments => {:fields => fields,:ids => [id]})
     response["arguments"]["torrents"].first
   end
 
   def remove(id, delete_local_data=false)
     @log.info "Remove Torrent: #{id} Delete Local Data: #{delete_local_data}"
-    response = post(:method => "torrent-remove",:arguments => {:ids => [id], :'delete-local-data'=> delete_local_data})
+    response = post(:method => "torrent-remove", :arguments => {:ids => [id], :'delete-local-data'=> delete_local_data})
     response
   end
+
+  def stop(id)
+    @log.info "Pausing Torrent: #{id}"
+    response = post(:method => "torrent-pause", :arguments => {:ids => [id]})
+    response
+
+  def start(id)
+    @log.info "Starting Torrent: #{id}"
+    response = post(:method => "torrent-start", :arguments => {:ids => [id]})
+    response
 
   def upload_link(url, destination)
     @log.info "Uploading: #{url}"

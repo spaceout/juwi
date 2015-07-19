@@ -52,7 +52,8 @@ class Torrent < ActiveRecord::Base
           #update the database download entry to be lost (9) and nil out xmission_id
           db_dl.update_attributes(
             :status => 9,
-            :xmission_id => nil)
+            :xmission_id => nil,
+            :eta => -2)
         end
       end
     end

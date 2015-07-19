@@ -9,4 +9,14 @@ class Tfile < ActiveRecord::Base
     return true if video_extnames.include?(File.extname(name)) && length >= Setting.get_value("min_videosize").to_i
   end
 
+  def rename_status_tag
+    if rename_status == true
+      return 'success'
+    elsif rename_status == false
+      return 'danger'
+    else
+      return nil
+    end
+  end
+
 end

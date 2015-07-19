@@ -30,21 +30,24 @@
       %tr
         %th Name
         %th Size
-        %th Rename Result
+        %th Rename Status
         %th Rename Data
         %th Manual Rename
     %tbody
       - @torrent.tfiles.each do |torrent_file|
-        %tr
-          %td= torrent_file.name
+        %tr{class: torrent_file.rename_status_tag}
+          %td= torrent_file.name.split("/").last
           %td= Filesize.from("#{torrent_file.length} B").pretty
           %td= torrent_file.rename_status
           %td= torrent_file.rename_data
-          %td
-            = form_tag(rename_tfile_path(torrent_file.id), class: "navbar-form navbar-right") do
-              .form-group
-                %input{:name => "new_name", :type => "text", :class => "form-control", placeholder: torrent_file.name}
-                %button{:type => "submit", :class => "btn btn-primary btn-sm"} Rename
+          - if torrent_file.is_video_file? && torrent_file.rename_status == false
+            %td
+              = form_tag(rename_tfile_path(torrent_file.id), class: "form-inline") do
+                .form-group
+                  %input{:name => "new_name", :type => "text", :class => "form-control", placeholder: torrent_file.name}
+                  %button{:type => "submit", :class => "btn btn-primary btn-sm"} Rename
+          - else
+            %td
 %p
   %b Rename Status:
   =@torrent.rename_status

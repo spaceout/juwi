@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150710181008) do
+ActiveRecord::Schema.define(:version => 20150719234813) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -72,11 +72,11 @@ ActiveRecord::Schema.define(:version => 20150710181008) do
     t.string   "name"
     t.integer  "length"
     t.integer  "bytes_completed"
-    t.string   "rename_status"
+    t.boolean  "rename_status",   :limit => 255
     t.string   "rename_data"
     t.integer  "torrent_id"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
   end
 
   add_index "tfiles", ["torrent_id"], :name => "index_tfiles_on_torrent_id"

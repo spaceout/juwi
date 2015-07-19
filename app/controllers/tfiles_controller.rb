@@ -11,10 +11,12 @@ class TfilesController < ApplicationController
   end
 
   def rename
+    require 're_namer'
     tfile = Tfile.find(params[:id])
     puts tfile.name
     puts "id: #{params[:id]}"
     puts "new_name #{params[:new_name]}"
+    puts "new_rename #{Renamer.rename(params[:new_name])}"
     redirect_to(:back)
   end
 

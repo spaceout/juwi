@@ -10,6 +10,15 @@ class TfilesController < ApplicationController
     end
   end
 
+  def rename
+    tfile = Tfile.find(params[:id])
+    puts tfile.name
+    puts "id: #{params[:id]}"
+    puts "new_name #{params[:new_name]}"
+    redirect_to(:back)
+  end
+
+
   # GET /tfiles/1
   # GET /tfiles/1.json
   def show

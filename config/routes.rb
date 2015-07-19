@@ -1,11 +1,15 @@
 Juwi::Application.routes.draw do
 
   resources :torrents do
-    resources :tfiles
     member do
       post :remove
       post :start
       post :stop
+      resources :tfiles do
+        member do
+          post :rename
+        end
+      end
     end
   end
 

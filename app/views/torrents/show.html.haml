@@ -30,7 +30,6 @@
       %tr
         %th Name
         %th Size
-        %th Rename Status
         %th Rename Data
         %th Manual Rename
     %tbody
@@ -38,14 +37,15 @@
         %tr{class: torrent_file.rename_status_tag}
           %td= torrent_file.name.split("/").last
           %td= Filesize.from("#{torrent_file.length} B").pretty
-          %td= torrent_file.rename_status
           %td= torrent_file.rename_data
           - if torrent_file.is_video_file? && torrent_file.rename_status == false
             %td
               = form_tag(rename_tfile_path(torrent_file.id), class: "form-inline") do
                 .form-group
-                  %input{:name => "new_name", :type => "text", :class => "form-control", placeholder: torrent_file.name}
+                  %input{:name => "new_name", :type => "text", :class => "form-control input-sm", placeholder: torrent_file.name}
                   %button{:type => "submit", :class => "btn btn-primary btn-sm"} Rename
+                .checkbox
+                  %input{:name => "overwrite_enabled", :type => "checkbox", :class => "checkbox"} overwrite
           - else
             %td
 %p

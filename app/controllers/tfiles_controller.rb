@@ -11,6 +11,10 @@ class TfilesController < ApplicationController
   end
 
   def rename
+    #if the new_name is nil, then just retry renaming
+    #when renameing, reset rename status for file and torrent (nil)
+    #make sure to go through the rename_status for all tfiles in a torrent
+    #  when going to reset the torrent files rename status
     require 're_namer'
     tfile = Tfile.find(params[:id])
     puts tfile.name

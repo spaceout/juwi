@@ -21,6 +21,7 @@ class TfilesController < ApplicationController
     puts "id: #{params[:id]}"
     puts "new_name #{params[:new_name]}"
     puts "new_rename #{Renamer.rename(params[:new_name])}"
+    Renamer.process_file(Tfile.name, params[:new_name])
     redirect_to(:back)
   end
 

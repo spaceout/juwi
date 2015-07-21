@@ -5,12 +5,12 @@ require 'scrubber'
 
 class Renamer
 
-  def self.process_file(filename, rename_output_dir = Setting.get_value("tvshow_base_path"))
+  def self.process_file(filename, manual_rename = filename, rename_output_dir = Setting.get_value("tvshow_base_path"))
     if File.directory?(filename)
       rename_result = {:failure=>{:reason=>"This is a Directory, not a File"}}
       return rename_result
     end
-    rename_result = Renamer.rename(File.basename(filename))
+    rename_result = Renamer.rename(File.basename(manual_rename))
     #if the rename result is successful
     if rename_result[:failure].nil?
       clean_name = rename_result[:success][:new_name]

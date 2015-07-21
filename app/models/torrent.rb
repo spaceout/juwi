@@ -59,10 +59,8 @@ class Torrent < ActiveRecord::Base
     end
   end
 
-  #dl_torrent = xmission hash
+  #dl_torrent = xmission hash of torrent info
   def process_torrent(dl_torrent)
-    #create or load a torrent object by hashstring
-    dl_torrent_size = dl_torrent["totalSize"]
     #if the download is showing complete and the db entry says its not, it just finished process it
     if dl_torrent["isFinished"]
       if !completed
@@ -109,45 +107,10 @@ class Torrent < ActiveRecord::Base
     end
     #go through each file in the completed torrent
     tfiles.each do |torrent_file|
-      #check if it is a video file
-      if torrent_file.is_video_file?
-        #rename the video file and store the rename result
-        result = Renamer.process_file(File.join(Setting.get_value("finished_path"), torrent_file.name))
-        #if there are no successful entries:
-        #mark the torrent rename status as false
-        #mark the tfile rename status as false
-        #shove the rename data into the tfile
-        if result[:success].nil?
-          puts "RENAME FAILURE"
-          update_attributes(:rename_status => false)
-          torrent_file.update_attributes(
-            :rename_status => false,
-            :rename_data => result[:failure][:reason]
-          )
-        #if there are no failure entries
-        #mark the torrent rename status as true UNLESS it is already false
-        #mark the tfile rename_status as true
-        #shove the rename data into the tfile
-        elsif result[:failure].nil?
-          puts "RENAME SUCCESS"
-          #if rename status == nil or true update_attributes to be true
-          #if its false, leave it alone
-          unless rename_status == false
-            update_attributes(:rename_status => true)
-          end
-          torrent_file.update_attributes(
-            :rename_status => true,
-            :rename_data => result[:success][:new_name]
-          )
-        else
-          #if its not success or failure, something happened, false it up
-          update_attributes(:rename_status => false)
-        end
-      else
-        #if its not a video file, mark rename_result as "SKIP"
-        torrent_file.update_attributes(:rename_data => "SKIP")
-      end
+      torrent_file.process_completed_tfile
     end
+    #update the torrent rename status based on tfile status
+    update_rename_status
     #done processing tfiles for the torrent, check rename_status and
     #if it is true, clean up remaining files from the download
     if rename_status
@@ -176,6 +139,17 @@ class Torrent < ActiveRecord::Base
         else
           puts "Not a folder, not removing"
         end
+      end
+    end
+  end
+
+  def update_rename_status
+    update_attributes(:rename_status => nil)
+    tfiles.each do |tfile|
+      if tfile.rename_status == false
+        update_attributes(:rename_status => false)
+      elsif tfile.rename_status && rename_status != false
+        update_attributes(:rename_status => true)
       end
     end
   end
@@ -236,21 +210,3 @@ class Torrent < ActiveRecord::Base
   end
 
 end
-
-=begin
-
-Situations:
-  What do you do with a failed renamed torrent
-    Why did it fail?
-      File Already exists
-        options: replace or delete manual rename
-      Unknown Show
-        options: search/add new show, delete, manual rename
-      Unknown Episode
-        options: delete, manual rename
-
-  Download starts AND finishes AND is removed from xmission while juwi is not running - gets the new file from xbmc database
-    What if there are files in our "finished" dir but no torrents etc.
-    Maybe setup "unprocessed" Files list, could use tfiles to track?
-
-=end

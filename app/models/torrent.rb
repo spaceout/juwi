@@ -178,7 +178,7 @@ class Torrent < ActiveRecord::Base
     elsif status == 6
       return "Seeding"
     elsif status == 9
-      return "Lost In Transmission"
+      return "Lost"
     else
       return "Unknown Status"
     end

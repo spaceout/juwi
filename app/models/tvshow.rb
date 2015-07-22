@@ -10,12 +10,17 @@ class Tvshow < ActiveRecord::Base
   def self.create_new_show(ttdb_show_id)
     puts "getting zip"
     TtdbHelper.get_zip_from_ttdb(ttdb_show_id)
-    puts "updating ttdb show data for"
+    puts "updating ttdb show data for #{ttdb_show_id}"
     Tvshow.update_ttdb_show_data(ttdb_show_id)
     puts "updating ttdb episode data"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
     puts "updating tvr information"
     Tvshow.update_tvrage_data(ttdb_show_id)
+
+    current_show = Tvshow.find_by_ttdb_id(ttdb_show_id)
+    directory_name = File.join(Setting.get_value('tvshow_base_path'), current_show.ttdb_show_title)
+    Dir.mkdir(directory_name) unless File.directory?(directory_name)
+
   end
 
   def self.create_and_sync_new_show(ttdb_show_id)

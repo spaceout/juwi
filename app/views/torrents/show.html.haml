@@ -31,7 +31,7 @@
         %th Name
         %th Size
         %th Rename Data
-        %th Manual Rename
+        %th Action
     %tbody
       - @torrent.tfiles.each do |torrent_file|
         %tr{class: torrent_file.rename_status_tag}

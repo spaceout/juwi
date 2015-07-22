@@ -12,16 +12,25 @@ class TfilesController < ApplicationController
 
   def rename
     #if the new_name is nil, then just retry renaming
-    #when renameing, reset rename status for file and torrent (nil)
-    #make sure to go through the rename_status for all tfiles in a torrent
-    #  when going to reset the torrent files rename status
-    require 're_namer'
+
     tfile = Tfile.find(params[:id])
     puts tfile.name
     puts "id: #{params[:id]}"
     puts "new_name #{params[:new_name]}"
-    puts "new_rename #{Renamer.rename(params[:new_name])}"
-    Renamer.process_file(Tfile.name, params[:new_name])
+    puts "overwrite #{params[:overwrite_enabled]}"
+    overwrite = false
+    if params[:overwrite_enabled] == "on"
+      overwrite = true
+    end
+    new_name = nil
+    if params[:new_name] = nil
+      new_name = name
+    end
+    tfile.process_completed_tfile(params[:new_name], overwrite)
+    tfile.torrent.update_rename_status
+    if tfile.torrent.rename_status == true
+      tfile.torrent.cleanup_torrent_files
+    end
     redirect_to(:back)
   end
 

@@ -92,27 +92,18 @@ class Torrent < ActiveRecord::Base
 
   def process_completed_torrent
     require 're_namer'
-    #update the time_completed for torrent object
-    #remove xmission ID as well
+    #update the time_completed for torrent object remove xmission ID
     xmission.remove(xmission_id)
     update_attributes(
       :time_completed => DateTime.now,
       :xmission_id => nil)
-    #remove torrent from xmission by id
-    #no files = nothing to rename set rename status to false
-    if tfiles.count == 0
-      puts "RENAME FAILURE"
-      update_attributes(:rename_status => false)
-      return
-    end
     #go through each file in the completed torrent
     tfiles.each do |torrent_file|
       torrent_file.process_completed_tfile
     end
     #update the torrent rename status based on tfile status
     update_rename_status
-    #done processing tfiles for the torrent, check rename_status and
-    #if it is true, clean up remaining files from the download
+    #check rename_status and if true, run cleanup
     if rename_status
       puts "Rename of torrent successful, initiating cleanup"
       cleanup_torrent_files
@@ -148,7 +139,7 @@ class Torrent < ActiveRecord::Base
     tfiles.each do |tfile|
       if tfile.rename_status == false
         update_attributes(:rename_status => false)
-      elsif tfile.rename_status && rename_status != false
+      elsif tfile.rename_status == true && rename_status != false
         update_attributes(:rename_status => true)
       end
     end

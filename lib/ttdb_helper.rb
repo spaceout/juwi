@@ -1,3 +1,14 @@
+#WHEN should a show get update:
+# - When an episode title is 'TBA'
+# - On Demand in the TVshow view (index/show)
+# - When the next airing episode is 'TBA'
+# - Daily??? - Is this bad for changes in episode scheme(eg splitting season)
+# - If a series was cancelled/ended it should never get updated unless on-demand
+#Stop storing the zip files, delete 'em when you are done with them
+#Ability to update individual episodes (get new names for TBA)
+
+
+
 require 'xmlsimple'
 require 'curl_helper'
 require 'zip/zipfilesystem'
@@ -97,7 +108,7 @@ class TtdbHelper
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{series_id}/en.xml"), { 'SuppressEmpty' => '' })
     return data
   end
-  
+
   def self.get_episode_from_ttdb(episode_id)
     data = nil
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })

@@ -34,7 +34,7 @@
         %th Action
     %tbody
       - @torrent.tfiles.each do |torrent_file|
-        %tr{class: torrent_file.rename_status_tag}
+        %tr{class: rename_status_tag(torrent_file)}
           %td= torrent_file.name.split("/").last
           %td= Filesize.from("#{torrent_file.length} B").pretty
           %td= torrent_file.rename_data

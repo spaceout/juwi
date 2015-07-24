@@ -42,6 +42,11 @@ class TorrentsController < ApplicationController
     end
   end
 
+  def active
+    @torrents = (Torrent.where('xmission_id IS NOT NULL').sort_by &:time_started)
+    render :index
+  end
+
   # GET /torrents/1
   # GET /torrents/1.json
   def show

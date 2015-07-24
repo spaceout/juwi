@@ -16,7 +16,7 @@
             %li
               = link_to  tvshows_path do
                 All
-                -#%span.badge #{@tvshows.count}
+                %span.label.label-primary #{Tvshow.count}
             %li
               = link_to "Forcast", forcast_tvshows_path
             %li.divider
@@ -30,12 +30,14 @@
             %li
               = link_to episodes_path do
                 All
-                -#%span.badge #{@episodes.count}
+                %span.label.label-primary #{Episode.count}
             %li
               = link_to "Recently Aired", episodes_recently_aired_path
             %li.divider
             %li
-              = link_to "Missing", episodes_missing_path
+              = link_to episodes_missing_path do
+                Missing
+                %span.label.label-danger #{Episode.missing.count}
         %li
           = link_to "Settings", settings_path
         %li

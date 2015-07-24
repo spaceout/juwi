@@ -8,12 +8,11 @@
       %th Size
       %th Percent
       %th Eta
-      %th Rename Status
       %th
 
   %tbody
     - @torrents.each do |torrent|
-      %tr
+      %tr{class: rename_status_tag(torrent)}
         %td= link_to torrent.name, torrent
         %td= torrent.status_to_s
         %td= Filesize.from("#{torrent.size} B").pretty
@@ -22,7 +21,6 @@
           %td= "Complete"
         - else
           %td= torrent.pretty_eta
-        %td= torrent.rename_status
         %td
           - unless torrent.xmission_id.nil?
             = link_to(start_torrent_path(torrent), method: "post", class: "btn btn-success btn-xs") do

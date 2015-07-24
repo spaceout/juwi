@@ -1,6 +1,7 @@
 Juwi::Application.routes.draw do
 
   resources :torrents do
+    get :active
     member do
       post :remove
       post :start

@@ -12,7 +12,6 @@ class TfilesController < ApplicationController
 
   def rename
     #if the new_name is nil, then just retry renaming
-
     tfile = Tfile.find(params[:id])
     puts tfile.name
     puts "id: #{params[:id]}"
@@ -23,10 +22,12 @@ class TfilesController < ApplicationController
       overwrite = true
     end
     new_name = nil
-    if params[:new_name] = nil
-      new_name = name
+    if params[:new_name].empty?
+      new_name = File.basename(tfile.name)
+      tfile.process_completed_tfile(new_name, overwrite)
+    else
+      tfile.process_completed_tfile(params[:new_name], overwrite)
     end
-    tfile.process_completed_tfile(params[:new_name], overwrite)
     tfile.torrent.update_rename_status
     if tfile.torrent.rename_status == true
       tfile.torrent.cleanup_torrent_files

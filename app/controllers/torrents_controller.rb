@@ -50,8 +50,15 @@ class TorrentsController < ApplicationController
   # GET /torrents/1
   # GET /torrents/1.json
   def show
+    require 're_namer'
     @torrent = Torrent.find(params[:id])
 
+    unknown_show_title = nil
+    rename_result = Renamer.rename(@torrent.name)
+    if !rename_result[:failure].nil?
+      unknown_show_title = rename_result[:failure][:show_title]
+    end
+    @unknown_show_title = unknown_show_title
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @torrent }

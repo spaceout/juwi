@@ -17,7 +17,6 @@ class Torrent < ActiveRecord::Base
   def self.xmission_poller
     if xmission.is_online?
       current_torrents = xmission.all
-      #cleanup torrents no longer found in xmission, makes sure the DB is in good shape
       current_torrents.each do |dl_torrent|
         #if the torrent download directory is set to the finished folder
         if dl_torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
@@ -27,6 +26,7 @@ class Torrent < ActiveRecord::Base
           db_torrent.process_torrent(dl_torrent)
         end
       end
+      #cleanup torrents no longer found in xmission, makes sure the DB is in good shape
       cleanup_torrents
     else
       puts "xmission is currently offline, poller skipped"
@@ -61,13 +61,6 @@ class Torrent < ActiveRecord::Base
 
   #dl_torrent = xmission hash of torrent info
   def process_torrent(dl_torrent)
-    #if the download is showing complete and the db entry says its not, it just finished process it
-    if dl_torrent["isFinished"]
-      if !completed
-        puts "Detected completed torrent, queing processing_completed"
-        delay(:queue => 'renamer').process_completed_torrent
-      end
-    end
     #update all items in the db torrent entry
     update_attributes(
       :completed => dl_torrent["isFinished"],
@@ -87,6 +80,11 @@ class Torrent < ActiveRecord::Base
         :name => torrent_file["name"],
         :length => torrent_file["length"],
         :bytes_completed => torrent_file["bytesCompleted"])
+    end
+    #if the download is showing complete and the db entry says its not, it just finished process it
+    if dl_torrent["isFinished"]
+      puts "Detected completed torrent, queing processing_completed"
+      delay(:queue => 'renamer').process_completed_torrent
     end
   end
 

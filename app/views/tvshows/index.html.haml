@@ -10,5 +10,5 @@
     - @tvshows.each do |tvshow|
       %tr
         %td= link_to(tvshow.ttdb_show_title, tvshow)
-        %td= tvshow.tvr_show_status
+        %td= tvshow.ttdb_show_status
         %td= if tvshow.tvr_next_episode_date == nil then "TBD" else "#{tvshow.tvr_next_episode_date}" end

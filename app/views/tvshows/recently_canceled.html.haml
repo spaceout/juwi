@@ -10,5 +10,5 @@
     - @tvshows_recently_canceled.each do |tvshow|
       %tr
         %td= link_to(tvshow.ttdb_show_title, tvshow)
-        %td= tvshow.tvr_show_status
+        %td= tvshow.ttdb_show_status
         %td= tvshow.tvr_latest_episode_date

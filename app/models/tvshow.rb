@@ -14,8 +14,8 @@ class Tvshow < ActiveRecord::Base
     Tvshow.update_ttdb_show_data(ttdb_show_id)
     puts "updating ttdb episode data"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
-    puts "updating tvr information"
-    Tvshow.update_tvrage_data(ttdb_show_id)
+    #puts "updating tvr information"
+    #Tvshow.update_tvrage_data(ttdb_show_id)
 
     current_show = Tvshow.find_by_ttdb_id(ttdb_show_id)
     directory_name = File.join(Setting.get_value('tvshow_base_path'), current_show.ttdb_show_title)
@@ -30,8 +30,8 @@ class Tvshow < ActiveRecord::Base
     Tvshow.update_ttdb_show_data(ttdb_show_id)
     puts "updating ttdb episode data"
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
-    puts "updating tvr information"
-    Tvshow.update_tvrage_data(ttdb_show_id)
+    #puts "updating tvr information"
+    #Tvshow.update_tvrage_data(ttdb_show_id)
     puts "synching xdb show info"
     Tvshow.update_xdb_show_data(ttdb_show_id)
     puts "synching xdb episode data"
@@ -229,5 +229,42 @@ class Tvshow < ActiveRecord::Base
       :xdb_episode_location => nil
     )
   end
+
+  def update_latest_episode
+    latest_episode = episodes.where("ttdb_episode_airdate <= ?", Date.today).order(:ttdb_episode_airdate).last
+    update_attributes(
+      :tvr_latest_episode_date => latest_episode.ttdb_episode_airdate,
+      :tvr_latest_season_number => latest_episode.ttdb_season_number,
+      :tvr_latest_episode_number => latest_episode.ttdb_episode_number,
+      :tvr_latest_episode_title => latest_episode.ttdb_episode_title
+    ) unless latest_episode.nil?
+  end
+
+  def update_next_episode
+      if ttdb_show_status == "ended"
+        update_attributes(
+          :tvr_next_episode_date => nil,
+          :tvr_latest_season_number => nil,
+          :tvr_latest_episode_number => nil,
+          :tvr_latest_episode_title => nil
+        )
+      end
+      next_episode = episodes.where("ttdb_episode_airdate >= ?", Date.today).order(:ttdb_episode_airdate).first
+      if next_episode.nil?
+        update_attributes(
+          :tvr_next_episode_date => nil,
+          :tvr_latest_season_number => nil,
+          :tvr_latest_episode_number => nil,
+          :tvr_next_episode_title => "TBA"
+        )
+      else
+        update_attributes(
+          :tvr_next_episode_date => next_episode.ttdb_episode_airdate,
+          :tvr_latest_season_number => next_episode.ttdb_season_number,
+          :tvr_latest_episode_number => next_episode.ttdb_episode_number,
+          :tvr_next_episode_title => next_episode.ttdb_episode_title
+        )
+      end
+    end
 
 end

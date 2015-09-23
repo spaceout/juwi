@@ -138,38 +138,38 @@ class Tvshow < ActiveRecord::Base
     tvr_latest_episode = tvragedata['Latest Episode']
     if tvr_latest_episode != nil
       tvr_latest_episode.force_encoding("utf-8")
-      tvr_latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
-      tvr_latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
-      tvr_latest_episode_title = tvr_latest_episode.split("^")[1]
-      tvr_latest_episode_date = tvr_latest_episode.split("^")[2]
+      latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+      latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+      latest_episode_title = tvr_latest_episode.split("^")[1]
+      latest_episode_date = tvr_latest_episode.split("^")[2]
     end
     tvr_next_episode = tvragedata['Next Episode']
     if tvr_next_episode != nil
       tvr_next_episode.force_encoding("utf-8")
-      tvr_next_season_number = tvr_next_episode.split("^").first.split("x")[0]
-      tvr_next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
-      tvr_next_episode_title = tvr_next_episode.split("^")[1]
-      tvr_next_episode_date = tvr_next_episode.split("^")[2]
+      next_season_number = tvr_next_episode.split("^").first.split("x")[0]
+      next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
+      next_episode_title = tvr_next_episode.split("^")[1]
+      next_episode_date = tvr_next_episode.split("^")[2]
     else
-      tvr_next_season_number = nil
-      tvr_next_episode_number = nil
-      tvr_next_episode_title = nil
-      tvr_next_episode_date = nil
+      next_season_number = nil
+      next_episode_number = nil
+      next_episode_title = nil
+      next_episode_date = nil
     end
     current_show.update_attributes(
       :tvr_show_id => tvragedata['Show ID'],
-      :tvr_latest_season_number => tvr_latest_season_number,
-      :tvr_latest_episode_number => tvr_latest_episode_number,
-      :tvr_latest_episode_title => tvr_latest_episode_title,
-      :tvr_latest_episode_date => tvr_latest_episode_date,
-      :tvr_next_season_number => tvr_next_season_number,
-      :tvr_next_episode_number => tvr_next_episode_number,
-      :tvr_next_episode_title => tvr_next_episode_title,
-      :tvr_next_episode_date => tvr_next_episode_date,
+      :latest_season_number => latest_season_number,
+      :latest_episode_number => latest_episode_number,
+      :latest_episode_title => latest_episode_title,
+      :latest_episode_date => latest_episode_date,
+      :next_season_number => next_season_number,
+      :next_episode_number => next_episode_number,
+      :next_episode_title => next_episode_title,
+      :next_episode_date => next_episode_date,
       :tvr_show_url => tvragedata['Show URL'],
       :tvr_show_started => tvragedata['Started'],
-      :tvr_show_ended => tvragedata['Ended'],
-      :tvr_show_status => tvragedata['Status']
+      :end_date => tvragedata['Ended'],
+      :status => tvragedata['Status']
       )
   end
 
@@ -233,36 +233,36 @@ class Tvshow < ActiveRecord::Base
   def update_latest_episode
     latest_episode = episodes.where("ttdb_episode_airdate <= ?", Date.today).order(:ttdb_episode_airdate).last
     update_attributes(
-      :tvr_latest_episode_date => latest_episode.ttdb_episode_airdate,
-      :tvr_latest_season_number => latest_episode.ttdb_season_number,
-      :tvr_latest_episode_number => latest_episode.ttdb_episode_number,
-      :tvr_latest_episode_title => latest_episode.ttdb_episode_title
+      :latest_episode_date => latest_episode.ttdb_episode_airdate,
+      :latest_season_number => latest_episode.ttdb_season_number,
+      :latest_episode_number => latest_episode.ttdb_episode_number,
+      :latest_episode_title => latest_episode.ttdb_episode_title
     ) unless latest_episode.nil?
   end
 
   def update_next_episode
       if ttdb_show_status == "ended"
         update_attributes(
-          :tvr_next_episode_date => nil,
-          :tvr_latest_season_number => nil,
-          :tvr_latest_episode_number => nil,
-          :tvr_latest_episode_title => nil
+          :next_episode_date => nil,
+          :latest_season_number => nil,
+          :latest_episode_number => nil,
+          :latest_episode_title => nil
         )
       end
       next_episode = episodes.where("ttdb_episode_airdate >= ?", Date.today).order(:ttdb_episode_airdate).first
       if next_episode.nil?
         update_attributes(
-          :tvr_next_episode_date => nil,
-          :tvr_latest_season_number => nil,
-          :tvr_latest_episode_number => nil,
-          :tvr_next_episode_title => "TBA"
+          :next_episode_date => nil,
+          :latest_season_number => nil,
+          :latest_episode_number => nil,
+          :next_episode_title => "TBA"
         )
       else
         update_attributes(
-          :tvr_next_episode_date => next_episode.ttdb_episode_airdate,
-          :tvr_latest_season_number => next_episode.ttdb_season_number,
-          :tvr_latest_episode_number => next_episode.ttdb_episode_number,
-          :tvr_next_episode_title => next_episode.ttdb_episode_title
+          :next_episode_date => next_episode.ttdb_episode_airdate,
+          :latest_season_number => next_episode.ttdb_season_number,
+          :latest_episode_number => next_episode.ttdb_episode_number,
+          :next_episode_title => next_episode.ttdb_episode_title
         )
       end
     end

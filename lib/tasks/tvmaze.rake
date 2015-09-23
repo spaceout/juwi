@@ -20,7 +20,7 @@ namespace :tvmaze do
   task :update => :environment do
     require 'tvmaze_helper'
     Tvshow.all.each do |tvshow|
-      next if ["Canceled/Ended", "Ended", "Canceled"].include?(tvshow.tvr_show_status)
+      next if ["Canceled/Ended", "Ended", "Canceled"].include?(tvshow.status)
       next if tvshow.tvmaze_id.nil?
       #Tvshow.update_tvmaze_data(tvshow.tvmaze_id)
       print "#{tvshow.ttdb_show_title} - "
@@ -28,8 +28,8 @@ namespace :tvmaze do
       tvm_nextaired_date = TvmazeHelper.get_next_episode(tvshow.tvmaze_id)
       puts "#{tvm_show_status} - #{tvm_nextaired_date}"
       tvshow.update_attributes(
-        :tvr_next_episode_date => tvm_nextaired_date,
-        :tvr_show_status => tvm_show_status
+        :next_episode_date => tvm_nextaired_date,
+        :status => tvm_show_status
       )
     end
   end

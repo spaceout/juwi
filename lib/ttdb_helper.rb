@@ -96,7 +96,7 @@ class TtdbHelper
         ttdb_show_id = series['id'].first
         current_jdb_show = Tvshow.find_by_ttdb_show_id(ttdb_show_id)
         next if current_jdb_show == nil
-        next if ["Canceled/Ended", "Ended", "Canceled"].include?(current_jdb_show.tvr_show_status)
+        next if ["Canceled/Ended", "Ended", "Canceled"].include?(current_jdb_show.status)
         update_set.push(ttdb_show_id)
       end
     end

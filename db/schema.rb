@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150918152604) do
+ActiveRecord::Schema.define(:version => 20150923130220) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -104,18 +104,18 @@ ActiveRecord::Schema.define(:version => 20150918152604) do
     t.integer  "xdb_show_id"
     t.string   "ttdb_show_title"
     t.integer  "tvr_show_id"
-    t.integer  "tvr_latest_season_number"
-    t.integer  "tvr_latest_episode_number"
-    t.string   "tvr_latest_episode_title"
-    t.date     "tvr_latest_episode_date"
-    t.integer  "tvr_next_season_number"
-    t.integer  "tvr_next_episode_number"
-    t.string   "tvr_next_episode_title"
-    t.date     "tvr_next_episode_date"
+    t.integer  "latest_season_number"
+    t.integer  "latest_episode_number"
+    t.string   "latest_episode_title"
+    t.date     "latest_episode_date"
+    t.integer  "next_season_number"
+    t.integer  "next_episode_number"
+    t.string   "next_episode_title"
+    t.date     "next_episode_date"
     t.string   "tvr_show_url"
     t.date     "tvr_show_started"
-    t.date     "tvr_show_ended"
-    t.string   "tvr_show_status"
+    t.date     "end_date"
+    t.string   "status"
     t.string   "ttdb_show_imdb_id"
     t.text     "ttdb_show_overview"
     t.integer  "ttdb_show_last_updated"
@@ -127,8 +127,8 @@ ActiveRecord::Schema.define(:version => 20150918152604) do
     t.string   "ttdb_show_network"
     t.string   "ttdb_show_status"
     t.integer  "ttdb_show_runtime"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
     t.text     "jdb_clean_show_title"
     t.string   "tvr_search_name"
     t.integer  "tvmaze_id"

@@ -5,7 +5,7 @@ namespace :tvr do
     progressbar = ProgressBar.create(:title => "TVR Update", :total => Tvshow.all.count)
     Tvshow.all.each do |tvshow|
       progressbar.increment
-      next if ["Canceled/Ended", "Ended", "Canceled"].include?(tvshow.tvr_show_status)
+      next if ["Canceled/Ended", "Ended", "Canceled"].include?(tvshow.status)
       Tvshow.update_tvrage_data(tvshow.ttdb_show_id)
     end
   end

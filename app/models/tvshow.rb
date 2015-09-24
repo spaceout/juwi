@@ -6,6 +6,7 @@ require 'jdb_helper'
 class Tvshow < ActiveRecord::Base
   has_many :episodes, :dependent => :destroy
   has_many :name_deviations, :dependent => :destroy
+  validates :ttdb_show_id, presence: true, uniqueness: true
 
   def self.create_new_show(ttdb_show_id)
     puts "getting zip"
@@ -16,11 +17,9 @@ class Tvshow < ActiveRecord::Base
     Tvshow.update_all_ttdb_episode_data(ttdb_show_id)
     #puts "updating tvr information"
     #Tvshow.update_tvrage_data(ttdb_show_id)
-
     current_show = Tvshow.find_by_ttdb_id(ttdb_show_id)
     directory_name = File.join(Setting.get_value('tvshow_base_path'), current_show.ttdb_show_title)
     Dir.mkdir(directory_name) unless File.directory?(directory_name)
-
   end
 
   def self.create_and_sync_new_show(ttdb_show_id)
@@ -38,7 +37,6 @@ class Tvshow < ActiveRecord::Base
     Tvshow.update_all_xdb_episode_data(ttdb_show_id)
   end
 
-
   ############
   #TTDB Stuff#
   ############
@@ -55,7 +53,7 @@ class Tvshow < ActiveRecord::Base
       :ttdb_show_overview => ttdbdata['Series'].first['Overview'].first,
       :ttdb_show_title => ttdbdata['Series'].first['SeriesName'].first,
       :ttdb_show_network => ttdbdata['Series'].first['Network'].first,
-      :ttdb_show_status => ttdbdata['Series'].first['Status'].first,
+      :status => ttdbdata['Series'].first['Status'].first,
       :ttdb_show_runtime => ttdbdata['Series'].first['Runtime'].first,
       :jdb_clean_show_title => Scrubber.clean_show_title(ttdbdata['Series'].first['SeriesName'].first)
     )
@@ -123,6 +121,9 @@ class Tvshow < ActiveRecord::Base
     #puts "resynching with XDB"
     Tvshow.update_xdb_show_data(ttdb_show_id)
     Tvshow.update_all_xdb_episode_data(ttdb_show_id)
+    tvshow = Tvshow.where(:ttdb_show_id => ttdb_show_id).first
+    tvshow.update_next_episode
+    tvshow.update_latest_episode
   end
 
   ###########
@@ -241,7 +242,7 @@ class Tvshow < ActiveRecord::Base
   end
 
   def update_next_episode
-      if ttdb_show_status == "ended"
+      if status == "ended"
         update_attributes(
           :next_episode_date => nil,
           :latest_season_number => nil,
@@ -266,5 +267,4 @@ class Tvshow < ActiveRecord::Base
         )
       end
     end
-
 end

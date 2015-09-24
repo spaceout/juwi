@@ -1,20 +1,113 @@
-#WHEN should a show get update:
-# - When an episode title is 'TBA'
-# - On Demand in the TVshow view (index/show)
-# - When the next airing episode is 'TBA'
-# - Daily??? - Is this bad for changes in episode scheme(eg splitting season)
-# - If a series was cancelled/ended it should never get updated unless on-demand
-#Stop storing the zip files, delete 'em when you are done with them
-#Ability to update individual episodes (get new names for TBA)
-
-
-
 require 'xmlsimple'
 require 'curl_helper'
 require 'zip/zipfilesystem'
 require 'scrubber'
 
 class TtdbHelper
+
+  def initialize(ttdb_show_id)
+    @ttdb_show_id = ttdb_show_id
+  end
+
+  def get_series_data
+    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_show_id}/all/en.xml"), { 'SuppressEmpty' => '' })
+  end
+
+  def series_data
+    @series_data ||= get_series_data
+  end
+
+  def actors
+    series_data["Series"].first["Actors"].first
+  end
+
+  def airs_day_of_week
+    series_data["Series"].first["Airs_DayOfWeek"].first
+  end
+
+  def airs_time
+    series_data["Series"].first["Airs_Time"].first
+  end
+
+  def content_rating
+    series_data["Series"].first["ContentRating"].first
+  end
+
+  def first_aired
+    series_data["Series"].first["FirstAired"].first
+  end
+
+  def genre
+    series_data["Series"].first["Genre"].first
+  end
+
+  def imdb_id
+    series_data["Series"].first["IMDB_ID"].first
+  end
+
+  def language
+    series_data["Series"].first["Language"].first
+  end
+
+  def network
+    series_data["Series"].first["Network"].first
+  end
+
+  def overview
+    series_data["Series"].first["Overview"].first
+  end
+
+  def rating
+    series_data["Series"].first["Rating"].first
+  end
+
+  def rating_count
+    series_data["Series"].first["RatingCount"].first
+  end
+
+  def runtime
+    series_data["Series"].first["Runtime"].first
+  end
+
+  def series_name
+    series_data["Series"].first["SeriesName"].first
+  end
+
+  def status
+    series_data["Series"].first["Status"].first
+  end
+
+  def added
+    series_data["Series"].first["added"].first
+  end
+
+  def added_by
+    series_data["Series"].first["addedBy"].first
+  end
+
+  def banner
+    series_data["Series"].first["banner"].first
+  end
+
+  def fanart
+    series_data["Series"].first["fanart"].first
+  end
+
+  def last_updated
+    series_data["Series"].first["lastupdated"].first
+  end
+
+  def posters
+    series_data["Series"].first["poster"].first
+  end
+
+  def zap2it_id
+    series_data["Series"].first["zap2it_id"].first
+  end
+
+  def episodes
+    series_data["Episode"]
+  end
 
   def self.search_ttdb(search_string)
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{URI.encode(search_string)}&language=en"), { 'SuppressEmpty' => '' })
@@ -112,6 +205,12 @@ class TtdbHelper
   def self.get_episode_from_ttdb(episode_id)
     data = nil
     data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/episodes/#{episode_id}/en.xml"), { 'SuppressEmpty' => '' })
+    return data
+  end
+
+  def self.get_all_data_from_ttdb(series_id)
+    data = nil
+    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{series_id}/all/en.xml"), { 'SuppressEmpty' => '' })
     return data
   end
 

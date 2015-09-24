@@ -157,7 +157,7 @@ Tvshows
 - ttdb_show_fanart             Path to ttdb show fanart
 - ttdb_show_poster             Path to ttdb show poster
 - ttdb_show_network            TV Network show (last) aired on
-- ttdb_show_status             TTDB Show status (returning or canceled)
+- status             TTDB Show status (returning or canceled)
 - ttdb_show_runtime            Runtime of each episode in minutes
 - ttdb_show_title              Show title
 - tvr_show_id                  Unique TVR show identifier

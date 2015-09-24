@@ -10,7 +10,7 @@ class TvshowsController < ApplicationController
 
   def recently_canceled
    # @tvshows_recently_canceled = Tvshow.where("end_date > ? AND end_date < ?", 6.months.ago, Date.today).sort_by(&:end_date).reverse
-    @tvshows_recently_canceled = Tvshow.where("ttdb_show_status = 'Ended'").where("latest_episode_date > ? AND latest_episode_date < ?", 6.months.ago, Date.today).reverse.select(&:latest_episode_date).sort_by(&:latest_episode_date).reverse
+    @tvshows_recently_canceled = Tvshow.where("status = 'Ended'").where("latest_episode_date > ? AND latest_episode_date < ?", 6.months.ago, Date.today).reverse.select(&:latest_episode_date).sort_by(&:latest_episode_date).reverse
   end
 
   def index

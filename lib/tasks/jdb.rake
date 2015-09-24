@@ -111,4 +111,13 @@ namespace :jdb do
     Setting.set_value("ttdb_last_scrape", ttdbtime)
     xbmcdb.disconnect
   end
+
+  desc "this will update the forcast data"
+  task :update_forcast => :environment do
+    Tvshow.all.each do |tvshow|
+      puts "updating #{tvshow.ttdb_show_title}"
+      tvshow.update_next_episode
+      tvshow.update_latest_episode
+    end
+  end
 end

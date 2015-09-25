@@ -97,7 +97,7 @@ class TtdbHelper
     series_data["Series"].first["lastupdated"].first
   end
 
-  def posters
+  def poster
     series_data["Series"].first["poster"].first
   end
 

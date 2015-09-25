@@ -23,7 +23,38 @@ class Tvshow < ActiveRecord::Base
   end
 
   def update_series_data
-    update_attributes
+    seriesdata = TtdbHelper.new(ttdb_id)
+    update_attributes(
+      :title => seriesdata.series_name,
+      :status => seriesdata.status,
+      :first_aired => seriesdata.first_aired,
+      :imdb_id => seriesdata.imdb_id,
+      :overview => seriesdata.overview,
+      :ttdb_last_updated => seriesdata.last_updated,
+      :banner => seriesdata.banner,
+      :fanart => seriesdata.fanart,
+      :poster => seriesdata.poster,
+      :rating => seriesdata.rating,
+      :rating_count => seriesdata.rating_count,
+      :network => seriesdata.network,
+      :runtime => seriesdata.runtime,
+      :clean_title => Scrubber.clean_show_title(seriesdata.series_name)
+    )
+    update_next_episode
+    update_latest_episode
+  end
+
+  def sync_series
+    require 'xdb_helper'
+    xdb_series = XdbSeriesHelper.new(ttdb_id)
+    update_attributes(
+      :xdb_id => xdb_series.get_id,
+      :location => xdb_series.get_location
+    )
+  end
+
+  def update_episode_data
+
   end
 
   def self.create_and_sync_new_show(ttdb_id)
@@ -40,10 +71,6 @@ class Tvshow < ActiveRecord::Base
     puts "synching xdb episode data"
     Tvshow.update_all_xdb_episode_data(ttdb_id)
   end
-
-  ############
-  #TTDB Stuff#
-  ############
 
   def self.update_ttdb_show_data(ttdb_id)
     ttdbdata = TtdbHelper.ttdb_xml_show_data("#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_id}.zip", "en.xml")
@@ -125,53 +152,6 @@ class Tvshow < ActiveRecord::Base
     tvshow.update_latest_episode
   end
 
-  ###########
-  #TVR Stuff#
-  ###########
-
-  def self.update_tvrage_data(ttdb_id)
-    current_show = Tvshow.find_by_ttdb_id(ttdb_id)
-    title = current_show.clean_title
-    #puts "Updating TVR for: #{title}"
-    tvragedata = TvrHelper.get_tvrage_data(title)
-    return if tvragedata == nil;
-    tvr_latest_episode = tvragedata['Latest Episode']
-    if tvr_latest_episode != nil
-      tvr_latest_episode.force_encoding("utf-8")
-      latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
-      latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
-      latest_episode_title = tvr_latest_episode.split("^")[1]
-      latest_episode_date = tvr_latest_episode.split("^")[2]
-    end
-    tvr_next_episode = tvragedata['Next Episode']
-    if tvr_next_episode != nil
-      tvr_next_episode.force_encoding("utf-8")
-      next_season_number = tvr_next_episode.split("^").first.split("x")[0]
-      next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
-      next_episode_title = tvr_next_episode.split("^")[1]
-      next_episode_date = tvr_next_episode.split("^")[2]
-    else
-      next_season_number = nil
-      next_episode_number = nil
-      next_episode_title = nil
-      next_episode_date = nil
-    end
-    current_show.update_attributes(
-      :tvr_id => tvragedata['Show ID'],
-      :latest_season_number => latest_season_number,
-      :latest_episode_number => latest_episode_number,
-      :latest_episode_title => latest_episode_title,
-      :latest_episode_date => latest_episode_date,
-      :next_season_number => next_season_number,
-      :next_episode_number => next_episode_number,
-      :next_episode_title => next_episode_title,
-      :next_episode_date => next_episode_date,
-      :tvr_url => tvragedata['Show URL'],
-      :first_aired => tvragedata['Started'],
-      :end_date => tvragedata['Ended'],
-      :status => tvragedata['Status']
-      )
-  end
 
   ###########
   #XDB Stuff#
@@ -267,3 +247,52 @@ class Tvshow < ActiveRecord::Base
       end
     end
 end
+
+###########
+#TVR Stuff#
+###########
+=begin
+def self.update_tvrage_data(ttdb_id)
+  current_show = Tvshow.find_by_ttdb_id(ttdb_id)
+  title = current_show.clean_title
+  #puts "Updating TVR for: #{title}"
+  tvragedata = TvrHelper.get_tvrage_data(title)
+  return if tvragedata == nil;
+  tvr_latest_episode = tvragedata['Latest Episode']
+  if tvr_latest_episode != nil
+    tvr_latest_episode.force_encoding("utf-8")
+    latest_season_number = tvr_latest_episode.split("^").first.split("x")[0]
+    latest_episode_number = tvr_latest_episode.split("^").first.split("x")[1]
+    latest_episode_title = tvr_latest_episode.split("^")[1]
+    latest_episode_date = tvr_latest_episode.split("^")[2]
+  end
+  tvr_next_episode = tvragedata['Next Episode']
+  if tvr_next_episode != nil
+    tvr_next_episode.force_encoding("utf-8")
+    next_season_number = tvr_next_episode.split("^").first.split("x")[0]
+    next_episode_number = tvr_next_episode.split("^").first.split("x")[1]
+    next_episode_title = tvr_next_episode.split("^")[1]
+    next_episode_date = tvr_next_episode.split("^")[2]
+  else
+    next_season_number = nil
+    next_episode_number = nil
+    next_episode_title = nil
+    next_episode_date = nil
+  end
+  current_show.update_attributes(
+    :tvr_id => tvragedata['Show ID'],
+    :latest_season_number => latest_season_number,
+    :latest_episode_number => latest_episode_number,
+    :latest_episode_title => latest_episode_title,
+    :latest_episode_date => latest_episode_date,
+    :next_season_number => next_season_number,
+    :next_episode_number => next_episode_number,
+    :next_episode_title => next_episode_title,
+    :next_episode_date => next_episode_date,
+    :tvr_url => tvragedata['Show URL'],
+    :first_aired => tvragedata['Started'],
+    :end_date => tvragedata['Ended'],
+    :status => tvragedata['Status']
+    )
+end
+=end

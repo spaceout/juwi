@@ -8,8 +8,8 @@ namespace :ttdb do
     update_set = TtdbHelper.get_updates_from_ttdb
     puts "Updating #{update_set.count} Series"
     progressbar = ProgressBar.create(:title => "TTDB Update", :total => update_set.count)
-    update_set.each do |ttdb_show_id|
-      Tvshow.update_all_ttdb_data(ttdb_show_id)
+    update_set.each do |ttdb_id|
+      Tvshow.update_all_ttdb_data(ttdb_id)
       progressbar.increment
     end
     #progressbar.finish
@@ -19,8 +19,8 @@ namespace :ttdb do
     desc "Update all TTDB data for all shows"
     task :all => :environment do
       Tvshow.all.each do |tvshow|
-        puts "updating ttdbdata for #{tvshow.ttdb_show_title}"
-        Tvshow.update_all_ttdb_data(tvshow.ttdb_show_id)
+        puts "updating ttdbdata for #{tvshow.title}"
+        Tvshow.update_all_ttdb_data(tvshow.ttdb_id)
       end
     end
   end
@@ -29,7 +29,7 @@ namespace :ttdb do
   desc "This will download all images for current tvshows"
   task :get_images => :environment do
     Tvshow.all.each do |tvshow|
-      next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+      next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
       TtdbHelper.get_all_images(tvshow)
     end
   end

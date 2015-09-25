@@ -2,14 +2,14 @@ class JdbHelper
 
   def self.update_show(showname)
     puts "Searching for #{showname} in JDB"
-    currentshow = Tvshow.find_by_ttdb_show_title(showname)
+    currentshow = Tvshow.find_by_title(showname)
     if currentshow.nil?
       puts "No Show Found matching #{showname}"
     else
       currentshow.destroy
       puts "#{showname} destroyed"
-      ttdb_show_id = currentshow.ttdb_show_id
-      Tvshow.create_and_sync_new_show(ttdb_show_id)
+      ttdb_id = currentshow.ttdb_id
+      Tvshow.create_and_sync_new_show(ttdb_id)
     end
     puts "Completed drop and re-import of #{showname}"
   end

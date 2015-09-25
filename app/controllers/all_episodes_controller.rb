@@ -7,7 +7,7 @@ class AllEpisodesController < ApplicationController
 
   # GET /episodes/missing
   def missing
-    @episodes = Episode.missing.sort_by {|u| u.tvshow.ttdb_show_title}
+    @episodes = Episode.missing.sort_by {|u| u.tvshow.title}
     render :index
   end
 

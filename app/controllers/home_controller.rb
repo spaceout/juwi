@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   def index
     require 'file_manipulator'
-    @tvshows = Tvshow.all.sort_by(&:ttdb_show_title)
+    @tvshows = Tvshow.all.sort_by(&:title)
     @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
     @aired_yesterday = Episode.where(:ttdb_episode_airdate => Date.today.prev_day)

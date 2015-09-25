@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150923130220) do
+ActiveRecord::Schema.define(:version => 20150925125233) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -99,11 +99,11 @@ ActiveRecord::Schema.define(:version => 20150923130220) do
   end
 
   create_table "tvshows", :force => true do |t|
-    t.integer  "ttdb_show_id"
-    t.string   "xdb_show_location"
-    t.integer  "xdb_show_id"
-    t.string   "ttdb_show_title"
-    t.integer  "tvr_show_id"
+    t.integer  "ttdb_id"
+    t.string   "location"
+    t.integer  "xdb_id"
+    t.string   "title"
+    t.integer  "tvr_id"
     t.integer  "latest_season_number"
     t.integer  "latest_episode_number"
     t.string   "latest_episode_title"
@@ -112,25 +112,23 @@ ActiveRecord::Schema.define(:version => 20150923130220) do
     t.integer  "next_episode_number"
     t.string   "next_episode_title"
     t.date     "next_episode_date"
-    t.string   "tvr_show_url"
-    t.date     "tvr_show_started"
+    t.string   "tvr_url"
+    t.date     "first_aired"
     t.date     "end_date"
     t.string   "status"
-    t.string   "ttdb_show_imdb_id"
-    t.text     "ttdb_show_overview"
-    t.integer  "ttdb_show_last_updated"
-    t.string   "ttdb_show_banner"
-    t.string   "ttdb_show_fanart"
-    t.string   "ttdb_show_poster"
-    t.integer  "ttdb_show_rating"
-    t.integer  "ttdb_show_rating_count"
-    t.string   "ttdb_show_network"
-    t.string   "ttdb_show_status"
-    t.integer  "ttdb_show_runtime"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-    t.text     "jdb_clean_show_title"
-    t.string   "tvr_search_name"
+    t.string   "imdb_id"
+    t.text     "overview"
+    t.integer  "ttdb_last_updated"
+    t.string   "banner"
+    t.string   "fanart"
+    t.string   "poster"
+    t.integer  "rating"
+    t.integer  "rating_count"
+    t.string   "network"
+    t.integer  "runtime"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+    t.text     "clean_title"
     t.integer  "tvmaze_id"
   end
 

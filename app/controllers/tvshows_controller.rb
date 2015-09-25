@@ -3,7 +3,7 @@ class TvshowsController < ApplicationController
   def forcast
     tvshows_with_date = Tvshow.where("next_episode_date > 0").sort_by(&:next_episode_date)
     airing_status = ["Returning Series", "TBD/On The Bubble", "New Series", "Final Season"]
-    tvshows_tba = Tvshow.where(:next_episode_date => nil, :status => airing_status).sort_by(&:ttdb_show_title)
+    tvshows_tba = Tvshow.where(:next_episode_date => nil, :status => airing_status).sort_by(&:title)
     @tvshows = tvshows_with_date + tvshows_tba
     render :index
   end
@@ -14,7 +14,7 @@ class TvshowsController < ApplicationController
   end
 
   def index
-    @tvshows = Tvshow.all.sort_by(&:ttdb_show_title)
+    @tvshows = Tvshow.all.sort_by(&:title)
   end
 
   # GET /tvshows/1
@@ -30,7 +30,7 @@ class TvshowsController < ApplicationController
     require 'tvr_helper'
     @tvshow = Tvshow.find(params[:id])
     if @tvshow.update_attributes(params[:tvshow])
-      TvrHelper.update_tvrage_data(@tvshow.ttdb_show_id)
+      TvrHelper.update_tvrage_data(@tvshow.ttdb_id)
       flash[:notice] = "TV Show Updated"
     else
       flash[:alert] = "Couldn't Update TV Show, fucker"

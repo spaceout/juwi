@@ -21,19 +21,19 @@ namespace :jdb do
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
-    last_xdb_show_id = Setting.get_value("last_xdb_show_id")
+    last_xdb_id = Setting.get_value("last_xdb_id")
     last_xdb_episode_id = Setting.get_value("last_xdb_episode_id")
 
     #Search for new XDB series
     puts "Searching for new Shows in XDB"
-    new_shows = xdbtvshows.where("idShow > #{last_xdb_show_id}")
+    new_shows = xdbtvshows.where("idShow > #{last_xdb_id}")
     unless new_shows.empty?
       new_shows.each do |show|
-        ttdb_show_id = show[:c12]
-        Tvshow.create_and_sync_new_show(ttdb_show_id)
+        ttdb_id = show[:c12]
+        Tvshow.create_and_sync_new_show(ttdb_id)
       end
     end
-    Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
+    Setting.set_value("last_xdb_id", xdbtvshows.order(:idShow).last[:idShow])
 
     #Search and sync newly added XDB episodes
     puts "Searching for new episodes in XDB"
@@ -48,8 +48,8 @@ namespace :jdb do
     #Remove shows deleted from XBMC
     puts "Checking for removed TV Shows"
     Tvshow.all.each do |tvshow|
-      if xdbtvshows.filter(:idShow => tvshow.xdb_show_id).empty?
-        puts "deleting #{tvshow.ttdb_show_title} from JDB"
+      if xdbtvshows.filter(:idShow => tvshow.xdb_id).empty?
+        puts "deleting #{tvshow.title} from JDB"
         tvshow.destroy
       end
     end
@@ -59,7 +59,7 @@ namespace :jdb do
     Episode.all.each do |episode|
       next if episode.xdb_episode_id.nil?
       if xdbepisodes.filter(:idEpisode => episode.xdb_episode_id).empty?
-        puts "clearing XDB info on #{episode.tvshow.ttdb_show_title} - #{episode.ttdb_season_number} #{episode.ttdb_episode_number}"
+        puts "clearing XDB info on #{episode.tvshow.title} - #{episode.ttdb_season_number} #{episode.ttdb_episode_number}"
         Tvshow.remove_xdb_episode_data(episode.ttdb_episode_id)
       end
     end
@@ -81,7 +81,7 @@ namespace :jdb do
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
     xdbtvshows.each do |tvshow|
-      if Tvshow.where(:xdb_show_id => tvshow[:idShow]).empty?
+      if Tvshow.where(:xdb_id => tvshow[:idShow]).empty?
         puts "Importing #{tvshow[:c00]}"
         Tvshow.create_and_sync_new_show(tvshow[:c12])
       end
@@ -105,7 +105,7 @@ namespace :jdb do
     xdbtvshows.each do |show|
      Tvshow.create_and_sync_new_show(show[:c12])
     end
-    Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
+    Setting.set_value("last_xdb_id", xdbtvshows.order(:idShow).last[:idShow])
     Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
     Setting.set_value("xdb_last_scrape", DateTime.current)
     Setting.set_value("ttdb_last_scrape", ttdbtime)
@@ -115,7 +115,7 @@ namespace :jdb do
   desc "this will update the forcast data"
   task :update_forcast => :environment do
     Tvshow.all.each do |tvshow|
-      puts "updating #{tvshow.ttdb_show_title}"
+      puts "updating #{tvshow.title}"
       tvshow.update_next_episode
       tvshow.update_latest_episode
     end

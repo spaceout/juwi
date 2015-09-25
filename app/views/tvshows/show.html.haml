@@ -1,12 +1,12 @@
 
-%h3= @tvshow.ttdb_show_title
-= image_tag("/images/#{@tvshow.ttdb_show_id}_banner.jpg", :alt => @tvshow.ttdb_show_title)
+%h3= @tvshow.title
+= image_tag("/images/#{@tvshow.ttdb_id}_banner.jpg", :alt => @tvshow.title)
 %br
-= @tvshow.ttdb_show_overview
+= @tvshow.overview
 %br
-= link_to('TTDB URL', "http://thetvdb.com/?tab=series&id=#{@tvshow.ttdb_show_id}")
+= link_to('TTDB URL', "http://thetvdb.com/?tab=series&id=#{@tvshow.ttdb_id}")
 |
-= link_to('TVR URL', @tvshow.tvr_show_url)
+= link_to('TVR URL', @tvshow.tvr_url)
 |
 = link_to('Episodes', tvshow_episodes_path(@tvshow))
 |

@@ -5,12 +5,12 @@ require 'scrubber'
 
 class TtdbHelper
 
-  def initialize(ttdb_show_id)
-    @ttdb_show_id = ttdb_show_id
+  def initialize(ttdb_id)
+    @ttdb_id = ttdb_id
   end
 
   def get_series_data
-    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_show_id}/all/en.xml"), { 'SuppressEmpty' => '' })
+    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_id}/all/en.xml"), { 'SuppressEmpty' => '' })
   end
 
   def series_data
@@ -139,8 +139,8 @@ class TtdbHelper
     CurlHelper.download_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{tvdbid}/all/en.zip", "#{File.join(Rails.root,'/ttdbdata/')}#{tvdbid}.zip")
   end
 
-  def self.delete_ttdb_zip(ttdb_show_id)
-    zip_file = "#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_show_id}.zip"
+  def self.delete_ttdb_zip(ttdb_id)
+    zip_file = "#{File.join(Rails.root,'/ttdbdata/')}#{ttdb_id}.zip"
     if File.exist?(zip_file)
       #puts "deleting file #{zip_file}"
       File.delete(zip_file)
@@ -186,11 +186,11 @@ class TtdbHelper
     update_set = []
     unless data["Series"].nil?
       data["Series"].each do |series|
-        ttdb_show_id = series['id'].first
-        current_jdb_show = Tvshow.find_by_ttdb_show_id(ttdb_show_id)
+        ttdb_id = series['id'].first
+        current_jdb_show = Tvshow.find_by_ttdb_id(ttdb_id)
         next if current_jdb_show == nil
         next if ["Canceled/Ended", "Ended", "Canceled"].include?(current_jdb_show.status)
-        update_set.push(ttdb_show_id)
+        update_set.push(ttdb_id)
       end
     end
     return update_set
@@ -215,14 +215,14 @@ class TtdbHelper
   end
 
   def self.get_all_images(tvshow)
-    if tvshow.ttdb_show_banner != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+    if tvshow.banner != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
     end
-    if tvshow.ttdb_show_fanart != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_fanart.jpg"))
+    if tvshow.fanart != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_fanart.jpg"))
     end
-    if tvshow.ttdb_show_poster != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.ttdb_show_poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_poster.jpg"))
+    if tvshow.poster != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_poster.jpg"))
     end
   end
 end

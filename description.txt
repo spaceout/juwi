@@ -137,8 +137,8 @@ XBMC Database (external mysql database)
   :idShow                      Unique XBMC DB show identifier    Source of xdb_id
   :c00                         Show title
 :episode                       XBMC episode table
-  :idEpisode                   Unique XBMC DB episode identifier Source of xdb_episode_id
-  :c18                         Location of episode file          Source of xdb_episode_location
+  :idEpisode                   Unique XBMC DB episode identifier Source of xdb_id
+  :c18                         Location of episode file          Source of filename
   :idShow                      Unique XBMC DB show identifier
   :c00                         Episodes title
   :c12                         Episodes season number
@@ -180,16 +180,16 @@ Tvshows
 Episodes
 - episode_id
 - tvshow_id
-- ttdb_episode_title           Episodes title
-- ttdb_season_number           Episodes season number
-- ttdb_episode_number          Episodes episode number
-- ttdb_episode_id              Unique TTDB episode identifier
-- ttdb_episode_overview        Episode plot summary
-- ttdb_episode_last_updated    TTDB time the episode data was last updated
+- title           Episodes title
+- season_num           Episodes season number
+- episode_num          Episodes episode number
+- ttdb_id              Unique TTDB episode identifier
+- overview        Episode plot summary
+- ttdb_last_updated    TTDB time the episode data was last updated
 - ttdb_id                 Unique TTDB show identifier
-- ttdb_episode_airdate         Date episode aired
-- xdb_episode_id               Unique XBMC DB episode identifier
-- xdb_episode_location         Location of episode file
+- airdate         Date episode aired
+- xdb_id               Unique XBMC DB episode identifier
+- filename         Location of episode file
 - xdb_id                  Unique XBMC DB show identifier
 - state                        Not quite sure yet!
 

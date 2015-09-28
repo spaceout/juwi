@@ -90,7 +90,7 @@ class Renamer
       if tvshow.empty? == false
         match_ttdb_id = tvshow.first.ttdb_id
         matched_show_title = tvshow.first.title.gsub(":", '')
-        matched_episode = Episode.where("ttdb_season_number = ? AND ttdb_episode_number = ? AND ttdb_id = ?", season_number, episode_number, match_ttdb_id).reload
+        matched_episode = Episode.where("season_num = ? AND episode_num = ? AND ttdb_id = ?", season_number, episode_number, match_ttdb_id).reload
         if matched_episode.empty?
           puts "No Matched Episode for: #{matched_show_title} - s#{season_number}e#{episode_number} checking ttdb"
           if attempt == 1
@@ -101,7 +101,7 @@ class Renamer
             return {:failure => {:reason => "episode not found"}}
           end
         else
-          matched_episode_title = matched_episode.first.ttdb_episode_title.gsub(/[?"\/':]/,'').gsub('’','\'')
+          matched_episode_title = matched_episode.first.title.gsub(/[?"\/':]/,'').gsub('’','\'')
           if matched_episode_title == "TBA"
             puts "TBA FOUND!"
             if attempt == 1

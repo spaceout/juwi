@@ -44,7 +44,8 @@ class TvshowsController < ApplicationController
       flash[:notice] = "Could not add TV Show, entry was nil"
       redirect_to '/'
     else
-      Tvshow.create_new_show(params[:ttdb_id])
+      new_show = Tvshow.new(:ttdb_id => params[:ttdb_id])
+      new_show.create_new_show
       flash[:notice] = "TV show added #{params[:ttdb_id]}"
     end
     redirect_to '/'

@@ -10,7 +10,7 @@ class TtdbHelper
   end
 
   def get_series_data
-    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_id}/all/en.xml"), { 'SuppressEmpty' => '' })
+    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_id}/all/en.xml"), { 'SuppressEmpty' => '', 'ForceArray' => false})
   end
 
   def series_data
@@ -18,99 +18,103 @@ class TtdbHelper
   end
 
   def actors
-    series_data["Series"].first["Actors"].first
+    series_data["Series"]["Actors"]
   end
 
   def airs_day_of_week
-    series_data["Series"].first["Airs_DayOfWeek"].first
+    series_data["Series"]["Airs_DayOfWeek"]
   end
 
   def airs_time
-    series_data["Series"].first["Airs_Time"].first
+    series_data["Series"]["Airs_Time"]
   end
 
   def content_rating
-    series_data["Series"].first["ContentRating"].first
+    series_data["Series"]["ContentRating"]
   end
 
   def first_aired
-    series_data["Series"].first["FirstAired"].first
+    series_data["Series"]["FirstAired"]
   end
 
   def genre
-    series_data["Series"].first["Genre"].first
+    series_data["Series"]["Genre"]
   end
 
   def imdb_id
-    series_data["Series"].first["IMDB_ID"].first
+    series_data["Series"]["IMDB_ID"]
   end
 
   def language
-    series_data["Series"].first["Language"].first
+    series_data["Series"]["Language"]
   end
 
   def network
-    series_data["Series"].first["Network"].first
+    series_data["Series"]["Network"]
   end
 
   def overview
-    series_data["Series"].first["Overview"].first
+    series_data["Series"]["Overview"]
   end
 
   def rating
-    series_data["Series"].first["Rating"].first
+    series_data["Series"]["Rating"]
   end
 
   def rating_count
-    series_data["Series"].first["RatingCount"].first
+    series_data["Series"]["RatingCount"]
   end
 
   def runtime
-    series_data["Series"].first["Runtime"].first
+    series_data["Series"]["Runtime"]
   end
 
   def series_name
-    series_data["Series"].first["SeriesName"].first
+    series_data["Series"]["SeriesName"]
   end
 
   def status
-    series_data["Series"].first["Status"].first
+    series_data["Series"]["Status"]
   end
 
   def added
-    series_data["Series"].first["added"].first
+    series_data["Series"]["added"]
   end
 
   def added_by
-    series_data["Series"].first["addedBy"].first
+    series_data["Series"]["addedBy"]
   end
 
   def banner
-    series_data["Series"].first["banner"].first
+    series_data["Series"]["banner"]
   end
 
   def fanart
-    series_data["Series"].first["fanart"].first
+    series_data["Series"]["fanart"]
   end
 
   def last_updated
-    series_data["Series"].first["lastupdated"].first
+    series_data["Series"]["lastupdated"]
   end
 
   def poster
-    series_data["Series"].first["poster"].first
+    series_data["Series"]["poster"]
   end
 
   def zap2it_id
-    series_data["Series"].first["zap2it_id"].first
+    series_data["Series"]["zap2it_id"]
   end
 
   def episodes
     series_data["Episode"]
   end
 
+  def episode(season, episode)
+
+  end
+
   def self.search_ttdb(search_string)
-    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{URI.encode(search_string)}&language=en"), { 'SuppressEmpty' => '' })
+    data = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/GetSeries.php?seriesname=#{URI.encode(search_string)}&language=en"), { 'SuppressEmpty' => '', 'ForceArray' => true})
     result_set = []
     data["Series"].each do |result|
       result_set.push(

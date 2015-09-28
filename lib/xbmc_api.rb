@@ -39,15 +39,15 @@ class XbmcApi
     end
   end
 
-  def self.add_episode(xdb_episode_id)
-    puts "Adding episode with XDBID #{xdb_episode_id}"
-    Tvshow.update_xdb_episode_data(xdb_episode_id)
+  def self.add_episode(xdb_id)
+    puts "Adding episode with XDBID #{xdb_id}"
+    Tvshow.update_xdb_episode_data(xdb_id)
   end
 
-  def self.remove_episode(xdb_episode_id)
-    episode = Episode.find_by_xdb_episode_id(xdb_episode_id)
-    puts "un-syncing #{episode.tvshow.title} - s#{episode.ttdb_season_number}e#{episode.ttdb_episode_number}"
-    Tvshow.remove_xdb_episode_data(episode.ttdb_episode_id)
+  def self.remove_episode(xdb_id)
+    episode = Episode.find_by_xdb_id(xdb_id)
+    puts "un-syncing #{episode.tvshow.title} - s#{episode.season_num}e#{episode.episode_num}"
+    Tvshow.remove_xdb_episode_data(episode.ttdb_id)
   end
 
   def self.add_tvshow(xdb_id)

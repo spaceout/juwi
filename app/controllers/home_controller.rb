@@ -2,11 +2,11 @@ class HomeController < ApplicationController
   def index
     require 'file_manipulator'
     @tvshows = Tvshow.all.sort_by(&:title)
-    @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
+    @episodes = Episode.where("season_num > 0 AND airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
-    @aired_yesterday = Episode.where(:ttdb_episode_airdate => Date.today.prev_day)
-    @airing_today = Episode.where(:ttdb_episode_airdate => Date.today)
-    @airing_tomorrow = Episode.where(:ttdb_episode_airdate => Date.today.next_day)
+    @aired_yesterday = Episode.where(:airdate => Date.today.prev_day)
+    @airing_today = Episode.where(:airdate => Date.today)
+    @airing_tomorrow = Episode.where(:airdate => Date.today.next_day)
   end
 
   def rename

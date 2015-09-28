@@ -8,6 +8,6 @@
   %tbody
     - @episodes.each do |episode|
       %tr
-        %td= link_to episode.tvshow.title + " - " + "s" '%02d' % episode.ttdb_season_number + "e" + '%02d' % episode.ttdb_episode_number + " - " + episode.ttdb_episode_title, "/tvshows/#{@tvshow.id}/episodes/#{episode.id}"
-        %td= episode.ttdb_episode_airdate
-        %td= episode.xdb_episode_id
+        %td= link_to episode.tvshow.title + " - " + "s" '%02d' % episode.season_num + "e" + '%02d' % episode.episode_num + " - " + episode.title, "/tvshows/#{@tvshow.id}/episodes/#{episode.id}"
+        %td= episode.airdate
+        %td= episode.xdb_id

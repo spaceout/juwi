@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150925125233) do
+ActiveRecord::Schema.define(:version => 20150928145420) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -31,21 +31,21 @@ ActiveRecord::Schema.define(:version => 20150925125233) do
 
   create_table "episodes", :force => true do |t|
     t.integer  "tvshow_id"
-    t.integer  "xdb_episode_id"
-    t.string   "xdb_episode_location"
+    t.integer  "xdb_id"
+    t.string   "filename"
     t.integer  "xdb_show_id"
-    t.string   "ttdb_episode_title"
-    t.integer  "ttdb_season_number"
-    t.integer  "ttdb_episode_number"
-    t.integer  "ttdb_episode_id"
-    t.text     "ttdb_episode_overview"
-    t.integer  "ttdb_episode_last_updated"
+    t.string   "title"
+    t.integer  "season_num"
+    t.integer  "episode_num"
+    t.integer  "ttdb_id"
+    t.text     "overview"
+    t.integer  "ttdb_last_updated"
     t.integer  "ttdb_show_id"
-    t.date     "ttdb_episode_airdate"
-    t.string   "ttdb_episode_rating"
-    t.integer  "ttdb_episode_rating_count"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.date     "airdate"
+    t.string   "rating"
+    t.integer  "rating_count"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
     t.string   "state"
   end
 

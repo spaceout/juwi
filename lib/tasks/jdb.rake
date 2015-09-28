@@ -1,11 +1,11 @@
 namespace :jdb do
   desc "cleans up the TBA dupes"
   task :tba_fix => :environment do
-    Episode.where(ttdb_episode_title: "TBA").each do |tba_episode|
+    Episode.where(title: "TBA").each do |tba_episode|
       if tba_episode.tvshow.episodes.where(
-        ttdb_season_number: tba_episode.ttdb_season_number,
-        ttdb_episode_number: tba_episode.ttdb_episode_number
-      ).where('ttdb_episode_title != ?', "TBA").count == 1
+        season_num: tba_episode.season_num,
+        episode_num: tba_episode.episode_num
+      ).where('title != ?', "TBA").count == 1
         puts "found match"
         puts tba_episode.inspect
       end
@@ -22,7 +22,7 @@ namespace :jdb do
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
     last_xdb_id = Setting.get_value("last_xdb_id")
-    last_xdb_episode_id = Setting.get_value("last_xdb_episode_id")
+    last_xdb_id = Setting.get_value("last_xdb_id")
 
     #Search for new XDB series
     puts "Searching for new Shows in XDB"
@@ -37,13 +37,13 @@ namespace :jdb do
 
     #Search and sync newly added XDB episodes
     puts "Searching for new episodes in XDB"
-    new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
+    new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_id}")
     unless new_episodes.empty?
       new_episodes.each do |episode|
         Tvshow.update_xdb_episode_data(episode[:idEpisode])
       end
     end
-    Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
+    Setting.set_value("last_xdb_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
 
     #Remove shows deleted from XBMC
     puts "Checking for removed TV Shows"
@@ -57,10 +57,10 @@ namespace :jdb do
     #Remove episodes deleted from XBMC
     puts "Checking for removed Episodes"
     Episode.all.each do |episode|
-      next if episode.xdb_episode_id.nil?
-      if xdbepisodes.filter(:idEpisode => episode.xdb_episode_id).empty?
-        puts "clearing XDB info on #{episode.tvshow.title} - #{episode.ttdb_season_number} #{episode.ttdb_episode_number}"
-        Tvshow.remove_xdb_episode_data(episode.ttdb_episode_id)
+      next if episode.xdb_id.nil?
+      if xdbepisodes.filter(:idEpisode => episode.xdb_id).empty?
+        puts "clearing XDB info on #{episode.tvshow.title} - #{episode.season_num} #{episode.episode_num}"
+        Tvshow.remove_xdb_episode_data(episode.ttdb_id)
       end
     end
   xbmcdb.disconnect
@@ -88,7 +88,7 @@ namespace :jdb do
     end
     puts "Checking Episodes"
     xdbepisodes.each do |episode|
-      if Episode.find_by_xdb_episode_id(episode[:idEpisode]).nil?
+      if Episode.find_by_xdb_id(episode[:idEpisode]).nil?
         puts "Importing #{episode[:c00]}"
         Tvshow.update_xdb_episode_data(episode[:idEpisode])
       end
@@ -106,7 +106,7 @@ namespace :jdb do
      Tvshow.create_and_sync_new_show(show[:c12])
     end
     Setting.set_value("last_xdb_id", xdbtvshows.order(:idShow).last[:idShow])
-    Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
+    Setting.set_value("last_xdb_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
     Setting.set_value("xdb_last_scrape", DateTime.current)
     Setting.set_value("ttdb_last_scrape", ttdbtime)
     xbmcdb.disconnect

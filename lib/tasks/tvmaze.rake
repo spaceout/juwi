@@ -10,9 +10,7 @@ namespace :tvmaze do
         next
       end
       puts "#{tvshow.title} - #{tvmaze_id}"
-      tvshow.update_attributes(
-        :tvmaze_id => tvmaze_id
-      )
+      tvshow.update_attributes(:tvmaze_id => tvmaze_id)
     end
   end
 
@@ -27,10 +25,7 @@ namespace :tvmaze do
       tvm_show_status = TvmazeHelper.get_show_status(tvshow.tvmaze_id)
       tvm_nextaired_date = TvmazeHelper.get_next_episode(tvshow.tvmaze_id)
       puts "#{tvm_show_status} - #{tvm_nextaired_date}"
-      tvshow.update_attributes(
-        :next_episode_date => tvm_nextaired_date,
-        :status => tvm_show_status
-      )
+      tvshow.update_attributes(:status => tvm_show_status)
     end
   end
 

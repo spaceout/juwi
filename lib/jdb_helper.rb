@@ -5,11 +5,12 @@ class JdbHelper
     currentshow = Tvshow.find_by_title(showname)
     if currentshow.nil?
       puts "No Show Found matching #{showname}"
+      return
     else
+      ttdb_id = currentshow.ttdb_id
       currentshow.destroy
       puts "#{showname} destroyed"
-      ttdb_id = currentshow.ttdb_id
-      Tvshow.create_and_sync_new_show(ttdb_id)
+      Tvshow.new(ttdb_id: ttdb_id).create_new_show
     end
     puts "Completed drop and re-import of #{showname}"
   end
@@ -31,4 +32,3 @@ class JdbHelper
   end
 
 end
-

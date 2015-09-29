@@ -1,49 +1,34 @@
-namespace :jdb do
-  desc "cleans up the TBA dupes"
-  task :tba_fix => :environment do
-    Episode.where(title: "TBA").each do |tba_episode|
-      if tba_episode.tvshow.episodes.where(
-        season_num: tba_episode.season_num,
-        episode_num: tba_episode.episode_num
-      ).where('title != ?', "TBA").count == 1
-        puts "found match"
-        puts tba_episode.inspect
-      end
-    end
-  end
-
   desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
   task :update => :environment do
     require 'jdb_helper'
     require 'ttdb_helper'
-    require 'tvr_helper'
 
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
-    last_xdb_id = Setting.get_value("last_xdb_id")
-    last_xdb_id = Setting.get_value("last_xdb_id")
+    last_xdb_episode_id = Setting.get_value("last_xdb_show_id")
+    last_xdb_show_id = Setting.get_value("last_xdb_episode_id")
 
     #Search for new XDB series
     puts "Searching for new Shows in XDB"
-    new_shows = xdbtvshows.where("idShow > #{last_xdb_id}")
+    new_shows = xdbtvshows.where("idShow > #{last_xdb_show_id}")
     unless new_shows.empty?
       new_shows.each do |show|
         ttdb_id = show[:c12]
-        Tvshow.create_and_sync_new_show(ttdb_id)
+        Tvshow.find_or_initialize_by_ttdb_id(ttdb_id).create_new_show
       end
     end
-    Setting.set_value("last_xdb_id", xdbtvshows.order(:idShow).last[:idShow])
+    Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
 
     #Search and sync newly added XDB episodes
     puts "Searching for new episodes in XDB"
-    new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_id}")
+    new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
     unless new_episodes.empty?
       new_episodes.each do |episode|
         Tvshow.update_xdb_episode_data(episode[:idEpisode])
       end
     end
-    Setting.set_value("last_xdb_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
+    Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
 
     #Remove shows deleted from XBMC
     puts "Checking for removed TV Shows"

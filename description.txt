@@ -161,14 +161,8 @@ Tvshows
 - runtime            Runtime of each episode in minutes
 - title              Show title
 - tvr_id                  Unique TVR show identifier
-- latest_season_number     Latest episodes season number
-- latest_episode_number    Latest episodes episode number
-- latest_episode_title     Latest episodes title
-- latest_episode_date      Latest episodes airdate
-- next_season_number       Next episodes season number
-- next_episode_number      Next episodes episode number
-- next_episode_title       Next episodes title
-- next_episode_date        Next episodes airdate
+- next_episode       episode id of the next episode
+- latest_episode     episode id of the latest episode
 - tvr_url                 TVR URL for show info
 - first_aired             Shows first airdate
 - end_date               Shows last airdate

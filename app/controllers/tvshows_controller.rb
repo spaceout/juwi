@@ -1,16 +1,17 @@
 class TvshowsController < ApplicationController
   # GET /tvshows/forcast
   def forcast
-    tvshows_with_date = Tvshow.where("next_episode_date > 0").sort_by(&:next_episode_date)
-    airing_status = ["Returning Series", "TBD/On The Bubble", "New Series", "Final Season"]
-    tvshows_tba = Tvshow.where(:next_episode_date => nil, :status => airing_status).sort_by(&:title)
-    @tvshows = tvshows_with_date + tvshows_tba
+    #tvshows_with_date = Tvshow.where(:next_episode != nil)
+    #tvshows_tba = Tvshow.where(:next_episode => nil, :status => "Continuing").sort_by(&:title)
+    tvshows_with_date = Tvshow.where("next_episode_date IS NOT NULL").sort_by(&:next_episode_date)
+    tvshows_tbd = Tvshow.where(:status => "Continuing", :next_episode_date => nil)
+    @tvshows = tvshows_with_date + tvshows_tbd
     render :index
   end
 
   def recently_canceled
    # @tvshows_recently_canceled = Tvshow.where("end_date > ? AND end_date < ?", 6.months.ago, Date.today).sort_by(&:end_date).reverse
-    @tvshows_recently_canceled = Tvshow.where("status = 'Ended'").where("latest_episode_date > ? AND latest_episode_date < ?", 6.months.ago, Date.today).reverse.select(&:latest_episode_date).sort_by(&:latest_episode_date).reverse
+    @tvshows_recently_canceled = Tvshow.where(:status => 'Ended').where("latest_episode_date > ? AND latest_episode_date < ?", 6.months.ago, Date.today).reverse.select(&:latest_episode_date).sort_by(&:latest_episode_date).reverse
   end
 
   def index

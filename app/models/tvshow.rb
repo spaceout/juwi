@@ -64,12 +64,15 @@ class Tvshow < ActiveRecord::Base
     require 'xdb_helper'
     xep = XdbEpisodeHelper.new(xdb_id)
     episodes.each do |ep|
-      puts "#{ep.season_num} - #{ep.episode_num} - #{ep.title} - #{xep.get_id(ep.season_num, ep.episode_num)} - #{xep.get_filename(ep.season_num, ep.episode_num)}"
       ep.update_attributes(
         :xdb_id => xep.get_id(ep.season_num, ep.episode_num),
         :filename => xep.get_filename(ep.season_num, ep.episode_num)
       )
     end
+  end
+
+  def sync_episode
+    
   end
 
   def create_series_folder
@@ -85,20 +88,45 @@ class Tvshow < ActiveRecord::Base
     create_series_folder
   end
 
-
-  def self.create_new_show(ttdb_id)
-    puts "getting zip"
-    TtdbHelper.get_zip_from_ttdb(ttdb_id)
-    puts "updating ttdb show data for #{ttdb_id}"
-    Tvshow.update_ttdb_show_data(ttdb_id)
-    puts "updating ttdb episode data"
-    Tvshow.update_all_ttdb_episode_data(ttdb_id)
-    #puts "updating tvr information"
-    #Tvshow.update_tvrage_data(ttdb_id)
-    current_show = Tvshow.find_by_ttdb_id(ttdb_id)
-    directory_name = File.join(Setting.get_value('tvshow_base_path'), current_show.title)
-    Dir.mkdir(directory_name) unless File.directory?(directory_name)
+  def update_latest_episode
+    l_episode = episodes.where("airdate <= ?", Date.today).order(:airdate).last
+    if l_episode.nil?
+      update_attributes(
+        :latest_episode => nil,
+        :latest_episode_date => nil
+      )
+    else
+      update_attributes(
+        :latest_episode => l_episode.id,
+        :latest_episode_date => l_episode.airdate
+      )
+    end
   end
+
+  def update_next_episode
+    if status == "Ended"
+      update_attributes(
+        :next_episode => nil,
+        :next_episode_date => nil
+      )
+      return
+    end
+    n_episode = episodes.where("airdate >= ?", Date.today).order(:airdate).first
+    if n_episode.nil?
+      update_attributes(
+        :next_episode => nil,
+        :next_episode_date => nil
+      )
+    else
+      update_attributes(
+        :next_episode => n_episode.id,
+        :next_episode_date => n_episode.airdate
+      )
+    end
+  end
+end
+
+=begin
 
   def self.create_and_sync_new_show(ttdb_id)
     puts "getting zip"
@@ -253,48 +281,10 @@ class Tvshow < ActiveRecord::Base
     )
   end
 
-  def update_latest_episode
-    latest_episode = episodes.where("airdate <= ?", Date.today).order(:airdate).last
-    update_attributes(
-      :latest_episode_date => latest_episode.airdate,
-      :latest_season_number => latest_episode.season_num,
-      :latest_episode_number => latest_episode.episode_num,
-      :latest_episode_title => latest_episode.title
-    ) unless latest_episode.nil?
-  end
-
-  def update_next_episode
-      if status == "ended"
-        update_attributes(
-          :next_episode_date => nil,
-          :latest_season_number => nil,
-          :latest_episode_number => nil,
-          :latest_episode_title => nil
-        )
-      end
-      next_episode = episodes.where("airdate >= ?", Date.today).order(:airdate).first
-      if next_episode.nil?
-        update_attributes(
-          :next_episode_date => nil,
-          :latest_season_number => nil,
-          :latest_episode_number => nil,
-          :next_episode_title => "TBA"
-        )
-      else
-        update_attributes(
-          :next_episode_date => next_episode.airdate,
-          :latest_season_number => next_episode.season_num,
-          :latest_episode_number => next_episode.episode_num,
-          :next_episode_title => next_episode.title
-        )
-      end
-    end
-end
-
 ###########
 #TVR Stuff#
 ###########
-=begin
+
 def self.update_tvrage_data(ttdb_id)
   current_show = Tvshow.find_by_ttdb_id(ttdb_id)
   title = current_show.clean_title

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150928145420) do
+ActiveRecord::Schema.define(:version => 20150929191133) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -104,14 +104,6 @@ ActiveRecord::Schema.define(:version => 20150928145420) do
     t.integer  "xdb_id"
     t.string   "title"
     t.integer  "tvr_id"
-    t.integer  "latest_season_number"
-    t.integer  "latest_episode_number"
-    t.string   "latest_episode_title"
-    t.date     "latest_episode_date"
-    t.integer  "next_season_number"
-    t.integer  "next_episode_number"
-    t.string   "next_episode_title"
-    t.date     "next_episode_date"
     t.string   "tvr_url"
     t.date     "first_aired"
     t.date     "end_date"
@@ -126,10 +118,14 @@ ActiveRecord::Schema.define(:version => 20150928145420) do
     t.integer  "rating_count"
     t.string   "network"
     t.integer  "runtime"
-    t.datetime "created_at",            :null => false
-    t.datetime "updated_at",            :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
     t.text     "clean_title"
     t.integer  "tvmaze_id"
+    t.integer  "latest_episode"
+    t.integer  "next_episode"
+    t.date     "next_episode_date"
+    t.date     "latest_episode_date"
   end
 
 end

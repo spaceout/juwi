@@ -11,4 +11,4 @@
       %tr
         %td= link_to(tvshow.title, tvshow)
         %td= tvshow.status
-        %td= if tvshow.next_episode_date == nil then "TBD" else "#{tvshow.next_episode_date}" end
+        %td= if ((tvshow.next_episode_date == nil) && (tvshow.status == "Continuing")) then "TBD" else tvshow.next_episode_date end

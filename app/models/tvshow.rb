@@ -57,22 +57,20 @@ class Tvshow < ActiveRecord::Base
         :ttdb_id => episode['seriesid'],
         :airdate => episode['FirstAired']
       )
+      update_next_episode
+      update_latest_episode
     end
   end
 
   def sync_episodes
     require 'xdb_helper'
-    xep = XdbEpisodeHelper.new(xdb_id)
+    xep = XdbEpisodesHelper.new(xdb_id)
     episodes.each do |ep|
       ep.update_attributes(
         :xdb_id => xep.get_id(ep.season_num, ep.episode_num),
         :filename => xep.get_filename(ep.season_num, ep.episode_num)
       )
     end
-  end
-
-  def sync_episode
-
   end
 
   def create_series_folder

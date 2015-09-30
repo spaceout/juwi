@@ -30,7 +30,7 @@ class XdbSeriesHelper
 
 end
 
-class XdbEpisodeHelper
+class XdbEpisodesHelper
   def initialize(xdb_show_id)
     @xdb_show_id = xdb_show_id
     load_xdb_episodes
@@ -66,5 +66,54 @@ class XdbEpisodeHelper
       return filename
     end
     return nil
+  end
+end
+
+class XdbEpisodeHelper
+  def initialize(xdb_episode_id)
+    @xdb_episode_id = xdb_episode_id
+    load_episode_data
+  end
+
+  def load_episode_data
+    xbmcdb ||= Sequel.connect(Setting.get_value('xbmcdb'))
+    @xdb_episode = xbmcdb[:episodeview].where(:idEpisode => @xdb_episode_id).first
+    xbmcdb.disconnect
+  end
+
+  def get_id
+    return @xdb_episode_id
+  end
+
+  def get_filename
+    filename = @xdb_episode[:strFileName]
+  end
+
+  def get_season_num
+    season_num = @xdb_episode[:c12]
+  end
+
+  def get_episode_num
+    episode_num = @xdb_episode[:c13]
+  end
+
+  def get_show_id
+    show_id = @xdb_episode[:idShow]
+  end
+
+end
+
+class XdbHelper
+  def self.get_all_ep_ids
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xdb_episode_ids = xbmcdb[:episodeview].select_map(:idEpisode)
+    xbmcdb.disconnect
+    return xdb_episode_ids
+  end
+  def self.get_all_show_ids
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xdb_show_ids = xbmcdb[:tvshowview].select_map(:idShow)
+    xbmcdb.disconnect
+    return xdb_show_ids
   end
 end

@@ -9,18 +9,20 @@ namespace :ttdb do
     puts "Updating #{update_set.count} Series"
     progressbar = ProgressBar.create(:title => "TTDB Update", :total => update_set.count)
     update_set.each do |ttdb_id|
-      Tvshow.update_all_ttdb_data(ttdb_id)
+      show = Tvshow.find_by_ttdb_id(ttdb_id)
+      show.update_show
       progressbar.increment
     end
     #progressbar.finish
     Setting.set_value("ttdb_last_scrape", TtdbHelper.get_time_from_ttdb)
   end
+
   namespace :update do
     desc "Update all TTDB data for all shows"
     task :all => :environment do
       Tvshow.all.each do |tvshow|
         puts "updating ttdbdata for #{tvshow.title}"
-        Tvshow.update_all_ttdb_data(tvshow.ttdb_id)
+        tvshow.update_show
       end
     end
   end

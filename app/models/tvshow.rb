@@ -72,7 +72,7 @@ class Tvshow < ActiveRecord::Base
   end
 
   def sync_episode
-    
+
   end
 
   def create_series_folder
@@ -86,6 +86,13 @@ class Tvshow < ActiveRecord::Base
     update_episode_data
     sync_episodes
     create_series_folder
+  end
+
+  def update_show
+    update_series_data
+    sync_series
+    update_episode_data
+    sync_episodes
   end
 
   def update_latest_episode

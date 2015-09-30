@@ -1,3 +1,4 @@
+namespace :jdb do
   desc "This gets all new additions from XDB as well as removes shows from JDB that have been removed from XDB"
   task :update => :environment do
     require 'jdb_helper'
@@ -78,22 +79,6 @@
         Tvshow.update_xdb_episode_data(episode[:idEpisode])
       end
     end
-    xbmcdb.disconnect
-  end
-
-  desc "This will populate the data from cache zip files"
-  task :import_data => :environment do
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
-    xdbtvshows = xbmcdb[:tvshow]
-    xdbepisodes = xbmcdb[:episode]
-    ttdbtime = TtdbHelper.get_time_from_ttdb
-    xdbtvshows.each do |show|
-     Tvshow.create_and_sync_new_show(show[:c12])
-    end
-    Setting.set_value("last_xdb_id", xdbtvshows.order(:idShow).last[:idShow])
-    Setting.set_value("last_xdb_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
-    Setting.set_value("xdb_last_scrape", DateTime.current)
-    Setting.set_value("ttdb_last_scrape", ttdbtime)
     xbmcdb.disconnect
   end
 

@@ -60,7 +60,7 @@ class FileManipulator
   end
 
   #Process the finished directory rars/move/delete
-  def self.process_finished_directory(base_path, min_videosize)
+  def self.process_finished_directory(base_path = Setting.get_value("finished_path"), min_videosize = Setting.get_value("min_videosize").to_i)
     puts "Procesing Directory"
     Dir.chdir(base_path)
     Dir.glob("*").each do |dir_entry|

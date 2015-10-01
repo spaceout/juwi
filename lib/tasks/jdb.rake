@@ -91,4 +91,18 @@ namespace :jdb do
       tvshow.update_latest_episode
     end
   end
+
+  desc "this will process the files in the finished folder *BREAKS TORRENT TRACKER*"
+  task :process_finished => :environment do
+    require 'file_manipulator'
+    require 're_namer'
+    FileManipulator.process_finished_directory
+    Dir.chdir(Setting.get_value("finished_path"))
+    video_extensions = Setting.get_value("video_extensions").gsub('.','')
+    Dir.glob("*.{#{video_extensions}}").each do |dir_entry|
+      puts dir_entry
+      Renamer.process_file(dir_entry)
+    end
+  end
+  
 end

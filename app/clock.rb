@@ -12,7 +12,7 @@ module Clockwork
   # end
 
   every(10.seconds,'Poll Transmission') {Torrent.delay(:queue => 'xmission').xmission_poller}
-  #every(1.day, :at => '01:00'){Update TTDB}
+  every(1.day, :at => '01:00'){Tvshow.update_all}
   #every(1.day, :at => '02:00'){Update latest/next episode}
   #every(1.day, :at => '03:00'){do some more shit}
 end

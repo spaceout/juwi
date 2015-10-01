@@ -67,12 +67,8 @@ class Renamer
     end
   end
 
-  def self.rename(dirty_name, attempt = 1)
-    if attempt == 2
-      puts "second try"
-    end
+  def self.rename(dirty_name)
     match_data = /^((?:The.100)|(?:.+?)(?:.20[01][0-9].?)?).s?(\d{1,2})e?x?(\d\d)/i.match(dirty_name.gsub("720p", ""))
-    #enable overwriting if it is a repack
     overwrite_enable = false
     if /repack|proper/i.match(dirty_name)
       puts "REPACK FOUND, OVERWRITE ENABLED"
@@ -92,25 +88,12 @@ class Renamer
         matched_show_title = tvshow.first.title.gsub(":", '')
         matched_episode = Episode.where("season_num = ? AND episode_num = ? AND ttdb_id = ?", season_number, episode_number, match_ttdb_id).reload
         if matched_episode.empty?
-          puts "No Matched Episode for: #{matched_show_title} - s#{season_number}e#{episode_number} checking ttdb"
-          if attempt == 1
-            JdbHelper.update_show(tvshow.first.title)
-            Renamer.rename(dirty_name, 2)
-          elsif attempt == 2
-            puts "No Episode Found for: #{matched_show_title} - s#{season_number}e#{episode_number}"
-            return {:failure => {:reason => "episode not found"}}
-          end
+          puts "No Matched Episode for: #{matched_show_title} - s#{season_number}e#{episode_number}"
+          return {:failure => {:reason => "episode not found"}}
         else
           matched_episode_title = matched_episode.first.title.gsub(/[?"\/':]/,'').gsub('’','\'')
-          if matched_episode_title == "TBA"
-            puts "TBA FOUND!"
-            if attempt == 1
-              JdbHelper.update_show(tvshow.first.title)
-              Renamer.rename(dirty_name, 2)
-            end
-          end
-        rename_to = matched_show_title  +  " - s" '%02d' % season_number + "e" + '%02d' % episode_number + " - " + matched_episode_title
-        return {:success => {:new_name => rename_to, :overwrite_enable => overwrite_enable}}
+          rename_to = matched_show_title  +  " - s" '%02d' % season_number + "e" + '%02d' % episode_number + " - " + matched_episode_title
+          return {:success => {:new_name => rename_to, :overwrite_enable => overwrite_enable}}
         end
       else
         puts "Show Not found #{clean_show_title}"

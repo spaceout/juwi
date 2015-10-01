@@ -57,9 +57,9 @@ class Tvshow < ActiveRecord::Base
         :ttdb_id => episode['seriesid'],
         :airdate => episode['FirstAired']
       )
-      update_next_episode
-      update_latest_episode
     end
+    update_next_episode
+    update_latest_episode
   end
 
   def sync_episodes
@@ -129,6 +129,14 @@ class Tvshow < ActiveRecord::Base
       )
     end
   end
+
+  def self.update_all
+    Tvshow.all.each do |tvshow|
+      next if tvshow.status == "Ended"
+      tvshow.delay(:queue => 'tvshow').update_show
+    end
+  end
+
 end
 
 =begin

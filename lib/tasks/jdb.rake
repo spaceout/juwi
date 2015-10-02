@@ -10,7 +10,6 @@ namespace :jdb do
     last_xdb_episode_id = Setting.get_value("last_xdb_episode_id")
     last_xdb_show_id = Setting.get_value("last_xdb_show_id")
 
-    #Search for new XDB series
     puts "Searching for new Shows in XDB"
     new_shows = xdbtvshows.where("idShow > #{last_xdb_show_id}")
     unless new_shows.empty?
@@ -21,7 +20,6 @@ namespace :jdb do
     end
     Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
 
-    #Search and sync newly added XDB episodes
     puts "Searching for new episodes in XDB"
     new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
     unless new_episodes.empty?
@@ -32,7 +30,6 @@ namespace :jdb do
     end
     Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
 
-    #Remove shows deleted from XBMC
     puts "Checking for removed TV Shows"
     jdb_show_ids = Tvshow.pluck(:xdb_id)
     xdb_show_ids =  XdbHelper.get_all_show_ids
@@ -41,7 +38,6 @@ namespace :jdb do
       Tvshow.find_by_xdb_id(xdbid).destroy
     end
 
-    #Remove episodes deleted from XBMC
     puts "Checking for removed Episodes"
     jdb_ep_ids = Episode.where("xdb_id IS NOT NULL").pluck(:xdb_id)
     xdb_ep_ids = XdbHelper.get_all_ep_ids
@@ -104,23 +100,5 @@ namespace :jdb do
       Renamer.process_file(dir_entry)
     end
   end
-
-
-  desc "fuck string encoding"
-  task :fuck_encoding => :environment do
-    blerm = []
-    Episode.all.each do |episode|
-      filename = episode.xdb_episode_location
-      next if filename.nil?
-      filename.force_encoding "utf-8"
-      unless filename.valid_encoding?
-        puts "#{episode.id} is stupid, see? -> #{episode.xdb_episode_location}"
-        episode.update_attributes(:xdb_episode_location => nil)
-      end
-    end
-  end
-
-
-
 
 end

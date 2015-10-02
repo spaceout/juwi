@@ -4,10 +4,12 @@ namespace :ttdb do
 
   desc "This updates TTDB data for all shows that have changed since last checkin with TTDB"
   task :update => :environment do
+    require 'ttdb_helper'
+    require 'ruby-progressbar'
     puts "Getting updates XML from ttdb"
     update_set = TtdbHelper.get_updates_from_ttdb
     puts "Updating #{update_set.count} Series"
-    progressbar = ProgressBar.create(:title => "TTDB Update", :total => update_set.count)
+    progressbar = ProgressBar.create(:title => "Updating Data", :total => update_set.count)
     update_set.each do |ttdb_id|
       show = Tvshow.find_by_ttdb_id(ttdb_id)
       show.update_show
@@ -20,10 +22,15 @@ namespace :ttdb do
   namespace :update do
     desc "Update all TTDB data for all shows"
     task :all => :environment do
+      require 'ttdb_helper'
+      require 'ruby-progressbar'
+      progressbar = ProgressBar.create(:title => "Updating Data", :total => Tvshow.all.count)
       Tvshow.all.each do |tvshow|
         puts "updating ttdbdata for #{tvshow.title}"
         tvshow.update_show
+        progressbar.increment
       end
+      Setting.set_value("ttdb_last_scrape", TtdbHelper.get_time_from_ttdb)
     end
   end
 

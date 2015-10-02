@@ -13,6 +13,12 @@ module Clockwork
 
   every(10.seconds,'Poll Transmission') {Torrent.delay(:queue => 'xmission').xmission_poller}
   every(1.day, :at => '01:00'){Tvshow.update_all}
-  #every(1.day, :at => '02:00'){Update latest/next episode}
-  #every(1.day, :at => '03:00'){do some more shit}
+  every(1.day, :at => '06:00') do
+    require 'xbmc_api'
+    XbmcApi.compose_command("VideoLibrary.Scan")
+  end
+  every(1.day, :at => '06:15') do
+    require 'jdb_helper'
+    JdbHelper.sync_xdb_to_jdb
+  end
 end

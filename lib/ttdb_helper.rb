@@ -128,6 +128,19 @@ class TtdbHelper
     return result_set
   end
 
+  def self.get_all_images(tvshow)
+    if tvshow.banner != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
+    end
+    if tvshow.fanart != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_fanart.jpg"))
+    end
+    if tvshow.poster != nil
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_poster.jpg"))
+    end
+  end
+end
+=begin
   def self.ttdb_xml_show_data(zipfile, insidefile)
     data = nil
     begin
@@ -218,15 +231,5 @@ class TtdbHelper
     return data
   end
 
-  def self.get_all_images(tvshow)
-    if tvshow.banner != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
-    end
-    if tvshow.fanart != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_fanart.jpg"))
-    end
-    if tvshow.poster != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_poster.jpg"))
-    end
-  end
-end
+
+=end

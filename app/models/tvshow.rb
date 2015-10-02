@@ -1,6 +1,5 @@
 require 'ttdb_helper'
 require 'scrubber'
-require 'tvr_helper'
 require 'jdb_helper'
 require 'xdb_helper'
 

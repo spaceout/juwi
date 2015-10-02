@@ -104,5 +104,23 @@ namespace :jdb do
       Renamer.process_file(dir_entry)
     end
   end
-  
+
+
+  desc "fuck string encoding"
+  task :fuck_encoding => :environment do
+    blerm = []
+    Episode.all.each do |episode|
+      filename = episode.xdb_episode_location
+      next if filename.nil?
+      filename.force_encoding "utf-8"
+      unless filename.valid_encoding?
+        puts "#{episode.id} is stupid, see? -> #{episode.xdb_episode_location}"
+        episode.update_attributes(:xdb_episode_location => nil)
+      end
+    end
+  end
+
+
+
+
 end

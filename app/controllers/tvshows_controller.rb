@@ -28,10 +28,10 @@ class TvshowsController < ApplicationController
   end
 
   def update
-    require 'tvr_helper'
+    #require 'tvr_helper'
     @tvshow = Tvshow.find(params[:id])
     if @tvshow.update_attributes(params[:tvshow])
-      TvrHelper.update_tvrage_data(@tvshow.ttdb_id)
+      #TvrHelper.update_tvrage_data(@tvshow.ttdb_id)
       flash[:notice] = "TV Show Updated"
     else
       flash[:alert] = "Couldn't Update TV Show, fucker"

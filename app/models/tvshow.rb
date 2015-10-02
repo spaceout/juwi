@@ -41,6 +41,7 @@ class Tvshow < ActiveRecord::Base
   def update_episode_data
     show_data = TtdbHelper.new(ttdb_id)
     episode_data = show_data.episodes
+    updated_ep_ids = []
     episode_data.each do |episode|
       jdb_episode = episodes.where(
         season_num: episode['SeasonNumber'],
@@ -56,6 +57,12 @@ class Tvshow < ActiveRecord::Base
         :ttdb_id => episode['seriesid'],
         :airdate => episode['FirstAired']
       )
+      updated_ep_ids.push(jdb_episode.id)
+    end
+    all_ep_ids = episodes.pluck(:id)
+    removed_ep_ids = all_ep_ids - updated_ep_ids
+    removed_ep_ids.each do |ep|
+      ep.destroy
     end
     update_next_episode
     update_latest_episode

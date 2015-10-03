@@ -46,7 +46,9 @@ class JdbHelper
     unless new_shows.empty?
       new_shows.each do |show|
         ttdb_id = show[:c12]
-        Tvshow.find_or_initialize_by_ttdb_id(ttdb_id).create_new_show
+        new_show = Tvshow.find_or_initialize_by_ttdb_id(ttdb_id)
+        new_show.create_new_show
+        puts "Found New Show: #{new_show.title}"
       end
     end
     Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
@@ -56,7 +58,14 @@ class JdbHelper
     unless new_episodes.empty?
       new_episodes.each do |episode|
         ep = Tvshow.find_by_xdb_id(episode[:idShow]).episodes.where(:season_num => episode[:c12], :episode_num => episode[:c13]).first
-        ep.sync(episode[:idEpisode])
+        if ep.nil?
+          puts "problem syncing episode xdbID: #{episode[:idEpisode]}"
+          next
+        else
+          ep.sync(episode[:idEpisode])
+        end
+        print "Found New Episode: "
+        puts ep.tvshow.title + " - " + "s" '%02d' % ep.season_num + "e" + '%02d' % ep.episode_num + " - " + ep.title
       end
     end
     Setting.set_value("last_xdb_episode_id", xdbepisodes.order(:idEpisode).last[:idEpisode])
@@ -66,7 +75,9 @@ class JdbHelper
     xdb_show_ids =  XdbHelper.get_all_show_ids
     removed_show_ids = jdb_show_ids - xdb_show_ids
     removed_show_ids.each do |xdbid|
-      Tvshow.find_by_xdb_id(xdbid).destroy
+      tvshow = Tvshow.find_by_xdb_id(xdbid)
+      puts "Removing Show: #{tvshow.title}"
+      tvshow.destroy
     end
 
     puts "Checking for removed Episodes"
@@ -75,7 +86,8 @@ class JdbHelper
     removed_ep_ids = jdb_ep_ids - xdb_ep_ids
     removed_ep_ids.each do |xdbid|
       rem_ep = Episode.find_by_xdb_id(xdbid)
-      puts "clearing XDB info on #{episode.tvshow.title} - #{episode.season_num} #{episode.episode_num}"
+      print "Clearing XDB info on: "
+      puts rem_ep.tvshow.title + " - " + "s" '%02d' % rem_ep.season_num + "e" + '%02d' % rem_ep.episode_num + " - " + rem_ep.title
       rem_ep.clear_sync
     end
     xbmcdb.disconnect

@@ -117,6 +117,7 @@ class TorrentsController < ApplicationController
   # DELETE /torrents/1.json
   def destroy
     @torrent = Torrent.find(params[:id])
+    @torrent.cleanup_torrent_files
     @torrent.destroy
 
     respond_to do |format|

@@ -32,6 +32,7 @@ class JdbHelper
   end
 
   def self.sync_xdb_to_jdb
+    require 'xdb_helper'
     require 'jdb_helper'
     require 'ttdb_helper'
 
@@ -40,6 +41,17 @@ class JdbHelper
     xdbepisodes = xbmcdb[:episode]
     last_xdb_episode_id = Setting.get_value("last_xdb_episode_id")
     last_xdb_show_id = Setting.get_value("last_xdb_show_id")
+
+    #pluckify with xdb_helper
+    xdb_shows = XdbHelper.get_all_show_ids
+    xdb_eps = XdbHelper.get_all_ep_ids
+    jdb_shows = Tvshow.pluck(:xdb_id)
+    jdb_eps = Episode.where("xdb_id IS NOT NULL").pluck(:xdb_id)
+
+    new_shows = xdb_shows - jdb_shows
+    removed_shows = jdb_shows - xdb_shows
+    new_eps = xdb_eps - jdb_eps
+    removed_eps = jdb_eps - xdb_eps
 
     puts "Searching for new Shows in XDB"
     new_shows = xdbtvshows.where("idShow > #{last_xdb_show_id}")
@@ -54,7 +66,6 @@ class JdbHelper
     Setting.set_value("last_xdb_show_id", xdbtvshows.order(:idShow).last[:idShow])
 
     puts "Searching for new episodes in XDB"
-    new_episodes = xdbepisodes.where("idEpisode > #{last_xdb_episode_id}")
     unless new_episodes.empty?
       new_episodes.each do |episode|
         ep = Tvshow.find_by_xdb_id(episode[:idShow]).episodes.where(:season_num => episode[:c12], :episode_num => episode[:c13]).first

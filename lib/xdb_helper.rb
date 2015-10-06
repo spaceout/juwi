@@ -101,6 +101,10 @@ class XdbEpisodeHelper
     show_id = @xdb_episode[:idShow]
   end
 
+  def self.get_ttdb_id(xdb_id)
+
+  end
+
 end
 
 class XdbHelper
@@ -110,10 +114,18 @@ class XdbHelper
     xbmcdb.disconnect
     return xdb_episode_ids
   end
+
   def self.get_all_show_ids
     xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
     xdb_show_ids = xbmcdb[:tvshowview].select_map(:idShow)
     xbmcdb.disconnect
     return xdb_show_ids
+  end
+
+  def self.get_all_show_ttdb_ids
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xdb_show_ttdb_ids = xbmcdb[:tvshowview].select_map(:c12).map(&:to_i)
+    xbmcdb.disconnect
+    return xdb_show_ttdb_ids
   end
 end

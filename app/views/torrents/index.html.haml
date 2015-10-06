@@ -3,6 +3,7 @@
 %table.table.table-hover
   %thead
     %tr
+      %th Started
       %th Name
       %th Status
       %th Size
@@ -13,6 +14,7 @@
   %tbody
     - @torrents.each do |torrent|
       %tr{class: rename_status_tag(torrent)}
+        %td= torrent.time_started.strftime("%Y-%m-%d %I:%M%p")
         %td= link_to torrent.name, torrent
         %td= torrent.status_to_s
         %td= Filesize.from("#{torrent.size} B").pretty

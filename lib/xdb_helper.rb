@@ -128,4 +128,11 @@ class XdbHelper
     xbmcdb.disconnect
     return xdb_show_ttdb_ids
   end
+
+  def self.get_multiple_ep_data(ep_ids)
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    ep_data = xbmcdb[:episodeview].where(:idEpisode => ep_ids).all
+    xbmcdb.disconnect
+    return ep_data
+  end
 end

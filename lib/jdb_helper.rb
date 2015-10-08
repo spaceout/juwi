@@ -39,10 +39,13 @@ class JdbHelper
     xdb_eps = XdbHelper.get_all_ep_ids
     jdb_shows = Tvshow.pluck(:ttdb_id)
     jdb_eps = Episode.where("xdb_id IS NOT NULL").pluck(:xdb_id)
+
     new_shows = xdb_shows - jdb_shows
     removed_shows = jdb_shows - xdb_shows
     new_eps = xdb_eps - jdb_eps
     removed_eps = jdb_eps - xdb_eps
+
+    new_eps_data = XdbHelper.get_multiple_ep_data(new_eps) unless new_eps.nil?
 
     puts "Searching for new Shows in XDB"
     unless new_shows.empty?
@@ -54,14 +57,14 @@ class JdbHelper
     end
     puts "Searching for new episodes in XDB"
     unless new_eps.empty?
-      new_eps.each do |ep|
-        xep = XdbEpisodeHelper.new(ep)
-        episode = Tvshow.find_by_xdb_id(xep.get_show_id).episodes.where(:season_num => xep.get_season_num, :episode_num => xep.get_episode_num).first
+
+      new_eps_data.each do |ep|
+        episode = Tvshow.find_by_xdb_id(ep[:idShow]).episodes.where(:season_num => ep[:c12], :episode_num => ep[:c13]).first
         if episode.nil?
           puts "Couldnt Find Episode xdbID: #{ep}"
           next
         else
-          episode.sync(ep)
+          episode.sync(ep[:idEpisode])
         end
         print "Found New Episode: "
         puts episode.tvshow.title + " - " + "s" '%02d' % episode.season_num + "e" + '%02d' % episode.episode_num + " - " + episode.title
@@ -76,14 +79,21 @@ class JdbHelper
     puts "Checking for removed Episodes"
     removed_eps.each do |xdb_id|
       rem_ep = Episode.find_by_xdb_id(xdb_id)
-      print "Clearing XDB info on: "
+      print "Clearing XDB Ep #{rem_ep} info on: "
       puts rem_ep.tvshow.title + " - " + "s" '%02d' % rem_ep.season_num + "e" + '%02d' % rem_ep.episode_num + " - " + rem_ep.title
       rem_ep.clear_sync
     end
   end
 
   def self.populate
-
+    require 'xdb_helper'
+    allshows = XdbHelper.get_all_show_ttdb_ids
+    allshows.each do |show|
+      new_show = Tvshow.find_or_initialize_by_ttdb_id(show)
+      new_show.save
+      new_show.delay.update_show
+      puts new_show.title
+    end
   end
 
 end

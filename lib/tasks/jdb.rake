@@ -56,4 +56,10 @@ namespace :jdb do
     end
   end
 
+  desc "This does initial population of the DB based on contents of XBMC"
+  task :populate => :environment do
+    require 'jdb_helper'
+    JdbHelper.populate
+  end
+
 end

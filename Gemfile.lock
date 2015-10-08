@@ -89,6 +89,7 @@ GEM
     multi_json (1.6.1)
     multi_xml (0.5.3)
     mysql (2.9.1)
+    mysql2 (0.3.20)
     polyglot (0.3.3)
     rack (1.4.5)
     rack-cache (1.2)
@@ -166,6 +167,7 @@ DEPENDENCIES
   jquery-rails
   json
   mysql
+  mysql2 (~> 0.3.20)
   rails (= 3.2.12)
   ruby-progressbar
   rubyzip

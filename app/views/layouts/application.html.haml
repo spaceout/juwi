@@ -1,0 +1,19 @@
+!!!
+%html
+  %head
+    %meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}
+    - hostname = `hostname`.strip
+    %title= content_for?(:title) ? yield(:title) : "JUWI - #{hostname}"
+    = stylesheet_link_tag "application", :media => "all"
+    = csrf_meta_tags
+    = javascript_include_tag "application"
+  %body
+    = render "layouts/navigation"
+    .container
+      .content
+        .row
+          .col-xs-12
+            -#= render 'admin/layouts/flash'
+            = yield
+      .footer
+        = render "layouts/footer"

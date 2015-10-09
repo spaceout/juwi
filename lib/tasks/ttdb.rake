@@ -2,24 +2,38 @@ namespace :ttdb do
   require 'ttdb_helper'
   require 'ruby-progressbar'
 
-  desc "This updates TTDB data for all shows"
+  desc "This updates TTDB data for all non-ended shows"
   task :update => :environment do
-    puts "Getting updates XML from ttdb"
-    update_set = TtdbHelper.get_updates_from_ttdb
-    puts "Updating #{update_set.count} Series"
-    progressbar = ProgressBar.create(:title => "TTDB Update", :total => update_set.count)
-    update_set.each do |ttdb_show_id|
-      Tvshow.update_all_ttdb_data(ttdb_show_id)
+    require 'ttdb_helper'
+    require 'ruby-progressbar'
+    progressbar = ProgressBar.create(:title => "Updating Data", :total => Tvshow.all.count)
+    Tvshow.all.each do |tvshow|
       progressbar.increment
+      next if tvshow.status == "Ended"
+      tvshow.delay.update_show
     end
-    #progressbar.finish
-    Setting.set_value("ttdb_last_scrape", TtdbHelper.get_time_from_ttdb)
   end
+
+  namespace :update do
+    desc "Update all TTDB data for all shows"
+    task :all => :environment do
+      require 'ttdb_helper'
+      require 'ruby-progressbar'
+      progressbar = ProgressBar.create(:title => "Updating Data", :total => Tvshow.all.count)
+      Tvshow.all.each do |tvshow|
+        puts "updating ttdbdata for #{tvshow.title}"
+        tvshow.delay.update_show
+        progressbar.increment
+      end
+      Setting.set_value("ttdb_last_scrape", TtdbHelper.get_time_from_ttdb)
+    end
+  end
+
 
   desc "This will download all images for current tvshows"
   task :get_images => :environment do
     Tvshow.all.each do |tvshow|
-      next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_show_id}_banner.jpg"))
+      next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
       TtdbHelper.get_all_images(tvshow)
     end
   end

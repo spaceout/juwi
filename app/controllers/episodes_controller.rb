@@ -2,7 +2,7 @@ class EpisodesController < ApplicationController
   # GET /tvshow/:tvshow_id/episodes
   def index
     @tvshow = Tvshow.find(params[:tvshow_id])
-    @episodes = @tvshow.episodes.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
+    @episodes = @tvshow.episodes.where("season_num > 0 AND airdate < ?", DateTime.now)
   end
 
   def missing

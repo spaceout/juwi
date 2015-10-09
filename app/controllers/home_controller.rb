@@ -1,23 +1,12 @@
 class HomeController < ApplicationController
   def index
-    require 'xmission_api'
     require 'file_manipulator'
-    require 'xbmc_daemon'
-    @tvshows = Tvshow.all.sort_by(&:ttdb_show_title)
-    @episodes = Episode.where("ttdb_season_number > 0 AND ttdb_episode_airdate < ?", DateTime.now)
+    @tvshows = Tvshow.all.sort_by(&:title)
+    @episodes = Episode.where("season_num > 0 AND airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
-    @finished_dir = FileManipulator.list_dir(Setting.get_value("finished_path"))
-    xmission = XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url")
-    )
-    begin
-      @transmission_dls = xmission.all
-    rescue
-      @transmission_dls = nil
-    end
-    @xbmc_daemon_status = XbmcDaemon.status
+    @aired_yesterday = Episode.where(:airdate => Date.today.prev_day)
+    @airing_today = Episode.where(:airdate => Date.today)
+    @airing_tomorrow = Episode.where(:airdate => Date.today.next_day)
   end
 
   def rename
@@ -45,7 +34,7 @@ class HomeController < ApplicationController
       :url => Setting.get_value("transmission_url")
     )
     xmission.upload_link(params[:torrent], Setting.get_value("finished_dir"))
-    redirect_to '/'
+    redirect_to(:back)
   end
 
   def xbmc_update

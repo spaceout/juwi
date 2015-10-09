@@ -39,26 +39,26 @@ class XbmcApi
     end
   end
 
-  def self.add_episode(xdb_episode_id)
-    puts "Adding episode with XDBID #{xdb_episode_id}"
-    Tvshow.update_xdb_episode_data(xdb_episode_id)
+  def self.add_episode(xdb_id)
+    puts "Adding episode with XDBID #{xdb_id}"
+    Tvshow.update_xdb_episode_data(xdb_id)
   end
 
-  def self.remove_episode(xdb_episode_id)
-    episode = Episode.find_by_xdb_episode_id(xdb_episode_id)
-    puts "un-syncing #{episode.tvshow.ttdb_show_title} - s#{episode.ttdb_season_number}e#{episode.ttdb_episode_number}"
-    Tvshow.remove_xdb_episode_data(episode.ttdb_episode_id)
+  def self.remove_episode(xdb_id)
+    episode = Episode.find_by_xdb_id(xdb_id)
+    puts "un-syncing #{episode.tvshow.title} - s#{episode.season_num}e#{episode.episode_num}"
+    Tvshow.remove_xdb_episode_data(episode.ttdb_id)
   end
 
-  def self.add_tvshow(xdb_show_id)
-    puts "Adding new show with XDBID #{xdb_show_id}"
-    ttdb_show_id = JdbHelper.xdbid_to_ttdbid(xdb_show_id)
-    Tvshow.create_and_sync_new_show(ttdb_show_id)
+  def self.add_tvshow(xdb_id)
+    puts "Adding new show with XDBID #{xdb_id}"
+    ttdb_id = JdbHelper.xdbid_to_ttdbid(xdb_id)
+    Tvshow.create_and_sync_new_show(ttdb_id)
   end
 
-  def self.remove_tvshow(xdb_show_id)
-    tvshow = Tvshow.find_by_xdb_show_id(xdb_show_id)
-    puts "Destroying #{tvshow.ttdb_show_title} and all episodes"
+  def self.remove_tvshow(xdb_id)
+    tvshow = Tvshow.find_by_xdb_id(xdb_id)
+    puts "Destroying #{tvshow.title} and all episodes"
     tvshow.destroy
   end
 

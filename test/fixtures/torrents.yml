@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  hash_string: MyString
+  time_started: 2015-06-17 13:58:42
+  time_completed: 2015-06-17 13:58:42
+  name: MyString
+  size: 1
+  status: MyString
+  percent: 1
+  completed: false
+
+two:
+  hash_string: MyString
+  time_started: 2015-06-17 13:58:42
+  time_completed: 2015-06-17 13:58:42
+  name: MyString
+  size: 1
+  status: MyString
+  percent: 1
+  completed: false

@@ -1,0 +1,4 @@
+= form_for @tvshow, :html => {:class => "form"} do |f|
+  %h4= "Edit #{@tvshow.title}"
+  .form-group
+  =f.submit "Update TV Show", {:class => "btn btn-primary btn=sm"}

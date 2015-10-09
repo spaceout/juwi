@@ -1,0 +1,22 @@
+%h1 Listing tfiles
+
+%table.table.table-hover
+  %thead
+    %tr
+      %th Name
+      %th Length
+      %th Bytes completed
+      %th Rename status
+      %th Rename data
+      %th
+      %th
+      %th
+  %tbody
+  - @tfiles.each do |tfile|
+    %tr
+      %td= tfile.name
+      %td= Filesize.from("#{tfile.length} B").pretty
+      %td= Filesize.from("#{tfile.bytes_completed} B").pretty
+      %td= tfile.rename_status
+      %td= tfile.rename_data
+      %td= link_to 'Destroy', torrent_tfile_path(@torrent, tfile), :method => :delete, :data => { :confirm => 'Are you sure?' }

@@ -1,0 +1,33 @@
+<meta http-equiv="refresh" content="10" />
+%h1 Listing #{Torrent.count} Torrents
+%table.table.table-hover
+  %thead
+    %tr
+      %th Started
+      %th Name
+      %th Status
+      %th Size
+      %th Percent
+      %th Eta
+      %th
+
+  %tbody
+    - @torrents.each do |torrent|
+      %tr{class: rename_status_tag(torrent)}
+        %td= torrent.time_started.strftime("%Y-%m-%d %I:%M%p")
+        %td= link_to torrent.name, torrent
+        %td= torrent.status_to_s
+        %td= Filesize.from("#{torrent.size} B").pretty
+        %td= torrent.percent
+        - if torrent.completed
+          %td= "Complete"
+        - else
+          %td= torrent.pretty_eta
+        %td
+          - unless torrent.xmission_id.nil?
+            = link_to(start_torrent_path(torrent), method: "post", class: "btn btn-success btn-xs") do
+              %span.glyphicon.glyphicon-play
+            = link_to(stop_torrent_path(torrent), method: "post", class: "btn btn-primary btn-xs") do
+              %span.glyphicon.glyphicon-pause
+            = link_to(remove_torrent_path(torrent), method: "post", class: "btn btn-danger btn-xs") do
+              %span.glyphicon.glyphicon-remove

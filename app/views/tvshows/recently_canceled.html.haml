@@ -1,0 +1,14 @@
+%h3= "Listing #{@tvshows_recently_canceled.count} TV shows canceled in the past 6 months"
+
+%table.table.table-condensed.table-hover
+  %thead
+    %tr
+      %th= "Show Name"
+      %th= "Airing Status"
+      %th= "Last Episode"
+  %tbody
+    - @tvshows_recently_canceled.each do |tvshow|
+      %tr
+        %td= link_to(tvshow.title, tvshow)
+        %td= tvshow.status
+        %td= tvshow.latest_episode_date

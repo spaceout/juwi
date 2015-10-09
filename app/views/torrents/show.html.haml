@@ -1,0 +1,68 @@
+%p#notice= notice
+%p
+  %b Hash string:
+  = @torrent.hash_string
+%p
+  %b Time started:
+  = @torrent.time_started
+%p
+  %b Time completed:
+  = @torrent.time_completed
+%p
+  %b Name:
+  = @torrent.name
+%p
+  %b Size:
+  = Filesize.from("#{@torrent.size} B").pretty
+%p
+  %b Status:
+  = @torrent.status_to_s
+%p
+  %b Percent:
+  = @torrent.percent
+%p
+  %b Completed:
+  = @torrent.completed
+%p
+  %b Files:
+  %table.table.table-hover
+    %thead
+      %tr
+        %th Name
+        %th Size
+        %th Rename Data
+        %th
+    %tbody
+      - @torrent.tfiles.each do |torrent_file|
+        %tr{class: rename_status_tag(torrent_file)}
+          %td= torrent_file.name.split("/").last
+          %td= Filesize.from("#{torrent_file.length} B").pretty
+          %td
+            =torrent_file.rename_data
+          - if torrent_file.is_video_file? && torrent_file.rename_status == false
+            %td
+              = form_tag(rename_tfile_path(torrent_file.id), class: "form-inline") do
+                .form-group
+                  %input{:name => "new_name", :type => "text", :class => "form-control input-sm", placeholder: torrent_file.name}
+                  %button{:type => "submit", :class => "btn btn-primary btn-xs"} Rename
+                .checkbox
+                  %input{:name => "overwrite_enabled", :type => "checkbox", :class => "checkbox"} overwrite
+              - unless @unknown_show_title.nil?
+                =link_to "Search ttdb for #{@unknown_show_title}", ttdbsearch_path(show_title: @unknown_show_title), :class => "btn btn-primary btn-xs"
+          - else
+            %td
+%p
+  %b Rename Status:
+  =@torrent.rename_status
+%p
+  %b Eta:
+  =@torrent.pretty_eta
+%p
+  %b Xmission ID
+  =@torrent.xmission_id
+%p
+  %b Rate Download
+  =@torrent.rate_download
+
+=button_to 'Destroy', @torrent, :method => :delete, :data => { :confirm => 'Are you sure?' }, :class => "btn btn-primary btn-sm"
+= link_to 'Back', torrents_path

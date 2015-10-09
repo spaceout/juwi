@@ -1,4 +1,21 @@
 Juwi::Application.routes.draw do
+
+  resources :torrents do
+    get :active
+    member do
+      post :remove
+      post :start
+      post :stop
+      resources :tfiles do
+        member do
+          post :rename
+        end
+      end
+    end
+  end
+
+  resources :name_deviations
+
   match 'update' => 'home#update'
   match 'episodes' => 'all_episodes#index'
   match 'episodes/missing' => 'all_episodes#missing'

@@ -1,0 +1,28 @@
+
+%h3= @tvshow.title
+= image_tag("/images/#{@tvshow.ttdb_id}_banner.jpg", :alt => @tvshow.title)
+%br
+= @tvshow.overview
+%br
+%br
+= "Location - #{@tvshow.location}"
+%br
+= "XDB ID - #{@tvshow.xdb_id}"
+%br
+= "First Aired - #{@tvshow.first_aired}"
+%br
+= "Data Last Updated - #{@tvshow.ttdb_last_updated}"
+%br
+= "Airing Network - #{@tvshow.network}"
+%br
+= "Runtime - #{@tvshow.runtime}"
+%br
+="Latest Episode - #{@tvshow.episodes.find(@tvshow.latest_episode).title}"
+%br
+= link_to('TTDB URL', "http://thetvdb.com/?tab=series&id=#{@tvshow.ttdb_id}")
+|
+= link_to('Episodes', tvshow_episodes_path(@tvshow))
+|
+= link_to('Edit', edit_tvshow_path(@tvshow))
+|
+= link_to('Back', tvshows_path)

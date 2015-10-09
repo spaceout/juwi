@@ -6,8 +6,8 @@ gem 'rails', '3.2.12'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-
-
+gem 'mysql2', '~> 0.3.20'
+#gem 'activerecord-mysql2-adapter'
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -44,7 +44,13 @@ gem 'sequel'
 gem 'mysql'
 gem 'httparty'
 gem 'faye-websocket'
-gem 'daemons-rails'
+gem 'daemons'
 gem 'delayed_job_active_record'
 gem 'delayed_job_web'
 gem 'ruby-progressbar'
+gem 'bootstrap-sass', '~> 3.2.0'
+gem 'haml-rails'
+gem 'autoprefixer-rails'
+gem 'clockwork'
+gem 'filesize'
+gem 'god'

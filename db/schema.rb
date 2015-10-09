@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140126153310) do
+ActiveRecord::Schema.define(:version => 20150929191133) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -31,21 +31,21 @@ ActiveRecord::Schema.define(:version => 20140126153310) do
 
   create_table "episodes", :force => true do |t|
     t.integer  "tvshow_id"
-    t.integer  "xdb_episode_id"
-    t.string   "xdb_episode_location"
+    t.integer  "xdb_id"
+    t.string   "filename"
     t.integer  "xdb_show_id"
-    t.string   "ttdb_episode_title"
-    t.integer  "ttdb_season_number"
-    t.integer  "ttdb_episode_number"
-    t.integer  "ttdb_episode_id"
-    t.text     "ttdb_episode_overview"
-    t.integer  "ttdb_episode_last_updated"
+    t.string   "title"
+    t.integer  "season_num"
+    t.integer  "episode_num"
+    t.integer  "ttdb_id"
+    t.text     "overview"
+    t.integer  "ttdb_last_updated"
     t.integer  "ttdb_show_id"
-    t.date     "ttdb_episode_airdate"
-    t.string   "ttdb_episode_rating"
-    t.integer  "ttdb_episode_rating_count"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.date     "airdate"
+    t.string   "rating"
+    t.integer  "rating_count"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
     t.string   "state"
   end
 
@@ -68,39 +68,64 @@ ActiveRecord::Schema.define(:version => 20140126153310) do
     t.string   "notes"
   end
 
+  create_table "tfiles", :force => true do |t|
+    t.string   "name"
+    t.integer  "length"
+    t.integer  "bytes_completed"
+    t.boolean  "rename_status",   :limit => 255
+    t.string   "rename_data"
+    t.integer  "torrent_id"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
+
+  add_index "tfiles", ["torrent_id"], :name => "index_tfiles_on_torrent_id"
+
+  create_table "torrents", :force => true do |t|
+    t.string   "hash_string"
+    t.datetime "time_started"
+    t.datetime "time_completed"
+    t.string   "name"
+    t.integer  "size"
+    t.integer  "status",         :limit => 255
+    t.integer  "percent"
+    t.boolean  "completed"
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+    t.integer  "xmission_id"
+    t.integer  "rate_download"
+    t.integer  "eta"
+    t.boolean  "rename_status"
+  end
+
   create_table "tvshows", :force => true do |t|
-    t.integer  "ttdb_show_id"
-    t.string   "xdb_show_location"
-    t.integer  "xdb_show_id"
-    t.string   "ttdb_show_title"
-    t.integer  "tvr_show_id"
-    t.integer  "tvr_latest_season_number"
-    t.integer  "tvr_latest_episode_number"
-    t.string   "tvr_latest_episode_title"
-    t.date     "tvr_latest_episode_date"
-    t.integer  "tvr_next_season_number"
-    t.integer  "tvr_next_episode_number"
-    t.string   "tvr_next_episode_title"
-    t.date     "tvr_next_episode_date"
-    t.string   "tvr_show_url"
-    t.date     "tvr_show_started"
-    t.date     "tvr_show_ended"
-    t.string   "tvr_show_status"
-    t.string   "ttdb_show_imdb_id"
-    t.text     "ttdb_show_overview"
-    t.integer  "ttdb_show_last_updated"
-    t.string   "ttdb_show_banner"
-    t.string   "ttdb_show_fanart"
-    t.string   "ttdb_show_poster"
-    t.integer  "ttdb_show_rating"
-    t.integer  "ttdb_show_rating_count"
-    t.string   "ttdb_show_network"
-    t.string   "ttdb_show_status"
-    t.integer  "ttdb_show_runtime"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
-    t.text     "jdb_clean_show_title"
-    t.string   "tvr_search_name"
+    t.integer  "ttdb_id"
+    t.string   "location"
+    t.integer  "xdb_id"
+    t.string   "title"
+    t.integer  "tvr_id"
+    t.string   "tvr_url"
+    t.date     "first_aired"
+    t.date     "end_date"
+    t.string   "status"
+    t.string   "imdb_id"
+    t.text     "overview"
+    t.integer  "ttdb_last_updated"
+    t.string   "banner"
+    t.string   "fanart"
+    t.string   "poster"
+    t.integer  "rating"
+    t.integer  "rating_count"
+    t.string   "network"
+    t.integer  "runtime"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+    t.text     "clean_title"
+    t.integer  "tvmaze_id"
+    t.integer  "latest_episode"
+    t.integer  "next_episode"
+    t.date     "next_episode_date"
+    t.date     "latest_episode_date"
   end
 
 end

@@ -1,0 +1,34 @@
+= form_for @torrent do |f|
+  - if @torrent.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@torrent.errors.count, "error")} prohibited this torrent from being saved:"
+      %ul
+        - @torrent.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :hash_string
+    = f.text_field :hash_string
+  .field
+    = f.label :time_started
+    = f.datetime_select :time_started
+  .field
+    = f.label :time_completed
+    = f.datetime_select :time_completed
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :size
+    = f.number_field :size
+  .field
+    = f.label :status
+    = f.text_field :status
+  .field
+    = f.label :percent
+    = f.number_field :percent
+  .field
+    = f.label :completed
+    = f.check_box :completed
+  .actions
+    = f.submit 'Save'

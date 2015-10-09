@@ -1,6 +1,6 @@
 require 'httparty'
 require 'json'
-require "logger"
+require 'logger'
 
 class XmissionApi
   attr_accessor :session_id
@@ -9,7 +9,7 @@ class XmissionApi
   attr_accessor :fields
   attr_accessor :debug_mode
 
-  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir","hashString"]
+  TORRENT_FIELDS = ["id","name","percentDone","totalSize","isFinished","downloadDir","hashString", "files", "rateDownload", "addedDate", "status", "eta"]
 
   def initialize(options)
     @url = options[:url]
@@ -22,24 +22,36 @@ class XmissionApi
 
   def all
     @log.info "Get All Downloads"
-    response = post(:method => "torrent-get",:arguments => {:fields => fields})
+    response = post(:method => "torrent-get", :arguments => {:fields => fields})
     response["arguments"]["torrents"]
   end
 
   def find(id)
     @log.info "Get Torrent Info for  #{id}"
-    response = post(:method => "torrent-get",:arguments => {:fields => fields,:ids => [id]})
+    response = post(:method => "torrent-get", :arguments => {:fields => fields,:ids => [id]})
     response["arguments"]["torrents"].first
   end
 
-  def remove(id)
-    @log.info "Remove Torrent: #{id}"
-    response = post(:method => "torrent-remove",:arguments => {:ids => [id]})
+  def remove(id, delete_local_data=false)
+    @log.info "Remove Torrent: #{id} Delete Local Data: #{delete_local_data}"
+    response = post(:method => "torrent-remove", :arguments => {:ids => [id], :'delete-local-data'=> delete_local_data})
+    response
+  end
+
+  def stop(id)
+    @log.info "Pausing Torrent: #{id}"
+    response = post(:method => "torrent-stop", :arguments => {:ids => [id]})
+    response
+  end
+
+  def start(id)
+    @log.info "Starting Torrent: #{id}"
+    response = post(:method => "torrent-start", :arguments => {:ids => [id]})
     response
   end
 
   def upload_link(url, destination)
-    puts "Uploading: #{url}"
+    @log.info "Uploading: #{url}"
     response = post(:method => "torrent-add",:arguments => {:filename => url, :'download-dir' => "#{Setting.get_value("finished_path")}/"})
     response
   end
@@ -66,14 +78,50 @@ class XmissionApi
   end
 
   def remove_finished_downloads
-    puts "Removing finished downloads from transmission"
+    @log.info "Removing finished downloads from transmission"
     all.each do |download|
-      if download["isFinished"] == true && download["downloadDir"] == Setting.get_value("finished_path") + "/"
-        puts "Removing #{download["name"]} from Transmission"
+      if download["isFinished"] == true && download["downloadDir"].chomp("/") == Setting.get_value("finished_path")
+        @log.info "Removing #{download["name"]} from Transmission"
         remove(download["id"])
       end
     end
-    puts "Done with removing finished downloads from transmission"
+    @log.info "Done with removing finished downloads from transmission"
+  end
+
+  def is_online?
+    matches = /http:\/\/(.+):(\d+)/.match(url)
+    host = matches[1]
+    port = matches[2]
+    begin
+      Timeout::timeout(1) do
+        begin
+          socket_test = TCPSocket.new(host, port)
+          socket_test.close
+          return true
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          return false
+        end
+      end
+    rescue Timeout::Error
+    end
+    return false
   end
 
 end
+
+=begin
+
+STATUS CODE DEFINITIONS
+TR_STATUS_STOPPED        = 0, /* Torrent is stopped */
+TR_STATUS_CHECK_WAIT     = 1, /* Queued to check files */
+TR_STATUS_CHECK          = 2, /* Checking files */
+TR_STATUS_DOWNLOAD_WAIT  = 3, /* Queued to download */
+TR_STATUS_DOWNLOAD       = 4, /* Downloading */
+TR_STATUS_SEED_WAIT      = 5, /* Queued to seed */
+TR_STATUS_SEED           = 6  /* Seeding */
+
+ETA CODE DEFINITIONS
+Unknown   = -2
+Complete  = -1
+
+=end

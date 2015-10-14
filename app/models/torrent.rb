@@ -61,6 +61,8 @@ class Torrent < ActiveRecord::Base
 
   #dl_torrent = xmission hash of torrent info
   def process_torrent(dl_torrent)
+    #skip processing if completed and DJ rename has not run yet
+    return if (dl_torrent["isFinished"] && completed)
     #update all items in the db torrent entry
     update_attributes(
       :completed => dl_torrent["isFinished"],

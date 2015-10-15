@@ -59,6 +59,7 @@ class JdbHelper
     unless new_eps.empty?
 
       new_eps_data.each do |ep|
+        #puts ep
         episode = Tvshow.find_by_xdb_id(ep[:idShow]).episodes.where(:season_num => ep[:c12], :episode_num => ep[:c13]).first
         if episode.nil?
           puts "Couldnt Find Episode xdbID: #{ep}"

@@ -80,9 +80,11 @@ class JdbHelper
     puts "Checking for removed Episodes"
     removed_eps.each do |xdb_id|
       rem_ep = Episode.find_by_xdb_id(xdb_id)
-      print "Clearing XDB Ep #{rem_ep} info on: "
-      puts rem_ep.tvshow.title + " - " + "s" '%02d' % rem_ep.season_num + "e" + '%02d' % rem_ep.episode_num + " - " + rem_ep.title
-      rem_ep.clear_sync
+      unless rem_ep.nil?
+        print "Clearing XDB Ep #{rem_ep} info on: "
+        puts rem_ep.tvshow.title + " - " + "s" '%02d' % rem_ep.season_num + "e" + '%02d' % rem_ep.episode_num + " - " + rem_ep.title
+        rem_ep.clear_sync
+      end
     end
   end
 

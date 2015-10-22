@@ -62,7 +62,7 @@ class Torrent < ActiveRecord::Base
   #dl_torrent = xmission hash of torrent info
   def process_torrent(dl_torrent)
     #skip processing if completed and DJ rename has not run yet
-    return if (dl_torrent["isFinished"] && completed)
+    return if completed
     #update all items in the db torrent entry
     update_attributes(
       :completed => dl_torrent["isFinished"],
@@ -93,10 +93,10 @@ class Torrent < ActiveRecord::Base
   def process_completed_torrent
     require 're_namer'
     #update the time_completed for torrent object remove xmission ID
-    xmission.remove(xmission_id)
     update_attributes(
       :time_completed => DateTime.now,
       :xmission_id => nil)
+    xmission.remove(xmission_id)
     #go through each file in the completed torrent
     tfiles.each do |torrent_file|
       torrent_file.process_completed_tfile

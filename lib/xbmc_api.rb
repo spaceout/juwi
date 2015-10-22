@@ -13,7 +13,7 @@ class XbmcApi
     parsed_message = JSON.parse(message)
     message_method = parsed_message["method"]
     if message_method == "VideoLibrary.OnScanStarted"
-      puts "Scan for new video files initiated" 
+      puts "Scan for new video files initiated"
     elsif message_method == "VideoLibrary.OnScanFinished"
       puts "Scan for new video files complete"
     elsif message_method == "VideoLibrary.OnCleanStarted"
@@ -23,7 +23,7 @@ class XbmcApi
     elsif message_method == "VideoLibrary.OnUpdate"
       if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] == "episode"
         puts "New episode added to XBMC DB"
-        add_episode(parsed_message["params"]["data"]["item"]["id"])
+        #add_episode(parsed_message["params"]["data"]["item"]["id"])
       elsif parsed_message["params"]["data"]["item"]["type"] == "tvshow"
         puts "New TV show added to XBMC DB"
       elsif parsed_message["params"]["data"]["item"]["type"] = "movie"
@@ -34,32 +34,17 @@ class XbmcApi
         puts "Movie Removed from XBMC DB"
       elsif parsed_message["params"]["data"]["type"] == "episode"
         puts "Episode removed from XBMC DB"
-        remove_episode(parsed_message["params"]["data"]["id"])
+        #remove_episode(parsed_message["params"]["data"]["id"])
       end
     end
   end
 
-  def self.add_episode(xdb_id)
-    puts "Adding episode with XDBID #{xdb_id}"
-    Tvshow.update_xdb_episode_data(xdb_id)
+  def self.update_library
+    compose_command("VideoLibrary.Scan")
   end
 
-  def self.remove_episode(xdb_id)
-    episode = Episode.find_by_xdb_id(xdb_id)
-    puts "un-syncing #{episode.tvshow.title} - s#{episode.season_num}e#{episode.episode_num}"
-    Tvshow.remove_xdb_episode_data(episode.ttdb_id)
-  end
-
-  def self.add_tvshow(xdb_id)
-    puts "Adding new show with XDBID #{xdb_id}"
-    ttdb_id = JdbHelper.xdbid_to_ttdbid(xdb_id)
-    Tvshow.create_and_sync_new_show(ttdb_id)
-  end
-
-  def self.remove_tvshow(xdb_id)
-    tvshow = Tvshow.find_by_xdb_id(xdb_id)
-    puts "Destroying #{tvshow.title} and all episodes"
-    tvshow.destroy
+  def self.clean_library
+    compose_command("VideoLibrary.Clean")
   end
 
   def self.compose_command(method)
@@ -94,6 +79,25 @@ class XbmcApi
       ws.onmessage = lambda do |event|
         puts event.data
         EM.stop
+      end
+      ws.onclose = lambda do |event|
+        ws = nil
+        puts "Disconnected from server"
+        EM.stop
+      end
+    }
+  end
+
+  def self.wait_for_finished(command = nil)
+    EM.run {
+      ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
+      ws.onopen = lambda do |event|
+        puts "successfully established connection"
+        ws.send(command) unless command.nil?
+      end
+      ws.onmessage = lambda do |event|
+        puts event.data
+        EM.stop if event.data.include?('Finished')
       end
       ws.onclose = lambda do |event|
         ws = nil

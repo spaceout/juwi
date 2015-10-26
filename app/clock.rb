@@ -12,8 +12,8 @@ module Clockwork
     require 'xbmc_api'
     XbmcApi.compose_command("VideoLibrary.Scan")
   end
-  every(1.day, :at => '06:15') do
-    require 'jdb_helper'
-    JdbHelper.sync_xdb_to_jdb
-  end
+#  every(1.day, :at => '06:15') do
+#    require 'jdb_helper'
+#    JdbHelper.sync_xdb_to_jdb
+#  end
 end

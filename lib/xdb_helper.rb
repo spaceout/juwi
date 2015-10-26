@@ -135,4 +135,25 @@ class XdbHelper
     xbmcdb.disconnect
     return ep_data
   end
+
+  def self.get_all_play_counts
+    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    play_counts = xbmcdb[:episodeview].join(:files, :idFile => :idFile).select(:episodeview__idEpisode, :files__playCount, :files__lastPlayed, :files__dateAdded).where('files.playCount IS NOT NULL').all
+    xbmcdb.disconnect
+    return play_counts
+  end
+#Fix this bullshit below:
+  def self.sync_file_data
+    require 'xdb_helper'
+    blerm = XdbHelper.get_all_play_counts
+    blerm.each do |file_info|
+      ep = Episode.find_by_xdb_id(file_info[:idEpisode])
+      next if ep.nil?
+      ep.update_attributes(
+        :play_count => file_info[:playCount],
+        :last_played => file_info[:lastPlayed],
+        :date_added => file_info[:dateAdded]
+      )
+    end
+  end
 end

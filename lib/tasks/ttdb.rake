@@ -5,10 +5,7 @@ namespace :ttdb do
   desc "This updates TTDB data for all non-ended shows"
   task :update => :environment do
     require 'ttdb_helper'
-    require 'ruby-progressbar'
-    progressbar = ProgressBar.create(:title => "Updating Data", :total => Tvshow.all.count)
     Tvshow.all.each do |tvshow|
-      progressbar.increment
       next if tvshow.status == "Ended"
       tvshow.delay.update_show
     end
@@ -17,15 +14,9 @@ namespace :ttdb do
   namespace :update do
     desc "Update all TTDB data for all shows"
     task :all => :environment do
-      require 'ttdb_helper'
-      require 'ruby-progressbar'
-      progressbar = ProgressBar.create(:title => "Updating Data", :total => Tvshow.all.count)
       Tvshow.all.each do |tvshow|
-        puts "updating ttdbdata for #{tvshow.title}"
         tvshow.delay.update_show
-        progressbar.increment
       end
-      Setting.set_value("ttdb_last_scrape", TtdbHelper.get_time_from_ttdb)
     end
   end
 

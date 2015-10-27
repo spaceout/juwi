@@ -23,7 +23,6 @@ class XbmcApi
     elsif message_method == "VideoLibrary.OnUpdate"
       if parsed_message["params"]["data"]["playcount"] == nil && parsed_message["params"]["data"]["item"]["type"] == "episode"
         puts "New episode added to XBMC DB"
-        #add_episode(parsed_message["params"]["data"]["item"]["id"])
       elsif parsed_message["params"]["data"]["item"]["type"] == "tvshow"
         puts "New TV show added to XBMC DB"
       elsif parsed_message["params"]["data"]["item"]["type"] = "movie"
@@ -34,7 +33,6 @@ class XbmcApi
         puts "Movie Removed from XBMC DB"
       elsif parsed_message["params"]["data"]["type"] == "episode"
         puts "Episode removed from XBMC DB"
-        #remove_episode(parsed_message["params"]["data"]["id"])
       end
     end
   end
@@ -47,6 +45,110 @@ class XbmcApi
     compose_command("VideoLibrary.Clean")
   end
 
+  def self.now_playing
+    command = {
+      "jsonrpc"=>"2.0",
+      "id"=>"VideoGetItem",
+      "method"=>"Player.GetItem",
+      "params"=>{
+        "properties"=>["title", "season", "episode", "duration", "showtitle", "tvshowid"],
+        "playerid"=>1
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.play_episode(xdb_id)
+    command = {
+      "jsonrpc"=>"2.0",
+      "id" => 1,
+      "method" => "Player.Open",
+      "params" => {
+        "item" => {
+          "episodeid" => xdb_id
+        }
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.play_playlist
+    command = {
+      "jsonrpc"=>"2.0",
+      "id"=>1,
+      "method"=>"Player.Open",
+      "params"=>{
+        "item"=>{
+          "playlistid"=>1
+        }
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.stop_playback
+    command = {
+      "jsonrpc"=>"2.0",
+      "id" => 1,
+      "method" => "Player.Stop",
+      "params" => {
+        "playerid" => 1
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.pause_resume_playback
+    command = {
+      "jsonrpc"=>"2.0",
+      "id" => 1,
+      "method" => "Player.PlayPause",
+      "params" => {
+        "playerid" => 1
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.enqueue_video(xdb_id)
+    command = {
+      "jsonrpc"=>"2.0",
+      "id"=>1,
+      "method"=>"Playlist.Add",
+      "params"=>{
+        "playlistid"=>1,
+        "item"=>{
+          "episodeid"=>xdb_id
+        }
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.get_playlist(playlist_id = 1)
+    command = {
+      "jsonrpc"=>"2.0",
+      "id" => 1,
+      "method" => "Playlist.GetItems",
+      "params" => {
+        "playlistid" => 1
+      }
+    }
+    send_command(command.to_json)
+  end
+
+  def self.clear_playlist
+    command = {
+      "jsonrpc"=>"2.0",
+      "id"=>1,
+      "method"=>"Playlist.Clear",
+      "params"=>{
+        "playlistid"=>1
+      }
+    }
+    send_command(command.to_json)
+  end
+
   def self.compose_command(method)
     command = {
       "jsonrpc" => "2.0",
@@ -56,28 +158,16 @@ class XbmcApi
     send_command(command.to_json)
   end
 
-  def self.compose_query(method, data)
-    command = {
-      "jsonrpc"=>"2.0",
-      "method"=>"#{method}",
-      "params"=>
-        {
-        "data"=>"#{data}",
-        "sender"=>"xbmc"
-        }
-      }
-    send_command(command.to_json)
-  end
-
   def self.send_command(command)
+    response = nil
     EM.run {
       ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
       ws.onopen = lambda do |event|
-        puts "successfully established connection"
+        puts "Established connection"
         ws.send(command)
       end
       ws.onmessage = lambda do |event|
-        puts event.data
+        response = event.data
         EM.stop
       end
       ws.onclose = lambda do |event|
@@ -86,25 +176,7 @@ class XbmcApi
         EM.stop
       end
     }
-  end
-
-  def self.wait_for_finished(command = nil)
-    EM.run {
-      ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
-      ws.onopen = lambda do |event|
-        puts "successfully established connection"
-        ws.send(command) unless command.nil?
-      end
-      ws.onmessage = lambda do |event|
-        puts event.data
-        EM.stop if event.data.include?('Finished')
-      end
-      ws.onclose = lambda do |event|
-        ws = nil
-        puts "Disconnected from server"
-        EM.stop
-      end
-    }
+    return response
   end
 
 end

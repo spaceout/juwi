@@ -74,7 +74,10 @@ class Tvshow < ActiveRecord::Base
     episodes.each do |ep|
       ep.update_attributes(
         :xdb_id => xep.get_id(ep.season_num, ep.episode_num),
-        :filename => xep.get_filename(ep.season_num, ep.episode_num)
+        :filename => xep.get_filename(ep.season_num, ep.episode_num),
+        :play_count => xep.get_play_count(ep.season_num, ep.episode_num),
+        :last_played => xep.get_last_played(ep.season_num, ep.episode_num),
+        :date_added => xep.get_date_added(ep.season_num, ep.episode_num)
       )
     end
   end
@@ -136,10 +139,4 @@ class Tvshow < ActiveRecord::Base
     end
   end
 
-  def self.update_all
-    Tvshow.all.each do |tvshow|
-      next if tvshow.status == "Ended"
-      tvshow.delay(:queue => 'tvshow').update_show
-    end
-  end
 end

@@ -64,6 +64,8 @@ GEM
       eventmachine (>= 0.12.0)
     filesize (0.1.0)
     god (0.13.6)
+    groupdate (2.5.0)
+      activesupport (>= 3)
     haml (4.0.6)
       tilt
     haml-rails (0.4)
@@ -162,6 +164,7 @@ DEPENDENCIES
   faye-websocket
   filesize
   god
+  groupdate
   haml-rails
   httparty
   jquery-rails

@@ -8,14 +8,20 @@ class Episode < ActiveRecord::Base
     xep = XdbEpisodeHelper.new(xdb_episode_id)
     update_attributes(
       :xdb_id => xep.get_id,
-      :filename => xep.get_filename
+      :filename => xep.get_filename,
+      :play_count => xep.get_play_count,
+      :last_played => xep.get_last_played,
+      :date_added => xep.get_date_added
     )
   end
 
   def clear_sync
     update_attributes(
       :xdb_id => nil,
-      :filename => nil
+      :filename => nil,
+      :play_count => nil,
+      :last_played => nil,
+      :date_added => nil
     )
   end
 

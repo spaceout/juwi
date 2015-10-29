@@ -152,8 +152,8 @@ class XbmcApi
   def self.compose_command(method)
     command = {
       "jsonrpc" => "2.0",
-      "method" => "#{method}",
-      "id" => 1
+      "id" => 1,
+      "method" => "#{method}"
       }
     send_command(command.to_json)
   end

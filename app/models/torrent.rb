@@ -85,6 +85,9 @@ class Torrent < ActiveRecord::Base
     end
     #if the download is showing complete and the db entry says its not, it just finished process it
     if dl_torrent["isFinished"]
+      update_attributes(
+        :time_completed => DateTime.now,
+        :xmission_id => nil)
       puts "Detected completed torrent, queing processing_completed"
       delay(:queue => 'renamer').process_completed_torrent
     end
@@ -95,10 +98,7 @@ class Torrent < ActiveRecord::Base
     require 'xbmc_api'
     require 'jdb_helper'
     #update the time_completed for torrent object remove xmission ID
-    update_attributes(
-      :time_completed => DateTime.now,
-      :xmission_id => nil)
-    xmission.remove(xmission_id)
+    xmission.remove(hash_string)
     #go through each file in the completed torrent
     tfiles.each do |torrent_file|
       torrent_file.process_completed_tfile

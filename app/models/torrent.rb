@@ -109,8 +109,6 @@ class Torrent < ActiveRecord::Base
     if rename_status
       puts "Rename of torrent successful, initiating cleanup"
       cleanup_torrent_files
-      XbmcApi.update_library
-      JdbHelper.delay(run_at: 5.minutes.from_now).sync_xdb_to_jdb
     end
   end
 

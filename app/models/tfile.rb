@@ -4,6 +4,8 @@ class Tfile < ActiveRecord::Base
 
   def process_completed_tfile(manual_name = name, overwrite = false)
     require 're_namer'
+    require 'xbmc_api'
+    require 'jdb_helper'
     #check if it is a video file
     if is_video_file?
       #rename the video file and store the rename result
@@ -19,7 +21,10 @@ class Tfile < ActiveRecord::Base
         puts "RENAME SUCCESS #{result[:success][:new_name]}"
         update_attributes(
           :rename_status => true,
-          :rename_data => result[:success][:new_name])
+          :rename_data => result[:success][:new_name]
+        )
+        XbmcApi.update_library
+        JdbHelper.delay(run_at: 5.minutes.from_now).sync_xdb_to_jdb
       end
     else
       #if its not a video file, mark rename_result as "SKIP"

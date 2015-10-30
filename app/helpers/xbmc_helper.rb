@@ -1,0 +1,2 @@
+module XbmcHelper
+end

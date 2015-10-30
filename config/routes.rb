@@ -16,7 +16,6 @@ Juwi::Application.routes.draw do
 
   resources :name_deviations
 
-  match 'update' => 'home#update'
   match 'episodes' => 'episodes#all'
   match 'episodes/missing' => 'episodes#missing'
   match 'episodes/recently_aired' => 'episodes#recently_aired'
@@ -30,14 +29,14 @@ Juwi::Application.routes.draw do
     resources :name_deviations
     get :missing
   end
+  get 'xbmc' => 'xbmc#index'
+  post 'xbmc/play/:id' => 'xbmc#play', as: 'xbmc_play'
   resources :settings
   root :to => 'home#index'
-  match 'rename' => 'home#rename'
   match 'start_daemon' => 'daemons#start_daemon'
   match 'stop_daemon' => 'daemons#stop_daemon'
-  match 'upload_torrent' => 'home#upload_torrent'
-  match 'xbmc_update' => 'home#xbmc_update'
-  match 'process_downloads' => 'home#process_downloads'
+  get 'upload_torrent' => 'home#upload_torrent'
+  post 'xbmc_update' => 'xbmc#update_library'
   get 'ttdbsearch', to: 'home#ttdbsearch', as: 'ttdbsearch'
   match "/delayed_job" => DelayedJobWeb, :anchor => false, via: [:get, :post]
 end

@@ -1,29 +1,11 @@
 class HomeController < ApplicationController
   def index
-    require 'file_manipulator'
     @tvshows = Tvshow.all.sort_by(&:title)
     @episodes = Episode.where("season_num > 0 AND airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
     @aired_yesterday = Episode.where(:airdate => Date.today.prev_day)
     @airing_today = Episode.where(:airdate => Date.today)
     @airing_tomorrow = Episode.where(:airdate => Date.today.next_day)
-  end
-
-  def rename
-    require 'xmlsimple'
-    require 're_namer'
-    require 'fileutils'
-    @rename_success = []
-    @rename_failure = []
-    rename_results = Renamer.process_dir(Setting.get_value("finished_path"), Setting.get_value("tvshow_base_path"))
-    rename_results.each do |result|
-      if result[:success] != nil
-        @rename_success.push(result)
-      elsif result[:failure] != nil
-        @rename_failure.push(result)
-      end
-    end
-    render 'home/worker'
   end
 
   def upload_torrent
@@ -35,23 +17,6 @@ class HomeController < ApplicationController
     )
     xmission.upload_link(params[:torrent], Setting.get_value("finished_dir"))
     redirect_to(:back)
-  end
-
-  def xbmc_update
-    require 'xbmc_api'
-    XbmcApi.compose_command("VideoLibrary.Scan")
-    redirect_to '/'
-  end
-
-  def process_downloads
-    xmission = XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url")
-    )
-    xmission.remove_finished_downloads
-    FileManipulator.process_finished_directory(Setting.get_value("finished_path"), Setting.get_value("min_videosize").to_i)
-    redirect_to '/'
   end
 
   def ttdbsearch

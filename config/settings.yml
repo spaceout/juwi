@@ -1,0 +1,13 @@
+xbmcdb: mysql://xbmc:xbmc@192.168.1.50/MyVideos90
+ttdb_api_key: 8E35AC6C9C5836F0
+finished_path: /Users/jemily/finished/tvshows
+tvshow_base_path: /Users/jemily/bender/tvshows
+min_videosize: 60000000
+xbmc_hostname: 192.168.1.61
+xbmc_port: 9090
+transmission_url: http://192.168.1.50:9091/transmission/rpc
+transmission_user: transmission
+transmission_password: transmission
+video_extensions: .mkv,.avi,.mp4,.mts,.m2ts
+xmission_token: NOTSETYET
+http_retries: 2

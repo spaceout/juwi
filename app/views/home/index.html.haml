@@ -34,6 +34,6 @@
     %h5= "Missing Episodes #{@episodes.missing.count}"
     %h5= "Collection Grade #{@completeness}"
   .col-xs-4
-    = button_to "Update XBMC", {:action => "xbmc_update", :controller => "home"}, :class => "btn btn-primary btn-sm"
+    = button_to "Update XBMC", {:action => "update_library", :controller => "xbmc"}, :class => "btn btn-primary btn-sm"
   -#  = button_to "Process Downloads", {:action => "process_downloads", :controller => "home"}, :class => "btn btn-primary btn-sm"
   -#  = button_to "Rename", {:action => "rename", :controller => "home"}, :class => "btn btn-primary btn-sm"

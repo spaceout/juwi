@@ -17,10 +17,10 @@ Juwi::Application.routes.draw do
   resources :name_deviations
 
   match 'update' => 'home#update'
-  match 'episodes' => 'all_episodes#index'
-  match 'episodes/missing' => 'all_episodes#missing'
-  match 'episodes/recently_aired' => 'all_episodes#recently_aired'
-  match "episodes/:episode_id" => 'all_episodes#show'
+  match 'episodes' => 'episodes#all'
+  match 'episodes/missing' => 'episodes#missing'
+  match 'episodes/recently_aired' => 'episodes#recently_aired'
+  match "episodes/:episode_id" => 'episodes#show2'
   resources :tvshows  do
     collection do
       get :forcast

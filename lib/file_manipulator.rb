@@ -21,7 +21,7 @@ class FileManipulator
 
   #checks sub folders for video files larger then min_videosize and moves them to the base_path
   def self.move_videos(incoming_folder, base_path, min_videosize)
-    video_extensions = Setting.get_value("video_extension")
+    video_extensions = Settings.video_extensions
     puts "Begin processing #{incoming_folder} for video files"
     Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions}}").each do |video_file|
       if File.size(video_file) > min_videosize
@@ -33,7 +33,7 @@ class FileManipulator
 
   #deletes folder if there are no video files larger them min_videosize
   def self.delete_folder(incoming_folder, min_videosize)
-    video_extensions = Setting.get_value("video_extension")
+    video_extensions = Settings.video_extensions
     puts "Double Checking to make sure #{incoming_folder} is clean"
     Dir.glob("#{FileManipulator.escape_glob(incoming_folder)}/**/*{#{video_extensions}}").each do |video_file|
       if File.size(video_file) > min_videosize
@@ -60,7 +60,7 @@ class FileManipulator
   end
 
   #Process the finished directory rars/move/delete
-  def self.process_finished_directory(base_path = Setting.get_value("finished_path"), min_videosize = Setting.get_value("min_videosize").to_i)
+  def self.process_finished_directory(base_path = Settings.finished_path, min_videosize = Settings.min_videosize.to_i)
     puts "Procesing Directory"
     Dir.chdir(base_path)
     Dir.glob("*").each do |dir_entry|

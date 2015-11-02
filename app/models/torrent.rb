@@ -5,9 +5,9 @@ class Torrent < ActiveRecord::Base
   def self.xmission
     require 'xmission_api'
     @@xmission ||= XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url"))
+      :username => Settings.transmission_user,
+      :password => Settings.transmission_password,
+      :url => Settings.transmission_url)
   end
 
   def xmission
@@ -19,7 +19,7 @@ class Torrent < ActiveRecord::Base
       current_torrents = xmission.all
       current_torrents.each do |dl_torrent|
         #if the torrent download directory is set to the finished folder
-        if dl_torrent["downloadDir"].chomp("/") == Setting.get_value('finished_path').chomp("/")
+        if dl_torrent["downloadDir"].chomp("/") == Settings.finished_path.chomp("/")
           #find or initialize a new torrent object
           db_torrent = Torrent.find_or_initialize_by_hash_string(dl_torrent["hashString"])
           #Send it for processing along with the xmission hash
@@ -121,8 +121,8 @@ class Torrent < ActiveRecord::Base
       return
     else
       #create the full pathname from successful torrent rename
-      base_dir = File.join(Setting.get_value("finished_path"), name)
-      if base_dir == Setting.get_value("finished_path").chomp('/')
+      base_dir = File.join(Settings.finished_path, name)
+      if base_dir == Settings.finished_path.chomp('/')
         puts "error, not deleting root download path"
         return
       else

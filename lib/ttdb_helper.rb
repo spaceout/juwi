@@ -10,7 +10,7 @@ class TtdbHelper
   end
 
   def get_series_data
-    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Setting.get_value("ttdb_api_key")}/series/#{@ttdb_id}/all/en.xml"), { 'SuppressEmpty' => '', 'ForceArray' => false})
+    series_data  = XmlSimple.xml_in(CurlHelper.get_http_data("http://thetvdb.com/api/#{Settings.ttdb_api_key}/series/#{@ttdb_id}/all/en.xml"), { 'SuppressEmpty' => '', 'ForceArray' => false})
   end
 
   def series_data
@@ -138,5 +138,9 @@ class TtdbHelper
     if tvshow.poster != nil
       CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_poster.jpg"))
     end
+  end
+
+  def self.get_episode_thumb(episode)
+    CurlHelper.download_http_data("http://thetvdb.com/banners/#{episode.thumb_url}", File.join(Rails.root, "/public/images/episode", "#{episode.ttdb_id}_thumb.jpg"))
   end
 end

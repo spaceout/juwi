@@ -31,10 +31,7 @@ Juwi::Application.routes.draw do
   end
   get 'xbmc' => 'xbmc#index'
   post 'xbmc/play/:id' => 'xbmc#play', as: 'xbmc_play'
-  resources :settings
   root :to => 'home#index'
-  match 'start_daemon' => 'daemons#start_daemon'
-  match 'stop_daemon' => 'daemons#stop_daemon'
   get 'upload_torrent' => 'home#upload_torrent'
   post 'xbmc_update' => 'xbmc#update_library'
   get 'ttdbsearch', to: 'home#ttdbsearch', as: 'ttdbsearch'

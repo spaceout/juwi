@@ -54,8 +54,11 @@ class Tvshow < ActiveRecord::Base
         :ttdb_id => episode['id'],
         :overview => episode['Overview'],
         :ttdb_last_updated => episode['lastupdated'],
-        :ttdb_id => episode['seriesid'],
-        :airdate => episode['FirstAired']
+        :ttdb_show_id => episode['seriesid'],
+        :airdate => episode['FirstAired'],
+        :thumb_url => episode['filename'],
+        :thumb_height => episode['thumb_height'],
+        :thumb_width => episode['thumb_width']
       )
       updated_ep_ids.push(jdb_episode.id)
     end
@@ -83,7 +86,7 @@ class Tvshow < ActiveRecord::Base
   end
 
   def create_series_folder
-    directory_name = File.join(Setting.get_value('tvshow_base_path'), title)
+    directory_name = File.join(Settings.tvshow_base_path, title)
     Dir.mkdir(directory_name) unless File.directory?(directory_name)
   end
 

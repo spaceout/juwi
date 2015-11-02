@@ -5,7 +5,7 @@ require 'scrubber'
 
 class Renamer
 
-  def self.process_file(filename, manual_rename = filename, overwrite_override = false, rename_output_dir = Setting.get_value("tvshow_base_path"))
+  def self.process_file(filename, manual_rename = filename, overwrite_override = false, rename_output_dir = Settings.tvshow_base_path)
     if File.directory?(filename)
       rename_result = {:failure=>{:reason=>"This is a Directory, not a File"}}
       return rename_result

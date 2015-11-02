@@ -3,9 +3,9 @@ class TorrentsController < ApplicationController
   def self.xmission
     require 'xmission_api'
     @@xmission ||= XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url"))
+      :username => Settings.transmission_user,
+      :password => Settings.transmission_password,
+      :url => Settings.transmission_url)
   end
 
   def xmission

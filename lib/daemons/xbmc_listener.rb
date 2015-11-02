@@ -21,7 +21,7 @@ while($running) do
 
   def xbmcconnect
     EM.run {
-      ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
+      ws = Faye::WebSocket::Client.new("ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/")
       ws.onopen = lambda do |event|
         puts "successfully established connection"
       end

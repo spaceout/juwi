@@ -52,7 +52,7 @@ class XmissionApi
 
   def upload_link(url, destination)
     @log.info "Uploading: #{url}"
-    response = post(:method => "torrent-add",:arguments => {:filename => url, :'download-dir' => "#{Setting.get_value("finished_path")}/"})
+    response = post(:method => "torrent-add",:arguments => {:filename => url, :'download-dir' => "#{Settings.finished_path}/"})
     response
   end
 
@@ -63,14 +63,14 @@ class XmissionApi
   def http_post(options)
     post_options = {
       :body => options.to_json,
-      :headers => {"x-transmission-session-id" => Setting.get_value("xmission_token")},
+      :headers => {"x-transmission-session-id" => Settings.xmission_token},
       :basic_auth => basic_auth
     }
     response = HTTParty.post(url, post_options)
     if(response.code == 409)
       @log.info "Bad Session ID changing..."
-      Setting.set_value("xmission_token", response.headers["x-transmission-session-id"])
-      @log.info "New Session ID: #{Setting.get_value("xmission_token")}"
+      Setting.xmission_token = response.headers["x-transmission-session-id"])
+      @log.info "New Session ID: #{Settings.xmission_token)}"
       @log.info "Retrying Post"
       response = http_post(options)
     end
@@ -80,7 +80,7 @@ class XmissionApi
   def remove_finished_downloads
     @log.info "Removing finished downloads from transmission"
     all.each do |download|
-      if download["isFinished"] == true && download["downloadDir"].chomp("/") == Setting.get_value("finished_path")
+      if download["isFinished"] == true && download["downloadDir"].chomp("/") == Settings.finished_path
         @log.info "Removing #{download["name"]} from Transmission"
         remove(download["id"])
       end

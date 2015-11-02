@@ -161,7 +161,7 @@ class XbmcApi
   def self.send_command(command)
     response = nil
     EM.run {
-      ws = Faye::WebSocket::Client.new("ws://#{Setting.get_value("xbmc_hostname")}:#{Setting.get_value("xbmc_port")}/")
+      ws = Faye::WebSocket::Client.new("ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/")
       ws.onopen = lambda do |event|
         puts "Established connection"
         ws.send(command)

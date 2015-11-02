@@ -5,7 +5,7 @@ class XdbSeriesHelper
   end
 
   def load_series_data
-    xbmcdb ||= Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb ||= Sequel.connect(Settings.xbmcdb)
     @xdb_tvshow = xbmcdb[:tvshowview][:c12 => @ttdb_id]
     xbmcdb.disconnect
   end
@@ -37,7 +37,7 @@ class XdbEpisodesHelper
   end
 
   def load_xdb_episodes
-    xbmcdb ||= Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb ||= Sequel.connect(Settings.xbmcdb)
     @xdb_episodes = xbmcdb[:episodeview].where(:idShow => @xdb_show_id).join(:files, :idFile => :idFile).all
     xbmcdb.disconnect
   end
@@ -116,7 +116,7 @@ class XdbEpisodeHelper
   end
 
   def load_episode_data
-    xbmcdb ||= Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb ||= Sequel.connect(Settings.xbmcdb)
     @xdb_episode = xbmcdb[:episodeview].where(:idEpisode => @xdb_episode_id).first
     xbmcdb.disconnect
   end
@@ -157,35 +157,35 @@ end
 
 class XdbHelper
   def self.get_all_ep_ids
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdb_episode_ids = xbmcdb[:episodeview].select_map(:idEpisode)
     xbmcdb.disconnect
     return xdb_episode_ids
   end
 
   def self.get_all_show_ids
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdb_show_ids = xbmcdb[:tvshowview].select_map(:idShow)
     xbmcdb.disconnect
     return xdb_show_ids
   end
 
   def self.get_all_show_ttdb_ids
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdb_show_ttdb_ids = xbmcdb[:tvshowview].select_map(:c12).map(&:to_i)
     xbmcdb.disconnect
     return xdb_show_ttdb_ids
   end
 
   def self.get_multiple_ep_data(ep_ids)
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     ep_data = xbmcdb[:episodeview].where(:idEpisode => ep_ids).all
     xbmcdb.disconnect
     return ep_data
   end
 
   def self.get_all_play_counts
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     play_counts = xbmcdb[:episodeview].select(:idEpisode, :playCount, :lastPlayed, :dateAdded).where('playCount IS NOT NULL').all
     xbmcdb.disconnect
     return play_counts

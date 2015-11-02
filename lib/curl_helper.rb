@@ -3,7 +3,7 @@ require 'curb'
 class CurlHelper
 
   def self.get_http_data(url)
-    attempts = Setting.get_value("http_retries").to_i
+    attempts = Settings.http_retries.to_i
     body_data = ""
     curl = Curl::Easy.new
     curl.follow_location = true
@@ -24,7 +24,7 @@ class CurlHelper
   end
 
   def self.download_http_data(url, savelocation)
-    attempts = Setting.get_value("http_retries").to_i
+    attempts = Settings.http_retries.to_i
     curl = Curl::Easy.new
     curl.follow_location = true
     curl.url = url

@@ -11,11 +11,11 @@ class HomeController < ApplicationController
   def upload_torrent
     require 'xmission_api'
     xmission = XmissionApi.new(
-      :username => Setting.get_value("transmission_user"),
-      :password => Setting.get_value("transmission_password"),
-      :url => Setting.get_value("transmission_url")
+      :username => Settings.transmission_user,
+      :password => Settings.transmission_password,
+      :url => Settings.transmission_url
     )
-    xmission.upload_link(params[:torrent], Setting.get_value("finished_dir"))
+    xmission.upload_link(params[:torrent], Settings.finished_path)
     redirect_to(:back)
   end
 

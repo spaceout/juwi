@@ -9,7 +9,7 @@ class Tfile < ActiveRecord::Base
     #check if it is a video file
     if is_video_file?
       #rename the video file and store the rename result
-      result = Renamer.process_file(File.join(Setting.get_value("finished_path"), name), manual_name, overwrite)
+      result = Renamer.process_file(File.join(Settings.finished_path, name), manual_name, overwrite)
       #if there are no successful entries (failure)
       if result[:success].nil?
         puts "RENAME FAILURE"
@@ -33,10 +33,10 @@ class Tfile < ActiveRecord::Base
   end
 
   def is_video_file?
-    torrent_file_path = File.join(Setting.get_value("finished_path"), name)
+    torrent_file_path = File.join(Settings.finished_path, name)
     return false if File.directory?(torrent_file_path)
-    video_extnames = Setting.get_value("video_extensions").split(',')
-    return true if video_extnames.include?(File.extname(name)) && length >= Setting.get_value("min_videosize").to_i
+    video_extnames = Settings.video_extensions.split(',')
+    return true if video_extnames.include?(File.extname(name)) && length >= Settings.min_videosize.to_i
   end
 
 end

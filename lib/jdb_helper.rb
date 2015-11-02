@@ -16,7 +16,7 @@ class JdbHelper
   end
 
   def self.xdbid_to_ttdbid(xdbid)
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdbtvshows = xbmcdb[:tvshow]
     ttdbid = xdbtvshows.where("idShow = #{xdbid}").first[:c12]
     xbmcdb.disconnect
@@ -24,7 +24,7 @@ class JdbHelper
   end
 
   def self.ttdbid_to_xdbid(ttdb_id)
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdbtvshows = xbmcdb[:tvshow]
     xdbid = xdbtvshows.where("c12 = #{ttdb_id}").first[:idShow]
     xbmcdb.disconnect

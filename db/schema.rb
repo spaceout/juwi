@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151026190339) do
+ActiveRecord::Schema.define(:version => 20151102184343) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -50,6 +50,9 @@ ActiveRecord::Schema.define(:version => 20151026190339) do
     t.integer  "play_count"
     t.datetime "last_played"
     t.datetime "date_added"
+    t.string   "thumb_url"
+    t.integer  "thumb_height"
+    t.integer  "thumb_width"
   end
 
   create_table "name_deviations", :force => true do |t|
@@ -61,14 +64,6 @@ ActiveRecord::Schema.define(:version => 20151026190339) do
     t.string   "type"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
-  end
-
-  create_table "settings", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.string   "name"
-    t.string   "value"
-    t.string   "notes"
   end
 
   create_table "tfiles", :force => true do |t|

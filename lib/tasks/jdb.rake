@@ -15,7 +15,7 @@ namespace :jdb do
   desc "This checks sync with XDB"
   task :verify => :environment do
     puts "Checking TV shows"
-    xbmcdb = Sequel.connect(Setting.get_value('xbmcdb'))
+    xbmcdb = Sequel.connect(Settings.xbmcdb)
     xdbtvshows = xbmcdb[:tvshow]
     xdbepisodes = xbmcdb[:episode]
     xdbtvshows.each do |tvshow|
@@ -48,8 +48,8 @@ namespace :jdb do
     require 'file_manipulator'
     require 're_namer'
     FileManipulator.process_finished_directory
-    Dir.chdir(Setting.get_value("finished_path"))
-    video_extensions = Setting.get_value("video_extensions").gsub('.','')
+    Dir.chdir(Settings.finished_path)
+    video_extensions = Settings.video_extensions.gsub('.','')
     Dir.glob("*.{#{video_extensions}}").each do |dir_entry|
       puts dir_entry
       Renamer.process_file(dir_entry)

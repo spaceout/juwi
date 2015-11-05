@@ -10,7 +10,7 @@ Dir.chdir(root)
 require File.join(root, "config", "environment")
 
 $running = true
-Signal.trap("TERM") do 
+Signal.trap("TERM") do
   $running = false
 end
 
@@ -20,6 +20,7 @@ while($running) do
   require 'xbmc_api'
 
   def xbmcconnect
+    puts "ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/"
     EM.run {
       ws = Faye::WebSocket::Client.new("ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/")
       ws.onopen = lambda do |event|

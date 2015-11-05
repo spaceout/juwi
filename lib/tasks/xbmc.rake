@@ -24,6 +24,7 @@ namespace :xbmc do
     require 'xbmc_api'
     def xbmcconnect
       EM.run {
+        puts "ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/"
         ws = Faye::WebSocket::Client.new("ws://#{Settings.xbmc_hostname}:#{Settings.xbmc_port}/")
         ws.onopen = lambda do |event|
           puts "successfully established connection"

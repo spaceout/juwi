@@ -16,3 +16,4 @@
 /tmp
 /public/images/*.jpg
 /ttdbdata/*.zip
+/config/settings.yml

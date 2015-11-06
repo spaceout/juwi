@@ -70,7 +70,7 @@ class XmissionApi
     if(response.code == 409)
       @log.info "Bad Session ID changing..."
       Setting.xmission_token = response.headers["x-transmission-session-id"])
-      @log.info "New Session ID: #{Settings.xmission_token)}"
+      @log.info "New Session ID: #{Settings.xmission_token}"
       @log.info "Retrying Post"
       response = http_post(options)
     end

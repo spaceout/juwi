@@ -6,14 +6,15 @@
 
 # Ignore bundler config
 /.bundle
-
 # Ignore the default SQLite database.
 /db/*.sqlite3
-
+# Ignore any database dumps
+/db/data.yml
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /log/*.pid
 /tmp
+# Ignore images
 /public/images/*.jpg
-/ttdbdata/*.zip
+# Ignore actual config file
 /config/settings.yml

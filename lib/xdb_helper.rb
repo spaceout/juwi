@@ -6,7 +6,7 @@ class XdbSeriesHelper
 
   def load_series_data
     xbmcdb ||= Sequel.connect(Settings.xbmcdb)
-    @xdb_tvshow = xbmcdb[:tvshowview][:c12 => @ttdb_id]
+    @xdb_tvshow = xbmcdb[:tvshow_view][:c12 => @ttdb_id]
     xbmcdb.disconnect
   end
 
@@ -165,14 +165,14 @@ class XdbHelper
 
   def self.get_all_show_ids
     xbmcdb = Sequel.connect(Settings.xbmcdb)
-    xdb_show_ids = xbmcdb[:tvshowview].select_map(:idShow)
+    xdb_show_ids = xbmcdb[:tvshow_view].select_map(:idShow)
     xbmcdb.disconnect
     return xdb_show_ids
   end
 
   def self.get_all_show_ttdb_ids
     xbmcdb = Sequel.connect(Settings.xbmcdb)
-    xdb_show_ttdb_ids = xbmcdb[:tvshowview].select_map(:c12).map(&:to_i)
+    xdb_show_ttdb_ids = xbmcdb[:tvshow_view].select_map(:c12).map(&:to_i)
     xbmcdb.disconnect
     return xdb_show_ttdb_ids
   end

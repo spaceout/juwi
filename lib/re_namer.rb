@@ -85,7 +85,7 @@ class Renamer
       tvshow = Tvshow.where("clean_title = ?", clean_show_title)
       if tvshow.empty? == false
         matched_show_title = tvshow.first.title.gsub(":", '')
-        matched_episode = tvshow.episodes.where("season_num = ? AND episode_num = ?", season_number, episode_number).reload
+        matched_episode = tvshow.first.episodes.where("season_num = ? AND episode_num = ?", season_number, episode_number)
         if matched_episode.empty?
           puts "No Matched Episode for: #{matched_show_title} - s#{season_number}e#{episode_number}"
           return {:failure => {:reason => "episode not found"}}

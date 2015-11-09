@@ -13,10 +13,7 @@ class TfilesController < ApplicationController
   def rename
     #if the new_name is nil, then just retry renaming
     tfile = Tfile.find(params[:id])
-    puts tfile.name
-    puts "id: #{params[:id]}"
-    puts "new_name #{params[:new_name]}"
-    puts "overwrite #{params[:overwrite_enabled]}"
+    puts "name: #{tfile.name}, id: #{params[:id]}, new_name #{params[:new_name]}, overwrite #{params[:overwrite_enabled]}"
     overwrite = false
     if params[:overwrite_enabled] == "on"
       overwrite = true

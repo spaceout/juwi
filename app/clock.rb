@@ -7,7 +7,12 @@ module Clockwork
   end
 
   every(10.seconds,'Poll Transmission') {Torrent.delay(:queue => 'xmission').xmission_poller}
-  every(1.day, :at => '01:00'){Tvshow.update}
+  every(1.day, :at => '01:00')do
+    Tvshow.all.each do |tvshow|
+      next if tvshow.status == "Ended"
+      tvshow.delay.update_show
+    end
+  end
 #  every(1.day, :at => '06:00') do
 #    require 'xbmc_api'
 #    XbmcApi.compose_command("VideoLibrary.Scan")

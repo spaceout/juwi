@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @tvshows = Tvshow.all.sort_by(&:title)
+    @tvshows = Tvshow.all
     @episodes = Episode.where("season_num > 0 AND airdate < ?", DateTime.now)
     @completeness = (100 - (@episodes.missing.count.to_f  / @episodes.count.to_f) * 100).round(3)
     @aired_yesterday = Episode.where(:airdate => Date.today.prev_day)

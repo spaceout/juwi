@@ -139,6 +139,7 @@ class Torrent < ActiveRecord::Base
   def update_rename_status
     update_attributes(:rename_status => true)
     tfiles.each do |tfile|
+      next if tfile.rename_status == nil
       if !tfile.rename_status
         update_attributes(:rename_status => false)
         return

@@ -34,7 +34,7 @@ class TorrentsController < ApplicationController
   # GET /torrents
   # GET /torrents.json
   def index
-    @torrents = (Torrent.all.sort_by &:time_started).reverse!
+    @torrents = Torrent.last(100).reverse!
 
     respond_to do |format|
       format.html # index.html.erb

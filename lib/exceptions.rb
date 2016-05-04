@@ -29,6 +29,12 @@ class Exceptions
     elsif clean_show_name == "daredevil"
       clean_show_name = "marvels daredevil"
       puts "Exception Found! New show name: #{clean_show_name}"
+    elsif clean_show_name == "houdini and doyle"
+      clean_show_name = "houdini & doyle"
+      puts "Exception Found! New show name: #{clean_show_name}"
+    elsif clean_show_name == "marvels avengers ultron revolution"
+      clean_show_name = "marvels avengers assemble"
+      puts "Exception Found! New show name: #{clean_show_name}"
     end
     return clean_show_name,season_number,episode_number
   end

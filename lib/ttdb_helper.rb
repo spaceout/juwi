@@ -156,4 +156,5 @@ class TtdbHelper
     tvshow.episodes.each do |ep|
       get_episode_thumb(ep)
     end
+  end
 end

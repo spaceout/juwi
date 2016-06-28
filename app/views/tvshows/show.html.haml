@@ -2,7 +2,7 @@
 .row
   .col-xs-6.col-sm-3
     .thumbnail
-      %img(src="/images/#{@tvshow.ttdb_id}_poster.jpg" alt="@tvshow.title")
+      %img(src="/images/#{@tvshow.ttdb_id}/#{@tvshow.ttdb_id}_poster.jpg" alt="@tvshow.title")
   .col-xs-6.col-sm-9
     %h3= @tvshow.title
     = @tvshow.overview
@@ -36,7 +36,8 @@
             - @tvshow.episodes.where(season_num: season_num).each do |ep|
               .col-xs-4.col-md-4
                 .thumbnail
-                  %img(src="http://www.thetvdb.com/banners/#{ep.thumb_url}" alt="boo")
+                  =unless ep.thumb_url.empty?
+                    %img(src="/images/#{ep.tvshow.ttdb_id}/episode/#{ep.ttdb_id}_thumb.jpg" alt="boo")
                   .caption
                     %h4= "#{ep.episode_num} - #{ep.title}"
                     %p= ep.overview

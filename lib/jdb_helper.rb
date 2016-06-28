@@ -97,7 +97,6 @@ class JdbHelper
       new_show = Tvshow.find_or_initialize_by_ttdb_id(show)
       new_show.save
       new_show.delay.update_show
-      puts new_show.title
     end
   end
 

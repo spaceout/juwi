@@ -2,6 +2,7 @@ require 'xmlsimple'
 require 'curl_helper'
 require 'zip/zipfilesystem'
 require 'scrubber'
+require 'fileutils'
 
 class TtdbHelper
 
@@ -128,19 +129,31 @@ class TtdbHelper
     return result_set
   end
 
-  def self.get_all_images(tvshow)
-    if tvshow.banner != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
+  def self.get_tvshow_images(tvshow)
+    tvshow_dir = "public/images/#{tvshow.ttdb_id}/"
+    episode_dir = "public/images/#{tvshow.ttdb_id}/episode/"
+    FileUtils.mkdir_p(tvshow_dir) unless File.directory?(tvshow_dir)
+    FileUtils.mkdir_p(episode_dir) unless File.directory?(episode_dir)
+    if tvshow.banner != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_banner.jpg")
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_banner.jpg"))
     end
-    if tvshow.fanart != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_fanart.jpg"))
+    if tvshow.fanart != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_fanart.jpg")
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_fanart.jpg"))
     end
-    if tvshow.poster != nil
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_poster.jpg"))
+    if tvshow.poster != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_poster.jpg")
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_poster.jpg"))
     end
   end
 
   def self.get_episode_thumb(episode)
-    CurlHelper.download_http_data("http://thetvdb.com/banners/#{episode.thumb_url}", File.join(Rails.root, "/public/images/episode", "#{episode.ttdb_id}_thumb.jpg"))
+    episode_dir = "public/images/#{episode.tvshow.ttdb_id}/episode/"
+    if !episode.thumb_url.empty? and not File.exist?("#{episode_dir}#{episode.ttdb_id}_thumb.jpg")
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{episode.thumb_url}", File.join(Rails.root, episode_dir, "#{episode.ttdb_id}_thumb.jpg"))
+    end
   end
+
+  def self.get_all_episode_thumb(tvshow)
+    tvshow.episodes.each do |ep|
+      get_episode_thumb(ep)
+    end
 end

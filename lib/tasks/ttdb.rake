@@ -24,8 +24,12 @@ namespace :ttdb do
   desc "This will download all images for current tvshows"
   task :get_images => :environment do
     Tvshow.all.each do |tvshow|
-      next if File.exist?(File.join(Rails.root, "/public/images/", "#{tvshow.ttdb_id}_banner.jpg"))
-      TtdbHelper.get_all_images(tvshow)
+      puts "#{tvshow.title} - creating directories and getting show images"
+      TtdbHelper.get_tvshow_images(tvshow)
+      puts "  Queuing #{tvshow.episodes.count} episode thumb downloads"
+      tvshow.episodes.each do |episode|
+        TtdbHelper.delay(:queue => 'get_images').get_episode_thumb(episode)
+      end
     end
   end
 

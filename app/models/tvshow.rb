@@ -28,6 +28,7 @@ class Tvshow < ActiveRecord::Base
     )
     update_next_episode
     update_latest_episode
+    TtdbHelper.get_tvshow_images(self)
   end
 
   def sync_series
@@ -67,6 +68,7 @@ class Tvshow < ActiveRecord::Base
     removed_ep_ids.each do |ep|
       episodes.find(ep).destroy
     end
+    TtdbHelper.delay(:queue => 'get_images').get_all_episode_thumb(self)
     update_next_episode
     update_latest_episode
   end
@@ -103,6 +105,7 @@ class Tvshow < ActiveRecord::Base
     sync_series
     update_episode_data
     sync_episodes
+
   end
 
   def update_latest_episode

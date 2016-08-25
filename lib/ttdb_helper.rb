@@ -130,8 +130,8 @@ class TtdbHelper
   end
 
   def self.get_tvshow_images(tvshow)
-    tvshow_dir = "public/images/#{tvshow.ttdb_id}/"
-    episode_dir = "public/images/#{tvshow.ttdb_id}/episode/"
+    tvshow_dir = Rails.root + "public/images/#{tvshow.ttdb_id}/"
+    episode_dir = Rails.root + "public/images/#{tvshow.ttdb_id}/episode/"
     FileUtils.mkdir_p(tvshow_dir) unless File.directory?(tvshow_dir)
     FileUtils.mkdir_p(episode_dir) unless File.directory?(episode_dir)
     if tvshow.banner != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_banner.jpg")

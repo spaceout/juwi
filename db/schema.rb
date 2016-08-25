@@ -70,11 +70,11 @@ ActiveRecord::Schema.define(:version => 20151102184343) do
     t.string   "name"
     t.integer  "length"
     t.integer  "bytes_completed"
-    t.boolean  "rename_status",   :limit => 255
+    t.boolean  "rename_status"
     t.string   "rename_data"
     t.integer  "torrent_id"
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   add_index "tfiles", ["torrent_id"], :name => "index_tfiles_on_torrent_id"
@@ -85,11 +85,11 @@ ActiveRecord::Schema.define(:version => 20151102184343) do
     t.datetime "time_completed"
     t.string   "name"
     t.integer  "size"
-    t.integer  "status",         :limit => 255
+    t.integer  "status"
     t.integer  "percent"
     t.boolean  "completed"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
     t.integer  "xmission_id"
     t.integer  "rate_download"
     t.integer  "eta"

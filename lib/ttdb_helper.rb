@@ -135,13 +135,13 @@ class TtdbHelper
     FileUtils.mkdir_p(tvshow_dir) unless File.directory?(tvshow_dir)
     FileUtils.mkdir_p(episode_dir) unless File.directory?(episode_dir)
     if tvshow.banner != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_banner.jpg")
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_banner.jpg"))
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.banner}", File.join(tvshow_dir, "#{tvshow.ttdb_id}_banner.jpg"))
     end
     if tvshow.fanart != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_fanart.jpg")
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_fanart.jpg"))
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.fanart}", File.join(tvshow_dir, "#{tvshow.ttdb_id}_fanart.jpg"))
     end
     if tvshow.poster != nil and not File.exist?("#{tvshow_dir}#{tvshow.ttdb_id}_poster.jpg")
-      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(Rails.root, tvshow_dir, "#{tvshow.ttdb_id}_poster.jpg"))
+      CurlHelper.download_http_data("http://thetvdb.com/banners/#{tvshow.poster}", File.join(tvshow_dir, "#{tvshow.ttdb_id}_poster.jpg"))
     end
   end
 

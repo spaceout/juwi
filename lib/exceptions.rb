@@ -5,18 +5,9 @@
 
 class Exceptions
   def self.process(clean_show_name, season_number, episode_number)
-    if clean_show_name == "csi"
-      clean_show_name = "csi crime scene investigation"
-      puts "Exception found! New show name: #{clean_show_name}"
-    elsif clean_show_name == "agents of s h i e l d"
+    if clean_show_name == "agents of s h i e l d"
       clean_show_name = "marvels agents of s h i e l d"
       puts "Exception found! New show name: #{clean_show_name}"
-    elsif clean_show_name == "american dad"
-      season_number += 1
-      puts "Exception Found! Show name: #{clean_show_name} New season number: #{season_number}"
-    elsif clean_show_name == "eastbound and down"
-      clean_show_name = "eastbound & down"
-      puts "Exception Found! New show name: #{clean_show_name}"
     elsif clean_show_name == "dragons defenders of berk"
       clean_show_name = "dragons riders of berk"
       puts "Exception Found! New show name: #{clean_show_name}"
@@ -29,12 +20,12 @@ class Exceptions
     elsif clean_show_name == "daredevil"
       clean_show_name = "marvels daredevil"
       puts "Exception Found! New show name: #{clean_show_name}"
-    elsif clean_show_name == "houdini and doyle"
-      clean_show_name = "houdini & doyle"
-      puts "Exception Found! New show name: #{clean_show_name}"
     elsif clean_show_name == "marvels avengers ultron revolution"
       clean_show_name = "marvels avengers assemble"
       puts "Exception Found! New show name: #{clean_show_name}"
+    elsif clean_show_name == "treehouse masters"
+      season_number+=1
+      puts "Exception Found! New season number #{season_number}"
     end
     return clean_show_name,season_number,episode_number
   end
